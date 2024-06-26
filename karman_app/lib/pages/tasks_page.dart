@@ -65,9 +65,11 @@ class _TasksPageState extends State<TasksPage> {
             setState(() {
               // Update the task name in Hive
               db.taskList[index][0] = _controller.text;
+              // Clear the controller
+              _controller.clear();
             });
-            Navigator.of(context).pop(); 
-            db.updateDataBase(); 
+            Navigator.of(context).pop();
+            db.updateDataBase();
           },
         );
       },
@@ -86,6 +88,8 @@ class _TasksPageState extends State<TasksPage> {
 
   // Function to create a new task
   void createNewTask() {
+    // clear the controller before opening the dialog
+    _controller.clear();
     showDialog(
       context: context,
       builder: (context) {
@@ -96,6 +100,18 @@ class _TasksPageState extends State<TasksPage> {
         );
       },
     );
+  }
+
+  // Function to reorder tasks
+  void reorderTasks(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final item = db.taskList.removeAt(oldIndex);
+      db.taskList.insert(newIndex, item);
+    });
+    db.updateDataBase();
   }
 
   @override
@@ -125,15 +141,24 @@ class _TasksPageState extends State<TasksPage> {
             size: 32,
           ),
         ),
-        body: ListView.builder(
+        body: ReorderableListView.builder(
+          onReorder: reorderTasks,
           itemCount: db.taskList.length,
           itemBuilder: (context, index) {
             return TaskTile(
+              key: ValueKey(
+                  db.taskList[index]), // Key is required for reordering
               taskName: db.taskList[index][0],
               taskCompleted: db.taskList[index][1],
               onChanged: (value) => checkBoxChanged(value, index),
               onEdit: (context) => editTask(context, index),
               onDelete: (context) => deleteTask(index, context),
+            );
+          },
+          proxyDecorator: (widget, index, animation) {
+            return Material(
+              color: Colors.transparent,
+              child: widget,
             );
           },
         ),
