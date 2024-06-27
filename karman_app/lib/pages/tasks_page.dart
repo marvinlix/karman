@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:karman_app/components/side_drawer.dart';
 import 'package:karman_app/components/task_dialog.dart';
 import 'package:karman_app/components/task_tile.dart';
 import 'package:karman_app/data/database.dart';
@@ -114,7 +115,9 @@ class _TasksPageState extends State<TasksPage> {
           ),
           backgroundColor: Colors.black,
           elevation: 0,
+          iconTheme: IconThemeData(color: Colors.white),
         ),
+        drawer: SideDrawer(),
         floatingActionButton: FloatingActionButton(
           onPressed: createNewTask,
           backgroundColor: Colors.white,
