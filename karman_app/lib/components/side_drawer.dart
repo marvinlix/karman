@@ -103,6 +103,9 @@ class _SideDrawerState extends State<SideDrawer> {
                       widget.db.updateDatabase();
                     });
                   },
+                  onTap: () {
+                    widget.onFolderSelected(folder);
+                  },
                 );
               }).toList(),
             ),

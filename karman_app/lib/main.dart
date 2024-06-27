@@ -5,10 +5,10 @@ import 'package:karman_app/pages/tasks_page.dart';
 import 'package:karman_app/data/database.dart';
 
 void main() async {
-  // Init Hive
+  // init hive
   await Hive.initFlutter();
 
-  // Open the box
+  // open the box
   var box = await Hive.openBox('myBox');
 
   KarmanDataBase db = KarmanDataBase();

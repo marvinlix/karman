@@ -114,14 +114,18 @@ class _TasksPageState extends State<TasksPage> {
           elevation: 0,
           iconTheme: IconThemeData(color: Colors.white),
         ),
-        drawer: SideDrawer(onFolderSelected: (folder) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => TasksPage(folderName: folder, db: widget.db),
-            ),
-          );
-        }, db: widget.db),
+        drawer: SideDrawer(
+          onFolderSelected: (folder) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    TasksPage(folderName: folder, db: widget.db),
+              ),
+            );
+          },
+          db: widget.db,
+        ),
         floatingActionButton: FloatingActionButton(
           onPressed: createNewTask,
           backgroundColor: Colors.white,
