@@ -16,9 +16,9 @@ class TaskDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Color.fromARGB(153, 33, 33, 33),
+      backgroundColor: Color.fromARGB(191, 33, 33, 33),
       content: SizedBox(
-        height: 150,
+        height: 120,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -33,13 +33,17 @@ class TaskDialog extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(50),
-                    borderSide: BorderSide(color: Colors.transparent),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey[800]!),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
                   ),
                 ),
               ),
             ),
+
+            const SizedBox(height: 20),
 
             // cancel and save buttons
             Row(
