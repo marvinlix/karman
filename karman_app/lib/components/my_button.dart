@@ -19,7 +19,9 @@ class MyButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(50),
       ),
       onPressed: onPressed,
-      color: Colors.black,
+      color: Colors.transparent,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      elevation: 0,
       child: Text(
         label,
         style: TextStyle(

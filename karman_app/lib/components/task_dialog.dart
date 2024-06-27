@@ -1,7 +1,3 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables
-
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:karman_app/components/my_button.dart';
 
@@ -20,23 +16,27 @@ class TaskDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Colors.transparent,
-      content: Container(
-        height: 120,
+      backgroundColor: Color.fromARGB(153, 33, 33, 33),
+      content: SizedBox(
+        height: 150,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            // user input field
-            TextField(
-              controller: controller,
-              cursorColor: Colors.white,
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(50),
+            Container(
+              padding: EdgeInsets.symmetric(vertical: 2),
+              child: TextField(
+                controller: controller,
+                cursorColor: Colors.white,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(50),
+                    borderSide: BorderSide(color: Colors.transparent),
+                  ),
                 ),
               ),
             ),
@@ -46,9 +46,15 @@ class TaskDialog extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 MyButton(
-                    label: "Cancel", color: Colors.redAccent, onPressed: onCancel),
+                  label: "Cancel",
+                  color: Colors.redAccent,
+                  onPressed: onCancel,
+                ),
                 MyButton(
-                    label: "Save", color: Colors.lightBlue, onPressed: onSave),
+                  label: "Save",
+                  color: Colors.lightBlue,
+                  onPressed: onSave,
+                ),
               ],
             ),
           ],
