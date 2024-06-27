@@ -6,44 +6,41 @@ import 'package:karman_app/components/task_tile.dart';
 import 'package:karman_app/data/database.dart';
 
 class TasksPage extends StatefulWidget {
-  const TasksPage({super.key});
+  final String folderName;
+  final KarmanDataBase db;
+
+  const TasksPage({super.key, required this.folderName, required this.db});
 
   @override
   State<TasksPage> createState() => _TasksPageState();
 }
 
 class _TasksPageState extends State<TasksPage> {
-  final _myBox = Hive.box('myBox');
-  KarmanDataBase db = KarmanDataBase();
+  List taskList = [];
 
   @override
   void initState() {
-    if (_myBox.get('tasks') == null) {
-      db.createIntialData();
-      db.updateDataBase();
-    } else {
-      db.loadData();
-    }
     super.initState();
-    db.loadData();
+    widget.db.loadData();
+    taskList = widget.db.folders[widget.folderName] ?? [];
   }
 
   final _controller = TextEditingController();
 
   void saveNewTask() {
     setState(() {
-      db.taskList.add([_controller.text, false]);
+      taskList.add([_controller.text, false]);
       _controller.clear();
     });
     Navigator.of(context).pop();
-    db.updateDataBase();
+    widget.db.updateDatabase();
   }
 
   void checkBoxChanged(bool? value, int index) {
     setState(() {
-      db.taskList[index][1] = !db.taskList[index][1];
+      taskList[index][1] = !taskList[index][1];
     });
-    db.updateDataBase();
+    widget.db.updateDatabase();
   }
 
   void editTask(BuildContext context, int index) {
@@ -55,23 +52,23 @@ class _TasksPageState extends State<TasksPage> {
           onCancel: () => Navigator.of(context).pop(),
           onSave: () {
             setState(() {
-              db.taskList[index][0] = _controller.text;
+              taskList[index][0] = _controller.text;
               _controller.clear();
             });
             Navigator.of(context).pop();
-            db.updateDataBase();
+            widget.db.updateDatabase();
           },
         );
       },
     );
-    _controller.text = db.taskList[index][0];
+    _controller.text = taskList[index][0];
   }
 
   void deleteTask(int index, BuildContext context) {
     setState(() {
-      db.taskList.removeAt(index);
+      taskList.removeAt(index);
     });
-    db.updateDataBase();
+    widget.db.updateDatabase();
   }
 
   void createNewTask() {
@@ -93,10 +90,10 @@ class _TasksPageState extends State<TasksPage> {
       if (newIndex > oldIndex) {
         newIndex -= 1;
       }
-      final item = db.taskList.removeAt(oldIndex);
-      db.taskList.insert(newIndex, item);
+      final item = taskList.removeAt(oldIndex);
+      taskList.insert(newIndex, item);
     });
-    db.updateDataBase();
+    widget.db.updateDatabase();
   }
 
   @override
@@ -106,7 +103,7 @@ class _TasksPageState extends State<TasksPage> {
         backgroundColor: Colors.black,
         appBar: AppBar(
           title: Text(
-            'Your Tasks',
+            '${widget.folderName} Tasks',
             style: TextStyle(
               color: Colors.white,
               fontSize: 24,
@@ -117,7 +114,14 @@ class _TasksPageState extends State<TasksPage> {
           elevation: 0,
           iconTheme: IconThemeData(color: Colors.white),
         ),
-        drawer: SideDrawer(),
+        drawer: SideDrawer(onFolderSelected: (folder) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TasksPage(folderName: folder, db: widget.db),
+            ),
+          );
+        }, db: widget.db),
         floatingActionButton: FloatingActionButton(
           onPressed: createNewTask,
           backgroundColor: Colors.white,
@@ -130,12 +134,12 @@ class _TasksPageState extends State<TasksPage> {
         ),
         body: ReorderableListView.builder(
           onReorder: reorderTasks,
-          itemCount: db.taskList.length,
+          itemCount: taskList.length,
           itemBuilder: (context, index) {
             return TaskTile(
-              key: ValueKey(db.taskList[index]),
-              taskName: db.taskList[index][0],
-              taskCompleted: db.taskList[index][1],
+              key: ValueKey(taskList[index]),
+              taskName: taskList[index][0],
+              taskCompleted: taskList[index][1],
               onChanged: (value) => checkBoxChanged(value, index),
               onEdit: (context) => editTask(context, index),
               onDelete: (context) => deleteTask(index, context),
