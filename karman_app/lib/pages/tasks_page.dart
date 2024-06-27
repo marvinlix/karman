@@ -12,28 +12,21 @@ class TasksPage extends StatefulWidget {
 }
 
 class _TasksPageState extends State<TasksPage> {
-  // Reference hive box
   final _myBox = Hive.box('myBox');
-
-  // Instantiation of database
   KarmanDataBase db = KarmanDataBase();
 
-  // initState to load data from the database
   @override
   void initState() {
-    // if first time opening the app, create initial data
     if (_myBox.get('tasks') == null) {
       db.createIntialData();
       db.updateDataBase();
     } else {
-      // there are tasks in the database, load them
       db.loadData();
     }
     super.initState();
     db.loadData();
   }
 
-  // TextEditingController to get user input
   final _controller = TextEditingController();
 
   void saveNewTask() {
@@ -45,7 +38,6 @@ class _TasksPageState extends State<TasksPage> {
     db.updateDataBase();
   }
 
-  // Function to change the state of the checkbox
   void checkBoxChanged(bool? value, int index) {
     setState(() {
       db.taskList[index][1] = !db.taskList[index][1];
@@ -53,7 +45,6 @@ class _TasksPageState extends State<TasksPage> {
     db.updateDataBase();
   }
 
-  // Function to edit a task
   void editTask(BuildContext context, int index) {
     showDialog(
       context: context,
@@ -63,9 +54,7 @@ class _TasksPageState extends State<TasksPage> {
           onCancel: () => Navigator.of(context).pop(),
           onSave: () {
             setState(() {
-              // Update the task name in Hive
               db.taskList[index][0] = _controller.text;
-              // Clear the controller
               _controller.clear();
             });
             Navigator.of(context).pop();
@@ -74,11 +63,9 @@ class _TasksPageState extends State<TasksPage> {
         );
       },
     );
-    // Set the initial text of the controller to the current task name
     _controller.text = db.taskList[index][0];
   }
 
-  // Function to delete a task
   void deleteTask(int index, BuildContext context) {
     setState(() {
       db.taskList.removeAt(index);
@@ -86,9 +73,7 @@ class _TasksPageState extends State<TasksPage> {
     db.updateDataBase();
   }
 
-  // Function to create a new task
   void createNewTask() {
-    // clear the controller before opening the dialog
     _controller.clear();
     showDialog(
       context: context,
@@ -102,7 +87,6 @@ class _TasksPageState extends State<TasksPage> {
     );
   }
 
-  // Function to reorder tasks
   void reorderTasks(int oldIndex, int newIndex) {
     setState(() {
       if (newIndex > oldIndex) {
@@ -146,8 +130,7 @@ class _TasksPageState extends State<TasksPage> {
           itemCount: db.taskList.length,
           itemBuilder: (context, index) {
             return TaskTile(
-              key: ValueKey(
-                  db.taskList[index]), // Key is required for reordering
+              key: ValueKey(db.taskList[index]),
               taskName: db.taskList[index][0],
               taskCompleted: db.taskList[index][1],
               onChanged: (value) => checkBoxChanged(value, index),
@@ -156,9 +139,13 @@ class _TasksPageState extends State<TasksPage> {
             );
           },
           proxyDecorator: (widget, index, animation) {
-            return Material(
-              color: Colors.transparent,
-              child: widget,
+            return Transform.scale(
+              scale: 1.03,
+              child: Material(
+                color: Colors.black,
+                elevation: 0,
+                child: widget,
+              ),
             );
           },
         ),
