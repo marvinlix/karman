@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:karman_app/data/database.dart';
 import 'package:karman_app/pages/habits_page.dart';
 import 'package:karman_app/pages/pomodoro_page.dart';
 import 'package:karman_app/pages/settings_page.dart';
 import 'package:karman_app/pages/tasks_page.dart';
 import 'package:karman_app/pages/zen_page.dart';
+import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class HomePage extends StatefulWidget {
   final KarmanDataBase db;
@@ -45,10 +47,11 @@ class _HomePageState extends State<HomePage> {
     ];
   }
 
-  void _onItemTapped(int index) {
+  _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+    return _selectedIndex;
   }
 
   @override
@@ -56,35 +59,45 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Tasks',
+      bottomNavigationBar: SafeArea(
+        child: GNav(
+          backgroundColor: Colors.black,
+          activeColor: Colors.white,
+          color: Colors.white,
+          tabBackgroundColor: Colors.grey.shade900,
+          gap: 8,
+          padding: EdgeInsets.all(10),
+          textStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.check),
-            label: 'Habits',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.timer),
-            label: 'Pomodoro',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.self_improvement),
-            label: 'Zen',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.grey[700],
-        onTap: _onItemTapped,
+          iconSize: 30,
+          haptic: true,
+          tabs:  const [
+            GButton(
+              icon: Icons.list,
+              text: 'Tasks',
+            ),
+            GButton(
+              icon: Icons.check,
+              text: 'Habits',
+            ),
+            GButton(
+              icon: Icons.timer,
+              text: 'Pomodoro',
+            ),
+            GButton(
+              icon: Icons.self_improvement,
+              text: 'Zen',
+            ),
+            GButton(
+              icon: Icons.settings,
+              text: 'Settings',
+            ),
+          ],
+          selectedIndex: _onItemTapped(0),
+        ),
       ),
     );
   }

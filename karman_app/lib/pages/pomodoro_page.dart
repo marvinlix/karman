@@ -12,9 +12,21 @@ class _PomodoroPageState extends State<PomodoroPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pomodoro'),
+        backgroundColor: Colors.black,
       ),
-      body: const Placeholder(),
+      body: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: Center(
+            child: Text(
+              'Pomodoro Page',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      )
     );
   }
 }

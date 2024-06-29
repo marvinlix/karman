@@ -12,9 +12,21 @@ class _ZenPageState extends State<ZenPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zen'),
+        backgroundColor: Colors.black,
       ),
-      body: const Placeholder(),
+      body: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: Center(
+            child: Text(
+              'Zen Page',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      )
     );
   }
 }

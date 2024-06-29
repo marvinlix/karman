@@ -126,14 +126,19 @@ class _TasksPageState extends State<TasksPage> {
           },
           db: widget.db,
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: createNewTask,
-          backgroundColor: Colors.white,
-          shape: CircleBorder(),
-          child: Icon(
-            Icons.add_rounded,
-            color: Colors.black,
-            size: 32,
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 10.0),
+          child: FloatingActionButton(
+            onPressed: createNewTask,
+            backgroundColor: Colors.white,
+            shape: CircleBorder(),
+            elevation: 0,
+            enableFeedback: true,
+            child: Icon(
+              Icons.add_rounded,
+              color: Colors.black,
+              size: 32,
+            ),
           ),
         ),
         body: ReorderableListView.builder(
