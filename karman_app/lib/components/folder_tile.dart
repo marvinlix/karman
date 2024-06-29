@@ -20,7 +20,7 @@ class FolderTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,  // Add this line
+      onTap: onTap,  
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Slidable(

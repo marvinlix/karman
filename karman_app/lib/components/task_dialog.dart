@@ -16,7 +16,7 @@ class TaskDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Color.fromARGB(191, 33, 33, 33),
+      backgroundColor: Colors.grey[900],
       content: SizedBox(
         height: 120,
         child: Column(

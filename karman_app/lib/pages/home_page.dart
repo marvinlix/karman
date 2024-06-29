@@ -6,7 +6,6 @@ import 'package:karman_app/pages/pomodoro_page.dart';
 import 'package:karman_app/pages/settings_page.dart';
 import 'package:karman_app/pages/tasks_page.dart';
 import 'package:karman_app/pages/zen_page.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
 class HomePage extends StatefulWidget {
   final KarmanDataBase db;
@@ -96,7 +95,7 @@ class _HomePageState extends State<HomePage> {
               text: 'Settings',
             ),
           ],
-          selectedIndex: _onItemTapped(0),
+          onTabChange: _onItemTapped,
         ),
       ),
     );
