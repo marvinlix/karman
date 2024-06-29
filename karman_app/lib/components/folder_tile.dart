@@ -47,7 +47,7 @@ class FolderTile extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.black,
+              color: Colors.grey[900]!,
               border: Border(
                 bottom: BorderSide(
                   color: Colors.grey[700]!,
