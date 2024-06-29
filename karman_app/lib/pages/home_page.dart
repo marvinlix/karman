@@ -46,57 +46,47 @@ class _HomePageState extends State<HomePage> {
     ];
   }
 
-  _onItemTapped(int index) {
+  void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
-    return _selectedIndex;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
       body: _pages[_selectedIndex],
-      bottomNavigationBar: SafeArea(
-        child: GNav(
-          backgroundColor: Colors.black,
-          activeColor: Colors.white,
-          color: Colors.white,
-          tabBackgroundColor: Colors.grey.shade900,
-          gap: 8,
-          padding: EdgeInsets.all(10),
-          textStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+      backgroundColor: Colors.black,
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        elevation: 0,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.checklist),
+            label: 'Tasks',
           ),
-          iconSize: 30,
-          haptic: true,
-          tabs:  const [
-            GButton(
-              icon: Icons.list,
-              text: 'Tasks',
-            ),
-            GButton(
-              icon: Icons.check,
-              text: 'Habits',
-            ),
-            GButton(
-              icon: Icons.timer,
-              text: 'Pomodoro',
-            ),
-            GButton(
-              icon: Icons.self_improvement,
-              text: 'Zen',
-            ),
-            GButton(
-              icon: Icons.settings,
-              text: 'Settings',
-            ),
-          ],
-          onTabChange: _onItemTapped,
-        ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check),
+            label: 'Habits',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.timer),
+            label: 'Pomodoro',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.self_improvement),
+            label: 'Zen',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
       ),
     );
   }
