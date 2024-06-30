@@ -29,14 +29,14 @@ class FolderTile extends StatelessWidget {
             children: [
               SlidableAction(
                 onPressed: onEdit,
-                backgroundColor: Colors.black,
+                backgroundColor: Colors.transparent,
                 foregroundColor: Colors.blueAccent,
                 icon: CupertinoIcons.pen,
                 label: 'Edit',
               ),
               SlidableAction(
                 onPressed: onDelete,
-                backgroundColor: Colors.black,
+                backgroundColor: Colors.transparent,
                 foregroundColor: Colors.redAccent,
                 icon: CupertinoIcons.delete,
                 label: 'Delete',
