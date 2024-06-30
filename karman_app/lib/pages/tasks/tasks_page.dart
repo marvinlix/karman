@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:karman_app/components/dialog_window.dart';
-import 'package:karman_app/components/task_tile.dart';
+import 'package:karman_app/pages/tasks/task_tile.dart';
 import 'package:karman_app/components/folder_drawer.dart';
 
 class TasksPage extends StatefulWidget {
