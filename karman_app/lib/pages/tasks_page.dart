@@ -1,157 +1,226 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import 'package:karman_app/components/side_drawer.dart';
-import 'package:karman_app/components/task_dialog.dart';
+import 'package:karman_app/components/dialog_window.dart';
 import 'package:karman_app/components/task_tile.dart';
-import 'package:karman_app/data/database.dart';
+import 'package:karman_app/components/folder_drawer.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({super.key});
 
   @override
-  State<TasksPage> createState() => _TasksPageState();
+  _TasksPageState createState() => _TasksPageState();
 }
 
 class _TasksPageState extends State<TasksPage> {
-  final _myBox = Hive.box('myBox');
-  KarmanDataBase db = KarmanDataBase();
+  String currentFolder = 'Default';
+  List<String> folders = ['Default'];
+  Map<String, List<Map<String, dynamic>>> folderTasks = {
+    'Default': [
+      {'name': 'Task 1', 'completed': false},
+      {'name': 'Task 2', 'completed': true},
+    ],
+  };
 
-  @override
-  void initState() {
-    if (_myBox.get('tasks') == null) {
-      db.createIntialData();
-      db.updateDataBase();
-    } else {
-      db.loadData();
-    }
-    super.initState();
-    db.loadData();
-  }
+  final TextEditingController _taskController = TextEditingController();
+  final TextEditingController _folderController = TextEditingController();
 
-  final _controller = TextEditingController();
-
-  void saveNewTask() {
+  void _toggleTaskCompletion(int index, bool? value) {
     setState(() {
-      db.taskList.add([_controller.text, false]);
-      _controller.clear();
+      folderTasks[currentFolder]![index]['completed'] = value!;
     });
-    Navigator.of(context).pop();
-    db.updateDataBase();
   }
 
-  void checkBoxChanged(bool? value, int index) {
-    setState(() {
-      db.taskList[index][1] = !db.taskList[index][1];
-    });
-    db.updateDataBase();
-  }
-
-  void editTask(BuildContext context, int index) {
-    showDialog(
+  void _editTask(BuildContext context, int index) {
+    _taskController.text = folderTasks[currentFolder]![index]['name'];
+    showCupertinoDialog(
       context: context,
       builder: (context) {
         return TaskDialog(
-          controller: _controller,
-          onCancel: () => Navigator.of(context).pop(),
+          controller: _taskController,
           onSave: () {
             setState(() {
-              db.taskList[index][0] = _controller.text;
-              _controller.clear();
+              folderTasks[currentFolder]![index]['name'] = _taskController.text;
+              _taskController.clear();
             });
             Navigator.of(context).pop();
-            db.updateDataBase();
+          },
+          onCancel: () {
+            _taskController.clear();
+            Navigator.of(context).pop();
+          },
+          initialText: folderTasks[currentFolder]![index]['name'],
+        );
+      },
+    );
+  }
+
+  void _deleteTask(BuildContext context, int index) {
+    setState(() {
+      folderTasks[currentFolder]!.removeAt(index);
+    });
+  }
+
+  void _addTask() {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) {
+        return TaskDialog(
+          controller: _taskController,
+          onSave: () {
+            setState(() {
+              folderTasks[currentFolder]!
+                  .add({'name': _taskController.text, 'completed': false});
+              _taskController.clear();
+            });
+            Navigator.of(context).pop();
+          },
+          onCancel: () {
+            _taskController.clear();
+            Navigator.of(context).pop();
           },
         );
       },
     );
-    _controller.text = db.taskList[index][0];
   }
 
-  void deleteTask(int index, BuildContext context) {
+  void _addFolder() {
     setState(() {
-      db.taskList.removeAt(index);
+      String newFolder = _folderController.text;
+      folders.add(newFolder);
+      folderTasks[newFolder] = [];
+      _folderController.clear();
+
+      // Automatically select the newly created folder if no folder was selected
+      if (folders.length == 1) {
+        currentFolder = newFolder;
+      }
     });
-    db.updateDataBase();
   }
 
-  void createNewTask() {
-    _controller.clear();
-    showDialog(
+  void _editFolder(BuildContext context, int index) {
+    _folderController.text = folders[index];
+    showCupertinoDialog(
       context: context,
       builder: (context) {
         return TaskDialog(
-          controller: _controller,
-          onCancel: () => Navigator.of(context).pop(),
-          onSave: saveNewTask,
+          controller: _folderController,
+          onSave: () {
+            setState(() {
+              String oldFolder = folders[index];
+              String newFolder = _folderController.text;
+              folders[index] = newFolder;
+              folderTasks[newFolder] = folderTasks.remove(oldFolder)!;
+              if (currentFolder == oldFolder) {
+                currentFolder = newFolder;
+              }
+              _folderController.clear();
+            });
+            Navigator.of(context).pop();
+          },
+          onCancel: () {
+            _folderController.clear();
+            Navigator.of(context).pop();
+          },
+          initialText: folders[index],
         );
       },
     );
   }
 
-  void reorderTasks(int oldIndex, int newIndex) {
+  void _deleteFolder(BuildContext context, int index) {
     setState(() {
-      if (newIndex > oldIndex) {
-        newIndex -= 1;
+      String folder = folders.removeAt(index);
+      folderTasks.remove(folder);
+      if (currentFolder == folder) {
+        currentFolder = folders.isNotEmpty ? folders[0] : 'Default';
       }
-      final item = db.taskList.removeAt(oldIndex);
-      db.taskList.insert(newIndex, item);
     });
-    db.updateDataBase();
+  }
+
+  void _openDrawer() {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return FolderDrawer(
+          folders: folders,
+          onFolderSelected: (folder) {
+            setState(() {
+              currentFolder = folder;
+            });
+          },
+          controller: _folderController,
+          onCreateFolder: _addFolder,
+          onEditFolder: (context, index) {
+            _editFolder(context, index);
+            setState(() {});
+          },
+          onDeleteFolder: (context, index) {
+            _deleteFolder(context, index);
+            setState(() {});
+          },
+        );
+      },
+    );
+  }
+
+  String getAppbarTitle() {
+    if (folders.isEmpty) {
+      return '¯\\_(ツ)_/¯'; // Shrugging emoticon when no folders exist
+    } else {
+      return currentFolder;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
         backgroundColor: Colors.black,
-        appBar: AppBar(
-          title: Text(
-            'Your Tasks',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          backgroundColor: Colors.black,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.white),
-        ),
-        drawer: SideDrawer(),
-        floatingActionButton: FloatingActionButton(
-          onPressed: createNewTask,
-          backgroundColor: Colors.white,
-          shape: CircleBorder(),
+        middle: Text(getAppbarTitle()),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          onPressed: _openDrawer,
           child: Icon(
-            Icons.add_rounded,
-            color: Colors.black,
-            size: 32,
+            CupertinoIcons.square_stack,
+            color: CupertinoColors.white,
           ),
         ),
-        body: ReorderableListView.builder(
-          onReorder: reorderTasks,
-          itemCount: db.taskList.length,
-          itemBuilder: (context, index) {
-            return TaskTile(
-              key: ValueKey(db.taskList[index]),
-              taskName: db.taskList[index][0],
-              taskCompleted: db.taskList[index][1],
-              onChanged: (value) => checkBoxChanged(value, index),
-              onEdit: (context) => editTask(context, index),
-              onDelete: (context) => deleteTask(index, context),
-            );
-          },
-          proxyDecorator: (widget, index, animation) {
-            return Transform.scale(
-              scale: 1.03,
-              child: Material(
-                color: Colors.black,
-                elevation: 0,
-                child: widget,
+        trailing: folders.isEmpty
+            ? null // Disable trailing button when no folders are present
+            : CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: _addTask,
+                child: Icon(
+                  CupertinoIcons.plus,
+                  color: CupertinoColors.white,
+                ),
               ),
-            );
-          },
-        ),
+      ),
+      child: SafeArea(
+        child: folders.isEmpty
+            ? Center(
+                child: Text(
+                  'No folders? Create one!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            : ListView.builder(
+                padding: EdgeInsets.all(16.0),
+                itemCount: folderTasks[currentFolder]!.length,
+                itemBuilder: (context, index) {
+                  return TaskTile(
+                    taskName: folderTasks[currentFolder]![index]['name'],
+                    taskCompleted: folderTasks[currentFolder]![index]
+                        ['completed'],
+                    onChanged: (value) => _toggleTaskCompletion(index, value),
+                    onEdit: (context) => _editTask(context, index),
+                    onDelete: (context) => _deleteTask(context, index),
+                  );
+                },
+              ),
       ),
     );
   }
