@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:karman_app/data/database.dart';
 import 'package:karman_app/pages/habits_page.dart';
 import 'package:karman_app/pages/pomodoro_page.dart';
