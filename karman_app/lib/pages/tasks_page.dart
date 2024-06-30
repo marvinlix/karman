@@ -5,6 +5,8 @@ import 'package:karman_app/components/task_tile.dart';
 import 'package:karman_app/components/folder_drawer.dart';
 
 class TasksPage extends StatefulWidget {
+  const TasksPage({super.key});
+
   @override
   _TasksPageState createState() => _TasksPageState();
 }
@@ -89,6 +91,46 @@ class _TasksPageState extends State<TasksPage> {
     });
   }
 
+  void _editFolder(BuildContext context, int index) {
+    _folderController.text = folders[index];
+    showCupertinoDialog(
+      context: context,
+      builder: (context) {
+        return TaskDialog(
+          controller: _folderController,
+          onSave: () {
+            setState(() {
+              String oldFolder = folders[index];
+              String newFolder = _folderController.text;
+              folders[index] = newFolder;
+              folderTasks[newFolder] = folderTasks.remove(oldFolder)!;
+              if (currentFolder == oldFolder) {
+                currentFolder = newFolder;
+              }
+              _folderController.clear();
+            });
+            Navigator.of(context).pop();
+          },
+          onCancel: () {
+            _folderController.clear();
+            Navigator.of(context).pop();
+          },
+          initialText: folders[index],
+        );
+      },
+    );
+  }
+
+  void _deleteFolder(BuildContext context, int index) {
+    setState(() {
+      String folder = folders.removeAt(index);
+      folderTasks.remove(folder);
+      if (currentFolder == folder) {
+        currentFolder = folders.isNotEmpty ? folders[0] : 'Default';
+      }
+    });
+  }
+
   void _openDrawer() {
     showCupertinoModalPopup(
       context: context,
@@ -102,6 +144,14 @@ class _TasksPageState extends State<TasksPage> {
           },
           controller: _folderController,
           onCreateFolder: _addFolder,
+          onEditFolder: (context, index) {
+            _editFolder(context, index);
+            setState(() {}); // Ensure state is updated after editing
+          },
+          onDeleteFolder: (context, index) {
+            _deleteFolder(context, index);
+            setState(() {}); // Ensure state is updated after deleting
+          },
         );
       },
     );
@@ -115,19 +165,19 @@ class _TasksPageState extends State<TasksPage> {
         middle: Text(currentFolder),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
+          onPressed: _openDrawer,
           child: Icon(
             CupertinoIcons.square_stack,
             color: CupertinoColors.white,
           ),
-          onPressed: _openDrawer,
         ),
         trailing: CupertinoButton(
           padding: EdgeInsets.zero,
+          onPressed: _addTask,
           child: Icon(
             CupertinoIcons.plus,
             color: CupertinoColors.white,
           ),
-          onPressed: _addTask,
         ),
       ),
       child: SafeArea(

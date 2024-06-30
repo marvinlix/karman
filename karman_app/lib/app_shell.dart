@@ -10,6 +10,7 @@ class AppShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
+        backgroundColor: CupertinoColors.black,
         activeColor: CupertinoColors.white,
         items: const [
           BottomNavigationBarItem(
