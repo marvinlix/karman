@@ -85,9 +85,15 @@ class _TasksPageState extends State<TasksPage> {
 
   void _addFolder() {
     setState(() {
-      folders.add(_folderController.text);
-      folderTasks[_folderController.text] = [];
+      String newFolder = _folderController.text;
+      folders.add(newFolder);
+      folderTasks[newFolder] = [];
       _folderController.clear();
+
+      // Automatically select the newly created folder if no folder was selected
+      if (folders.length == 1) {
+        currentFolder = newFolder;
+      }
     });
   }
 
@@ -146,15 +152,23 @@ class _TasksPageState extends State<TasksPage> {
           onCreateFolder: _addFolder,
           onEditFolder: (context, index) {
             _editFolder(context, index);
-            setState(() {}); // Ensure state is updated after editing
+            setState(() {});
           },
           onDeleteFolder: (context, index) {
             _deleteFolder(context, index);
-            setState(() {}); // Ensure state is updated after deleting
+            setState(() {});
           },
         );
       },
     );
+  }
+
+  String getAppbarTitle() {
+    if (folders.isEmpty) {
+      return '¯\\_(ツ)_/¯'; // Shrugging emoticon when no folders exist
+    } else {
+      return currentFolder;
+    }
   }
 
   @override
@@ -162,7 +176,7 @@ class _TasksPageState extends State<TasksPage> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         backgroundColor: Colors.black,
-        middle: Text(currentFolder),
+        middle: Text(getAppbarTitle()),
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
           onPressed: _openDrawer,
@@ -171,29 +185,42 @@ class _TasksPageState extends State<TasksPage> {
             color: CupertinoColors.white,
           ),
         ),
-        trailing: CupertinoButton(
-          padding: EdgeInsets.zero,
-          onPressed: _addTask,
-          child: Icon(
-            CupertinoIcons.plus,
-            color: CupertinoColors.white,
-          ),
-        ),
+        trailing: folders.isEmpty
+            ? null // Disable trailing button when no folders are present
+            : CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: _addTask,
+                child: Icon(
+                  CupertinoIcons.plus,
+                  color: CupertinoColors.white,
+                ),
+              ),
       ),
       child: SafeArea(
-        child: ListView.builder(
-          padding: EdgeInsets.all(16.0),
-          itemCount: folderTasks[currentFolder]!.length,
-          itemBuilder: (context, index) {
-            return TaskTile(
-              taskName: folderTasks[currentFolder]![index]['name'],
-              taskCompleted: folderTasks[currentFolder]![index]['completed'],
-              onChanged: (value) => _toggleTaskCompletion(index, value),
-              onEdit: (context) => _editTask(context, index),
-              onDelete: (context) => _deleteTask(context, index),
-            );
-          },
-        ),
+        child: folders.isEmpty
+            ? Center(
+                child: Text(
+                  'No folders? Create one!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            : ListView.builder(
+                padding: EdgeInsets.all(16.0),
+                itemCount: folderTasks[currentFolder]!.length,
+                itemBuilder: (context, index) {
+                  return TaskTile(
+                    taskName: folderTasks[currentFolder]![index]['name'],
+                    taskCompleted: folderTasks[currentFolder]![index]
+                        ['completed'],
+                    onChanged: (value) => _toggleTaskCompletion(index, value),
+                    onEdit: (context) => _editTask(context, index),
+                    onDelete: (context) => _deleteTask(context, index),
+                  );
+                },
+              ),
       ),
     );
   }
