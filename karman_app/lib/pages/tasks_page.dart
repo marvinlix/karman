@@ -1,166 +1,146 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:karman_app/components/side_drawer.dart';
-import 'package:karman_app/components/task_dialog.dart';
+import 'package:karman_app/components/dialog_window.dart';
 import 'package:karman_app/components/task_tile.dart';
-import 'package:karman_app/data/database.dart';
+import 'package:karman_app/components/folder_drawer.dart';
 
 class TasksPage extends StatefulWidget {
-  final String folderName;
-  final KarmanDataBase db;
-
-  const TasksPage({super.key, required this.folderName, required this.db});
-
   @override
-  State<TasksPage> createState() => _TasksPageState();
+  _TasksPageState createState() => _TasksPageState();
 }
 
 class _TasksPageState extends State<TasksPage> {
-  List taskList = [];
+  String currentFolder = 'Default';
+  List<String> folders = ['Default'];
+  Map<String, List<Map<String, dynamic>>> folderTasks = {
+    'Default': [
+      {'name': 'Task 1', 'completed': false},
+      {'name': 'Task 2', 'completed': true},
+    ],
+  };
 
-  @override
-  void initState() {
-    super.initState();
-    widget.db.loadData();
-    taskList = widget.db.folders[widget.folderName] ?? [];
-  }
+  final TextEditingController _taskController = TextEditingController();
+  final TextEditingController _folderController = TextEditingController();
 
-  final _controller = TextEditingController();
-
-  void saveNewTask() {
+  void _toggleTaskCompletion(int index, bool? value) {
     setState(() {
-      taskList.add([_controller.text, false]);
-      _controller.clear();
+      folderTasks[currentFolder]![index]['completed'] = value!;
     });
-    Navigator.of(context).pop();
-    widget.db.updateDatabase();
   }
 
-  void checkBoxChanged(bool? value, int index) {
-    setState(() {
-      taskList[index][1] = !taskList[index][1];
-    });
-    widget.db.updateDatabase();
-  }
-
-  void editTask(BuildContext context, int index) {
-    showDialog(
+  void _editTask(BuildContext context, int index) {
+    _taskController.text = folderTasks[currentFolder]![index]['name'];
+    showCupertinoDialog(
       context: context,
       builder: (context) {
         return TaskDialog(
-          controller: _controller,
-          onCancel: () => Navigator.of(context).pop(),
+          controller: _taskController,
           onSave: () {
             setState(() {
-              taskList[index][0] = _controller.text;
-              _controller.clear();
+              folderTasks[currentFolder]![index]['name'] = _taskController.text;
+              _taskController.clear();
             });
             Navigator.of(context).pop();
-            widget.db.updateDatabase();
+          },
+          onCancel: () {
+            _taskController.clear();
+            Navigator.of(context).pop();
+          },
+          initialText: folderTasks[currentFolder]![index]['name'],
+        );
+      },
+    );
+  }
+
+  void _deleteTask(BuildContext context, int index) {
+    setState(() {
+      folderTasks[currentFolder]!.removeAt(index);
+    });
+  }
+
+  void _addTask() {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) {
+        return TaskDialog(
+          controller: _taskController,
+          onSave: () {
+            setState(() {
+              folderTasks[currentFolder]!
+                  .add({'name': _taskController.text, 'completed': false});
+              _taskController.clear();
+            });
+            Navigator.of(context).pop();
+          },
+          onCancel: () {
+            _taskController.clear();
+            Navigator.of(context).pop();
           },
         );
       },
     );
-    _controller.text = taskList[index][0];
   }
 
-  void deleteTask(int index, BuildContext context) {
+  void _addFolder() {
     setState(() {
-      taskList.removeAt(index);
+      folders.add(_folderController.text);
+      folderTasks[_folderController.text] = [];
+      _folderController.clear();
     });
-    widget.db.updateDatabase();
   }
 
-  void createNewTask() {
-    _controller.clear();
-    showDialog(
+  void _openDrawer() {
+    showCupertinoModalPopup(
       context: context,
       builder: (context) {
-        return TaskDialog(
-          controller: _controller,
-          onCancel: () => Navigator.of(context).pop(),
-          onSave: saveNewTask,
+        return FolderDrawer(
+          folders: folders,
+          onFolderSelected: (folder) {
+            setState(() {
+              currentFolder = folder;
+            });
+          },
+          controller: _folderController,
+          onCreateFolder: _addFolder,
         );
       },
     );
-  }
-
-  void reorderTasks(int oldIndex, int newIndex) {
-    setState(() {
-      if (newIndex > oldIndex) {
-        newIndex -= 1;
-      }
-      final item = taskList.removeAt(oldIndex);
-      taskList.insert(newIndex, item);
-    });
-    widget.db.updateDatabase();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
         backgroundColor: Colors.black,
-        appBar: AppBar(
-          title: Text(
-            '${widget.folderName} Tasks',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+        middle: Text(currentFolder),
+        leading: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Icon(
+            CupertinoIcons.square_stack,
+            color: CupertinoColors.white,
           ),
-          backgroundColor: Colors.black,
-          elevation: 0,
-          iconTheme: IconThemeData(color: Colors.white),
+          onPressed: _openDrawer,
         ),
-        drawer: SideDrawer(
-          onFolderSelected: (folder) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    TasksPage(folderName: folder, db: widget.db),
-              ),
-            );
-          },
-          db: widget.db,
-        ),
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 10.0),
-          child: FloatingActionButton(
-            onPressed: createNewTask,
-            backgroundColor: Colors.white,
-            shape: CircleBorder(),
-            elevation: 0,
-            enableFeedback: true,
-            child: Icon(
-              Icons.add_rounded,
-              color: Colors.black,
-              size: 32,
-            ),
+        trailing: CupertinoButton(
+          padding: EdgeInsets.zero,
+          child: Icon(
+            CupertinoIcons.plus,
+            color: CupertinoColors.white,
           ),
+          onPressed: _addTask,
         ),
-        body: ReorderableListView.builder(
-          onReorder: reorderTasks,
-          itemCount: taskList.length,
+      ),
+      child: SafeArea(
+        child: ListView.builder(
+          padding: EdgeInsets.all(16.0),
+          itemCount: folderTasks[currentFolder]!.length,
           itemBuilder: (context, index) {
             return TaskTile(
-              key: ValueKey(taskList[index]),
-              taskName: taskList[index][0],
-              taskCompleted: taskList[index][1],
-              onChanged: (value) => checkBoxChanged(value, index),
-              onEdit: (context) => editTask(context, index),
-              onDelete: (context) => deleteTask(index, context),
-            );
-          },
-          proxyDecorator: (widget, index, animation) {
-            return Transform.scale(
-              scale: 1.03,
-              child: Material(
-                color: Colors.black,
-                elevation: 0,
-                child: widget,
-              ),
+              taskName: folderTasks[currentFolder]![index]['name'],
+              taskCompleted: folderTasks[currentFolder]![index]['completed'],
+              onChanged: (value) => _toggleTaskCompletion(index, value),
+              onEdit: (context) => _editTask(context, index),
+              onDelete: (context) => _deleteTask(context, index),
             );
           },
         ),

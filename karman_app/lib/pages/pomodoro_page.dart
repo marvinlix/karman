@@ -1,32 +1,17 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 
-class PomodoroPage extends StatefulWidget {
+class PomodoroPage extends StatelessWidget {
   const PomodoroPage({super.key});
 
   @override
-  State<PomodoroPage> createState() => _PomodoroPageState();
-}
-
-class _PomodoroPageState extends State<PomodoroPage> {
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
+    return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        middle: Text('Pomodoro'),
       ),
-      body: SafeArea(
-        child: Scaffold(
-          backgroundColor: Colors.black,
-          body: Center(
-            child: Text(
-              'Pomodoro Page',
-              style: TextStyle(
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      )
+      child: Center(
+        child: Text('Pomodoro Page'),
+      ),
     );
   }
 }
