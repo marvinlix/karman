@@ -82,7 +82,7 @@ class TaskTile extends StatelessWidget {
                         taskName,
                         style: TextStyle(
                           color: taskCompleted
-                              ? const Color.fromARGB(230, 158, 158, 158)
+                              ? Colors.grey[700]
                               : Colors.white,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
