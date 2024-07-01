@@ -1,12 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:karman_app/components/date_time/date_button.dart';
+import 'package:karman_app/components/date_time/time_button.dart';
 
 class TaskDetailsSheet extends StatefulWidget {
   final String taskName;
   final String initialNote;
   final DateTime? initialDueDate;
   final String initialPriority;
-  final Function(String, DateTime?, String) onSave;
+  final DateTime? initialReminderDate;
+  final TimeOfDay? initialReminderTime;
+  final Function(String, DateTime?, String, DateTime?, TimeOfDay?) onSave;
 
   const TaskDetailsSheet({
     super.key,
@@ -14,6 +18,8 @@ class TaskDetailsSheet extends StatefulWidget {
     required this.initialNote,
     required this.initialDueDate,
     required this.initialPriority,
+    this.initialReminderDate,
+    this.initialReminderTime,
     required this.onSave,
   });
 
@@ -25,6 +31,8 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   late TextEditingController _noteController;
   late DateTime? _dueDate;
   late String _priority;
+  late DateTime? _reminderDate;
+  late TimeOfDay? _reminderTime;
 
   @override
   void initState() {
@@ -32,6 +40,8 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
     _noteController = TextEditingController(text: widget.initialNote);
     _dueDate = widget.initialDueDate;
     _priority = widget.initialPriority;
+    _reminderDate = widget.initialReminderDate;
+    _reminderTime = widget.initialReminderTime;
   }
 
   @override
@@ -41,7 +51,8 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   }
 
   void _saveChanges() {
-    widget.onSave(_noteController.text, _dueDate, _priority);
+    widget.onSave(_noteController.text, _dueDate, _priority, _reminderDate,
+        _reminderTime);
     Navigator.of(context).pop();
   }
 
@@ -109,7 +120,8 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                           placeholder: 'Add a note...',
                           style: TextStyle(color: Colors.white),
                           decoration: BoxDecoration(
-                            color: CupertinoColors.tertiarySystemBackground.darkColor,
+                            color: CupertinoColors
+                                .tertiarySystemBackground.darkColor,
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
@@ -119,18 +131,12 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                         SizedBox(height: 10),
-                        CupertinoButton(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          color: CupertinoColors.tertiarySystemBackground.darkColor,
-                          child: Text(
-                            _dueDate == null
-                                ? 'Select Due Date'
-                                : '${_dueDate!.day}/${_dueDate!.month}/${_dueDate!.year}',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          onPressed: () {
-                            _showDatePicker(context);
+                        DateButton(
+                          selectedDate: _dueDate,
+                          onDateSelected: (date) {
+                            setState(() {
+                              _dueDate = date;
+                            });
                           },
                         ),
                         SizedBox(height: 20),
@@ -145,6 +151,37 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                             _buildPriorityOption('Low', Colors.green),
                             _buildPriorityOption('Medium', Colors.yellow),
                             _buildPriorityOption('High', Colors.red),
+                          ],
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Reminder:',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DateButton(
+                                selectedDate: _reminderDate,
+                                onDateSelected: (date) {
+                                  setState(() {
+                                    _reminderDate = date;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: TimeButton(
+                                selectedTime: _reminderTime,
+                                onTimeSelected: (time) {
+                                  setState(() {
+                                    _reminderTime = time;
+                                  });
+                                },
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -198,36 +235,6 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showDatePicker(BuildContext context) {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (_) => Container(
-        height: 300,
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: Column(
-          children: [
-            Container(
-              height: 240,
-              child: CupertinoDatePicker(
-                initialDateTime: _dueDate ?? DateTime.now(),
-                mode: CupertinoDatePickerMode.date,
-                onDateTimeChanged: (dateTime) {
-                  setState(() {
-                    _dueDate = dateTime;
-                  });
-                },
-              ),
-            ),
-            CupertinoButton(
-              child: Text('OK'),
-              onPressed: () => Navigator.of(context).pop(),
-            )
-          ],
-        ),
       ),
     );
   }

@@ -1,3 +1,5 @@
+// tasks_page.dart
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:karman_app/components/dialog_window.dart';
@@ -6,7 +8,7 @@ import 'package:karman_app/pages/tasks/task_tile.dart';
 import 'package:karman_app/components/folder_drawer.dart';
 
 class TasksPage extends StatefulWidget {
-  const TasksPage({super.key});
+  const TasksPage({Key? key}) : super(key: key);
 
   @override
   _TasksPageState createState() => _TasksPageState();
@@ -22,14 +24,18 @@ class _TasksPageState extends State<TasksPage> {
         'completed': false,
         'note': '',
         'dueDate': null,
-        'priority': 'Low'
+        'priority': 'Low',
+        'reminderDate': null,
+        'reminderTime': null,
       },
       {
         'name': 'Task 2',
         'completed': true,
         'note': '',
         'dueDate': null,
-        'priority': 'Low'
+        'priority': 'Low',
+        'reminderDate': null,
+        'reminderTime': null,
       },
     ],
   };
@@ -86,7 +92,9 @@ class _TasksPageState extends State<TasksPage> {
                 'completed': false,
                 'note': '',
                 'dueDate': null,
-                'priority': 'Low'
+                'priority': 'Low',
+                'reminderDate': null,
+                'reminderTime': null,
               });
               _taskController.clear();
             });
@@ -108,7 +116,6 @@ class _TasksPageState extends State<TasksPage> {
       folderTasks[newFolder] = [];
       _folderController.clear();
 
-      // Automatically select the newly created folder if no folder was selected
       if (folders.length == 1) {
         currentFolder = newFolder;
       }
@@ -191,11 +198,17 @@ class _TasksPageState extends State<TasksPage> {
           initialDueDate: folderTasks[currentFolder]![index]['dueDate'],
           initialPriority:
               folderTasks[currentFolder]![index]['priority'] ?? 'Low',
-          onSave: (note, dueDate, priority) {
+          initialReminderDate: folderTasks[currentFolder]![index]
+              ['reminderDate'],
+          initialReminderTime: folderTasks[currentFolder]![index]
+              ['reminderTime'],
+          onSave: (note, dueDate, priority, reminderDate, reminderTime) {
             setState(() {
               folderTasks[currentFolder]![index]['note'] = note;
               folderTasks[currentFolder]![index]['dueDate'] = dueDate;
               folderTasks[currentFolder]![index]['priority'] = priority;
+              folderTasks[currentFolder]![index]['reminderDate'] = reminderDate;
+              folderTasks[currentFolder]![index]['reminderTime'] = reminderTime;
             });
           },
         );
@@ -205,7 +218,7 @@ class _TasksPageState extends State<TasksPage> {
 
   String getAppbarTitle() {
     if (folders.isEmpty) {
-      return '¯\\_(ツ)_/¯'; // Shrugging emoticon when no folders exist
+      return '¯\\_(ツ)_/¯';
     } else {
       return currentFolder;
     }
@@ -226,7 +239,7 @@ class _TasksPageState extends State<TasksPage> {
           ),
         ),
         trailing: folders.isEmpty
-            ? null // Disable trailing button when no folders are present
+            ? null
             : CupertinoButton(
                 padding: EdgeInsets.zero,
                 onPressed: _addTask,
@@ -252,8 +265,7 @@ class _TasksPageState extends State<TasksPage> {
                 itemCount: folderTasks[currentFolder]!.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    onTap: () => _openTaskDetails(
-                        index), // Pass the index instead of the task name
+                    onTap: () => _openTaskDetails(index),
                     child: TaskTile(
                       taskName: folderTasks[currentFolder]![index]['name'],
                       taskCompleted: folderTasks[currentFolder]![index]
