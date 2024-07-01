@@ -3,10 +3,18 @@ import 'package:flutter/material.dart';
 
 class TaskDetailsSheet extends StatefulWidget {
   final String taskName;
+  final String initialNote;
+  final DateTime? initialDueDate;
+  final String initialPriority;
+  final Function(String, DateTime?, String) onSave;
 
   const TaskDetailsSheet({
     super.key,
     required this.taskName,
+    required this.initialNote,
+    required this.initialDueDate,
+    required this.initialPriority,
+    required this.onSave,
   });
 
   @override
@@ -14,6 +22,29 @@ class TaskDetailsSheet extends StatefulWidget {
 }
 
 class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
+  late TextEditingController _noteController;
+  late DateTime? _dueDate;
+  late String _priority;
+
+  @override
+  void initState() {
+    super.initState();
+    _noteController = TextEditingController(text: widget.initialNote);
+    _dueDate = widget.initialDueDate;
+    _priority = widget.initialPriority;
+  }
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  void _saveChanges() {
+    widget.onSave(_noteController.text, _dueDate, _priority);
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
@@ -49,11 +80,9 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                       alignment: Alignment.centerRight,
                       child: CupertinoButton(
                         padding: EdgeInsets.zero,
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
+                        onPressed: _saveChanges,
                         child: Icon(
-                          CupertinoIcons.clear_circled,
+                          CupertinoIcons.check_mark_circled,
                           color: Colors.white,
                           size: 30,
                         ),
@@ -65,10 +94,61 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
               Expanded(
                 child: SingleChildScrollView(
                   controller: scrollController,
-                  child: Column(
-                    children: [
-                      // Additional features will be added here
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Note:',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                        SizedBox(height: 10),
+                        CupertinoTextField(
+                          controller: _noteController,
+                          placeholder: 'Add a note...',
+                          style: TextStyle(color: Colors.white),
+                          decoration: BoxDecoration(
+                            color: CupertinoColors.systemGrey.darkColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Due Date:',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                        SizedBox(height: 10),
+                        CupertinoButton(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          color: CupertinoColors.systemGrey.darkColor,
+                          child: Text(
+                            _dueDate == null
+                                ? 'Select Due Date'
+                                : '${_dueDate!.day}/${_dueDate!.month}/${_dueDate!.year}',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          onPressed: () {
+                            _showDatePicker(context);
+                          },
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Priority:',
+                          style: TextStyle(color: Colors.white, fontSize: 18),
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildPriorityOption('Low', Colors.green),
+                            _buildPriorityOption('Medium', Colors.yellow),
+                            _buildPriorityOption('High', Colors.red),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -76,6 +156,79 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildPriorityOption(String priority, Color color) {
+    bool isSelected = _priority == priority;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _priority = priority;
+        });
+      },
+      child: Column(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isSelected ? color : Colors.transparent,
+              border: Border.all(
+                color: isSelected ? color : Colors.white,
+                width: 2,
+              ),
+            ),
+            child: Center(
+              child: Icon(
+                CupertinoIcons.flag_fill,
+                color: isSelected ? Colors.black : color,
+                size: 20,
+              ),
+            ),
+          ),
+          SizedBox(height: 5),
+          Text(
+            priority,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showDatePicker(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (_) => Container(
+        height: 300,
+        color: CupertinoColors.systemBackground.resolveFrom(context),
+        child: Column(
+          children: [
+            Container(
+              height: 240,
+              child: CupertinoDatePicker(
+                initialDateTime: _dueDate ?? DateTime.now(),
+                mode: CupertinoDatePickerMode.date,
+                onDateTimeChanged: (dateTime) {
+                  setState(() {
+                    _dueDate = dateTime;
+                  });
+                },
+              ),
+            ),
+            CupertinoButton(
+              child: Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

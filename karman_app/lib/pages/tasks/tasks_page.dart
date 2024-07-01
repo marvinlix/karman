@@ -17,8 +17,20 @@ class _TasksPageState extends State<TasksPage> {
   List<String> folders = ['Default'];
   Map<String, List<Map<String, dynamic>>> folderTasks = {
     'Default': [
-      {'name': 'Task 1', 'completed': false},
-      {'name': 'Task 2', 'completed': true},
+      {
+        'name': 'Task 1',
+        'completed': false,
+        'note': '',
+        'dueDate': null,
+        'priority': 'Low'
+      },
+      {
+        'name': 'Task 2',
+        'completed': true,
+        'note': '',
+        'dueDate': null,
+        'priority': 'Low'
+      },
     ],
   };
 
@@ -69,8 +81,13 @@ class _TasksPageState extends State<TasksPage> {
           controller: _taskController,
           onSave: () {
             setState(() {
-              folderTasks[currentFolder]!
-                  .add({'name': _taskController.text, 'completed': false});
+              folderTasks[currentFolder]!.add({
+                'name': _taskController.text,
+                'completed': false,
+                'note': '',
+                'dueDate': null,
+                'priority': 'Low'
+              });
               _taskController.clear();
             });
             Navigator.of(context).pop();
@@ -164,11 +181,24 @@ class _TasksPageState extends State<TasksPage> {
     );
   }
 
-  void _openTaskDetails(String taskName) {
+  void _openTaskDetails(int index) {
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
-        return TaskDetailsSheet(taskName: taskName);
+        return TaskDetailsSheet(
+          taskName: folderTasks[currentFolder]![index]['name'],
+          initialNote: folderTasks[currentFolder]![index]['note'] ?? '',
+          initialDueDate: folderTasks[currentFolder]![index]['dueDate'],
+          initialPriority:
+              folderTasks[currentFolder]![index]['priority'] ?? 'Low',
+          onSave: (note, dueDate, priority) {
+            setState(() {
+              folderTasks[currentFolder]![index]['note'] = note;
+              folderTasks[currentFolder]![index]['dueDate'] = dueDate;
+              folderTasks[currentFolder]![index]['priority'] = priority;
+            });
+          },
+        );
       },
     );
   }
@@ -223,7 +253,7 @@ class _TasksPageState extends State<TasksPage> {
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () => _openTaskDetails(
-                        folderTasks[currentFolder]![index]['name']),
+                        index), // Pass the index instead of the task name
                     child: TaskTile(
                       taskName: folderTasks[currentFolder]![index]['name'],
                       taskCompleted: folderTasks[currentFolder]![index]
