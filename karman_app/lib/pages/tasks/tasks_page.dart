@@ -1,5 +1,3 @@
-// tasks_page.dart
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:karman_app/components/dialog_window.dart';
@@ -264,15 +262,19 @@ class _TasksPageState extends State<TasksPage> {
                 padding: EdgeInsets.all(16.0),
                 itemCount: folderTasks[currentFolder]!.length,
                 itemBuilder: (context, index) {
+                  final task = folderTasks[currentFolder]![index];
                   return GestureDetector(
                     onTap: () => _openTaskDetails(index),
                     child: TaskTile(
-                      taskName: folderTasks[currentFolder]![index]['name'],
-                      taskCompleted: folderTasks[currentFolder]![index]
-                          ['completed'],
+                      taskName: task['name'],
+                      taskCompleted: task['completed'],
                       onChanged: (value) => _toggleTaskCompletion(index, value),
                       onEdit: (context) => _editTask(context, index),
                       onDelete: (context) => _deleteTask(context, index),
+                      priority: task['priority'],
+                      dueDate: task['dueDate'],
+                      reminderDate: task['reminderDate'],
+                      reminderTime: task['reminderTime'],
                     ),
                   );
                 },

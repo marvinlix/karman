@@ -8,6 +8,10 @@ class TaskTile extends StatelessWidget {
   final Function(bool?)? onChanged;
   final Function(BuildContext)? onEdit;
   final Function(BuildContext)? onDelete;
+  final String priority;
+  final DateTime? dueDate;
+  final DateTime? reminderDate;
+  final TimeOfDay? reminderTime;
 
   TaskTile({
     super.key,
@@ -16,6 +20,10 @@ class TaskTile extends StatelessWidget {
     required this.onChanged,
     required this.onEdit,
     required this.onDelete,
+    required this.priority,
+    this.dueDate,
+    this.reminderDate,
+    this.reminderTime,
   });
 
   @override
@@ -46,7 +54,7 @@ class TaskTile extends StatelessWidget {
             ],
           ),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Checkbox(
                 value: taskCompleted,
@@ -67,15 +75,31 @@ class TaskTile extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: Text(
-                    taskName,
-                    style: TextStyle(
-                      color: taskCompleted
-                          ? const Color.fromARGB(230, 158, 158, 158)
-                          : Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        taskName,
+                        style: TextStyle(
+                          color: taskCompleted
+                              ? const Color.fromARGB(230, 158, 158, 158)
+                              : Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Row(
+                        children: [
+                          _buildPriorityIcon(),
+                          SizedBox(width: 12),
+                          if (dueDate != null) _buildDateIcon(),
+                          if (dueDate != null) SizedBox(width: 12),
+                          if (reminderDate != null && reminderTime != null)
+                            _buildReminderIcon(),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -84,5 +108,31 @@ class TaskTile extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildPriorityIcon() {
+    Color color;
+    switch (priority.toLowerCase()) {
+      case 'low':
+        color = Colors.green;
+        break;
+      case 'medium':
+        color = Colors.yellow;
+        break;
+      case 'high':
+        color = Colors.red;
+        break;
+      default:
+        color = Colors.grey;
+    }
+    return Icon(CupertinoIcons.flag_fill, color: color, size: 16);
+  }
+
+  Widget _buildDateIcon() {
+    return Icon(CupertinoIcons.calendar, color: Colors.white, size: 16);
+  }
+
+  Widget _buildReminderIcon() {
+    return Icon(CupertinoIcons.clock, color: Colors.white, size: 16);
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:karman_app/components/date_time/date_button.dart';
-import 'package:karman_app/components/date_time/time_button.dart';
+import 'package:karman_app/components/date_time/reminders.dart';
 
 class TaskDetailsSheet extends StatefulWidget {
   final String taskName;
@@ -159,30 +159,15 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                           style: TextStyle(color: Colors.white, fontSize: 18),
                         ),
                         SizedBox(height: 10),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: DateButton(
-                                selectedDate: _reminderDate,
-                                onDateSelected: (date) {
-                                  setState(() {
-                                    _reminderDate = date;
-                                  });
-                                },
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Expanded(
-                              child: TimeButton(
-                                selectedTime: _reminderTime,
-                                onTimeSelected: (time) {
-                                  setState(() {
-                                    _reminderTime = time;
-                                  });
-                                },
-                              ),
-                            ),
-                          ],
+                        ReminderButton(
+                          selectedDate: _reminderDate,
+                          selectedTime: _reminderTime,
+                          onReminderSet: (date, time) {
+                            setState(() {
+                              _reminderDate = date;
+                              _reminderTime = time;
+                            });
+                          },
                         ),
                       ],
                     ),
