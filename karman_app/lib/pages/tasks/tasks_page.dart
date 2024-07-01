@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:karman_app/components/dialog_window.dart';
+import 'package:karman_app/pages/tasks/task_details_sheet.dart';
 import 'package:karman_app/pages/tasks/task_tile.dart';
 import 'package:karman_app/components/folder_drawer.dart';
 
@@ -163,6 +164,15 @@ class _TasksPageState extends State<TasksPage> {
     );
   }
 
+  void _openTaskDetails(String taskName) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return TaskDetailsSheet(taskName: taskName);
+      },
+    );
+  }
+
   String getAppbarTitle() {
     if (folders.isEmpty) {
       return '¯\\_(ツ)_/¯'; // Shrugging emoticon when no folders exist
@@ -211,13 +221,17 @@ class _TasksPageState extends State<TasksPage> {
                 padding: EdgeInsets.all(16.0),
                 itemCount: folderTasks[currentFolder]!.length,
                 itemBuilder: (context, index) {
-                  return TaskTile(
-                    taskName: folderTasks[currentFolder]![index]['name'],
-                    taskCompleted: folderTasks[currentFolder]![index]
-                        ['completed'],
-                    onChanged: (value) => _toggleTaskCompletion(index, value),
-                    onEdit: (context) => _editTask(context, index),
-                    onDelete: (context) => _deleteTask(context, index),
+                  return GestureDetector(
+                    onTap: () => _openTaskDetails(
+                        folderTasks[currentFolder]![index]['name']),
+                    child: TaskTile(
+                      taskName: folderTasks[currentFolder]![index]['name'],
+                      taskCompleted: folderTasks[currentFolder]![index]
+                          ['completed'],
+                      onChanged: (value) => _toggleTaskCompletion(index, value),
+                      onEdit: (context) => _editTask(context, index),
+                      onDelete: (context) => _deleteTask(context, index),
+                    ),
                   );
                 },
               ),
