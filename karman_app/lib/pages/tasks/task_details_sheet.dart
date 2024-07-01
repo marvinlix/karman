@@ -109,7 +109,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                           placeholder: 'Add a note...',
                           style: TextStyle(color: Colors.white),
                           decoration: BoxDecoration(
-                            color: CupertinoColors.systemGrey.darkColor,
+                            color: CupertinoColors.tertiarySystemBackground.darkColor,
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
@@ -122,7 +122,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                         CupertinoButton(
                           padding: EdgeInsets.symmetric(
                               horizontal: 20, vertical: 10),
-                          color: CupertinoColors.systemGrey.darkColor,
+                          color: CupertinoColors.tertiarySystemBackground.darkColor,
                           child: Text(
                             _dueDate == null
                                 ? 'Select Due Date'
