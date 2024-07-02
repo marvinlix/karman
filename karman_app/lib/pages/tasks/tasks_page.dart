@@ -53,7 +53,7 @@ class _TasksPageState extends State<TasksPage> {
     showCupertinoDialog(
       context: context,
       builder: (context) {
-        return TaskDialog(
+        return KarmanDialogWindow(
           controller: _taskController,
           onSave: () {
             setState(() {
@@ -82,7 +82,7 @@ class _TasksPageState extends State<TasksPage> {
     showCupertinoDialog(
       context: context,
       builder: (context) {
-        return TaskDialog(
+        return KarmanDialogWindow(
           controller: _taskController,
           onSave: () {
             setState(() {
@@ -126,7 +126,7 @@ class _TasksPageState extends State<TasksPage> {
     showCupertinoDialog(
       context: context,
       builder: (context) {
-        return TaskDialog(
+        return KarmanDialogWindow(
           controller: _folderController,
           onSave: () {
             setState(() {
@@ -223,8 +223,7 @@ class _TasksPageState extends State<TasksPage> {
               NotificationService.scheduleNotification(
                 id: index,
                 title: 'You have a task due!',
-                body:
-                    '${folderTasks[currentFolder]![index]['name']}',
+                body: '${folderTasks[currentFolder]![index]['name']}',
                 scheduledDate: scheduledDate,
                 payload: 'task_$index',
               );
