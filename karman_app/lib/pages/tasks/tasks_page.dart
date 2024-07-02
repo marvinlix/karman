@@ -4,6 +4,7 @@ import 'package:karman_app/components/dialog_window.dart';
 import 'package:karman_app/pages/tasks/task_details_sheet.dart';
 import 'package:karman_app/pages/tasks/task_tile.dart';
 import 'package:karman_app/components/folder_drawer.dart';
+import 'package:karman_app/services/notification_service.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({Key? key}) : super(key: key);
@@ -208,6 +209,29 @@ class _TasksPageState extends State<TasksPage> {
               folderTasks[currentFolder]![index]['reminderDate'] = reminderDate;
               folderTasks[currentFolder]![index]['reminderTime'] = reminderTime;
             });
+
+            // Schedule notification if reminder is set
+            if (reminderDate != null && reminderTime != null) {
+              DateTime scheduledDate = DateTime(
+                reminderDate.year,
+                reminderDate.month,
+                reminderDate.day,
+                reminderTime.hour,
+                reminderTime.minute,
+              );
+
+              NotificationService.scheduleNotification(
+                id: index,
+                title: 'You have a task due!',
+                body:
+                    '${folderTasks[currentFolder]![index]['name']}',
+                scheduledDate: scheduledDate,
+                payload: 'task_$index',
+              );
+            } else {
+              // Cancel notification if reminder is removed
+              NotificationService.cancelNotification(index);
+            }
           },
         );
       },
