@@ -42,7 +42,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
 
   void _saveChanges() {
     final updatedTask = Task(
-      task_id: widget.task.task_id,
+      taskId: widget.task.taskId,
       name: widget.task.name,
       note: _noteController.text,
       priority: _priority,
@@ -56,14 +56,14 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
     // Handle notifications
     if (updatedTask.reminder != null) {
       NotificationService.scheduleNotification(
-        id: updatedTask.task_id!,
+        id: updatedTask.taskId!,
         title: 'Task Reminder',
         body: updatedTask.name,
         scheduledDate: updatedTask.reminder!,
-        payload: 'task_${updatedTask.task_id}',
+        payload: 'task_${updatedTask.taskId}',
       );
     } else {
-      NotificationService.cancelNotification(updatedTask.task_id!);
+      NotificationService.cancelNotification(updatedTask.taskId!);
     }
 
     Navigator.of(context).pop();

@@ -24,7 +24,7 @@ class TaskTile extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: Slidable(
-          key: ValueKey(task.task_id),
+          key: ValueKey(task.taskId),
           endActionPane: ActionPane(
             motion: const DrawerMotion(),
             children: [

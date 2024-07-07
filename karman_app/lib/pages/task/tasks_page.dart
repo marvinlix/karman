@@ -50,7 +50,7 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   void _toggleTaskCompletion(Task task) {
-    final taskIndex = _sortedTasks.indexWhere((t) => t.task_id == task.task_id);
+    final taskIndex = _sortedTasks.indexWhere((t) => t.taskId == task.taskId);
     final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
 
     context.read<TaskController>().updateTask(updatedTask);
@@ -71,7 +71,7 @@ class _TasksPageState extends State<TasksPage> {
       });
 
       final newIndex =
-          _sortedTasks.indexWhere((t) => t.task_id == updatedTask.task_id);
+          _sortedTasks.indexWhere((t) => t.taskId == updatedTask.taskId);
       _listKey.currentState!
           .insertItem(newIndex, duration: Duration(milliseconds: 250));
     });
@@ -101,7 +101,7 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   void _deleteTask(BuildContext context, int id) {
-    final index = _sortedTasks.indexWhere((task) => task.task_id == id);
+    final index = _sortedTasks.indexWhere((task) => task.taskId == id);
     if (index != -1) {
       final removedTask = _sortedTasks.removeAt(index);
       context.read<TaskController>().deleteTask(id);
@@ -269,11 +269,11 @@ class _TasksPageState extends State<TasksPage> {
       child: GestureDetector(
         onTap: () => _openTaskDetails(task),
         child: TaskTile(
-          key: ValueKey(task.task_id),
+          key: ValueKey(task.taskId),
           task: task,
           onChanged: (value) => _toggleTaskCompletion(task),
           onEdit: (context) => _editTask(context, task),
-          onDelete: (context) => _deleteTask(context, task.task_id!),
+          onDelete: (context) => _deleteTask(context, task.taskId!),
         ),
       ),
     );

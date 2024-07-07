@@ -26,7 +26,7 @@ class TaskController extends ChangeNotifier {
     try {
       final id = await _taskService.createTask(task);
       final newTask = Task(
-        task_id: id,
+        taskId: id,
         name: task.name,
         note: task.note,
         priority: task.priority,
@@ -46,7 +46,7 @@ class TaskController extends ChangeNotifier {
 
   Future<void> updateTask(Task task) async {
     await _taskService.updateTask(task);
-    final index = _tasks.indexWhere((t) => t.task_id == task.task_id);
+    final index = _tasks.indexWhere((t) => t.taskId == task.taskId);
     if (index != -1) {
       _tasks[index] = task;
       notifyListeners();
@@ -55,7 +55,7 @@ class TaskController extends ChangeNotifier {
 
   Future<void> deleteTask(int id) async {
     await _taskService.deleteTask(id);
-    _tasks.removeWhere((task) => task.task_id == id);
+    _tasks.removeWhere((task) => task.taskId == id);
     notifyListeners();
   }
 

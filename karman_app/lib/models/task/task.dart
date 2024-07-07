@@ -1,5 +1,5 @@
 class Task {
-  final int? task_id; // Changed from id to task_id
+  final int? taskId; // Changed from id to task_id
   final String name;
   final String? note;
   final int priority;
@@ -9,7 +9,7 @@ class Task {
   final bool isCompleted;
 
   Task({
-    this.task_id, // Changed from id to task_id
+    this.taskId, // Changed from id to task_id
     required this.name,
     this.note,
     required this.priority,
@@ -21,7 +21,7 @@ class Task {
 
   Map<String, dynamic> toMap() {
     return {
-      'task_id': task_id, // Changed from id to task_id
+      'task_id': taskId, // Changed from id to task_id
       'name': name,
       'note': note,
       'priority': priority,
@@ -34,7 +34,7 @@ class Task {
 
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task(
-      task_id: map['task_id'], // Changed from id to task_id
+      taskId: map['task_id'], 
       name: map['name'],
       note: map['note'],
       priority: map['priority'],
@@ -48,7 +48,7 @@ class Task {
 
   // Update the copyWith method as well
   Task copyWith({
-    int? task_id, // Changed from id to task_id
+    int? taskId,
     String? name,
     String? note,
     int? priority,
@@ -58,7 +58,7 @@ class Task {
     bool? isCompleted,
   }) {
     return Task(
-      task_id: task_id ?? this.task_id, // Changed from id to task_id
+      taskId: taskId ?? this.taskId, // Changed from id to task_id
       name: name ?? this.name,
       note: note ?? this.note,
       priority: priority ?? this.priority,
