@@ -37,7 +37,13 @@ class _TasksPageState extends State<TasksPage> {
 
   void _addFolder() {
     final newFolder = TaskFolder(name: _folderController.text);
-    context.read<TaskController>().addFolder(newFolder);
+    context.read<TaskController>().addFolder(newFolder).then((folder) {
+      if (folder != null && folder.folder_id != null) {
+        setState(() {
+          currentFolderId = folder.folder_id!;
+        });
+      }
+    });
     _folderController.clear();
   }
 
@@ -132,7 +138,6 @@ class _TasksPageState extends State<TasksPage> {
                 setState(() {
                   _sortedTasks.insert(0, task);
                 });
-                // Add this null check
                 if (_listKey.currentState != null) {
                   _listKey.currentState!
                       .insertItem(0, duration: Duration(milliseconds: 250));
@@ -181,10 +186,12 @@ class _TasksPageState extends State<TasksPage> {
 
   String getAppbarTitle(List<TaskFolder> folders) {
     if (folders.isEmpty) {
-      return '¯\\_(ツ)_/¯';
+      return "¯\\_(ツ)_/¯";
     } else {
-      final currentFolder =
-          folders.firstWhere((folder) => folder.folder_id == currentFolderId);
+      final currentFolder = folders.firstWhere(
+        (folder) => folder.folder_id == currentFolderId,
+        orElse: () => TaskFolder(folder_id: -1, name: 'Unknown Folder'),
+      );
       return currentFolder.name;
     }
   }
@@ -194,32 +201,81 @@ class _TasksPageState extends State<TasksPage> {
     return Consumer<TaskController>(
       builder: (context, taskController, child) {
         final folders = taskController.folders;
-        final tasks = taskController.tasks
-            .where((task) => task.folderId == currentFolderId)
-            .toList();
+        final tasks = taskController.getTasksForFolder(currentFolderId);
+
+        if (folders.isEmpty) {
+          return CupertinoPageScaffold(
+            navigationBar: CupertinoNavigationBar(
+              backgroundColor: Colors.black,
+              middle: Text(
+                "Folder-less and fancy-free!",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              leading: CupertinoButton(
+                padding: EdgeInsets.zero,
+                onPressed: _openDrawer,
+                child: Icon(
+                  CupertinoIcons.square_stack,
+                  color: CupertinoColors.white,
+                  size: 20,
+                ),
+              ),
+            ),
+            child: SafeArea(
+              child: const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Your tasks are feeling homeless!",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    Text(
+                      "Click the icon in the top left to create a new folder.",
+                      style: TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
 
         return CupertinoPageScaffold(
           navigationBar: CupertinoNavigationBar(
             backgroundColor: Colors.black,
-            middle: Text(getAppbarTitle(folders)),
+            middle: Text(
+              getAppbarTitle(folders),
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
             leading: CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: _openDrawer,
               child: Icon(
                 CupertinoIcons.square_stack,
                 color: CupertinoColors.white,
+                size: 20,
               ),
             ),
-            trailing: folders.isEmpty
-                ? null
-                : CupertinoButton(
-                    padding: EdgeInsets.zero,
-                    onPressed: _addTask,
-                    child: Icon(
-                      CupertinoIcons.plus,
-                      color: CupertinoColors.white,
-                    ),
-                  ),
+            trailing: CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: _addTask,
+              child: Icon(
+                CupertinoIcons.plus,
+                color: CupertinoColors.white,
+                size: 20,
+              ),
+            ),
           ),
           child: SafeArea(
             child: Column(
@@ -238,24 +294,15 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   Widget _buildTasksList(List<TaskFolder> folders, List<Task> tasks) {
-    if (folders.isEmpty) {
+    if (tasks.isEmpty) {
       return Center(
         child: Text(
-          'No folders? Create one!',
+          'This space craves your brilliant ideas. Add one!',
           style: TextStyle(
-            fontSize: 24,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
-        ),
-      );
-    } else if (tasks.isEmpty) {
-      return Center(
-        child: Text(
-          'No tasks yet. Add one!',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-          ),
+          textAlign: TextAlign.center,
         ),
       );
     } else {
@@ -264,7 +311,6 @@ class _TasksPageState extends State<TasksPage> {
         _sortTasks(_sortedTasks);
       }
 
-      // Wrap AnimatedList in a Builder to ensure it's rebuilt when needed
       return Builder(
         builder: (context) {
           return AnimatedList(

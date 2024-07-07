@@ -40,7 +40,8 @@ class FolderDrawer extends StatelessWidget {
               child: Column(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.fromLTRB(
+                        20, 20, 20, 10), // Reduced bottom padding
                     child: Stack(
                       children: [
                         Center(
@@ -49,7 +50,6 @@ class FolderDrawer extends StatelessWidget {
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 30,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
@@ -78,7 +78,7 @@ class FolderDrawer extends StatelessWidget {
                             child: Icon(
                               CupertinoIcons.add_circled,
                               color: Colors.white,
-                              size: 30,
+                              size: 25,
                             ),
                           ),
                         ),
@@ -86,23 +86,39 @@ class FolderDrawer extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    child: ListView.builder(
-                      controller: scrollController,
-                      itemCount: folders.length,
-                      itemBuilder: (context, index) {
-                        return FolderTile(
-                          folder: folders[index],
-                          onTap: () {
-                            onFolderSelected(folders[index]);
-                            Navigator.of(context).pop();
-                          },
-                          onEdit: (context) => _editFolder(
-                              context, taskController, folders[index]),
-                          onDelete: (context) => _deleteFolder(
-                              context, taskController, folders[index].folder_id!),
-                        );
-                      },
-                    ),
+                    child: folders.isEmpty
+                        ? Center(
+                            child: Text(
+                              'Create a folder to get started',
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 18),
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: scrollController,
+                            itemCount: folders.length,
+                            itemBuilder: (context, index) {
+                              return FolderTile(
+                                folder: folders[index],
+                                onTap: () {
+                                  onFolderSelected(folders[index]);
+                                  Navigator.of(context).pop();
+                                },
+                                onEdit: (context) => _editFolder(
+                                    context, taskController, folders[index]),
+                                onDelete: (context) => _deleteFolder(context,
+                                    taskController, folders[index].folder_id!),
+                                onIconChanged: (IconData newIcon) {
+                                  final updatedFolder = TaskFolder(
+                                    folder_id: folders[index].folder_id,
+                                    name: folders[index].name,
+                                    icon: newIcon,
+                                  );
+                                  taskController.updateFolder(updatedFolder);
+                                },
+                              );
+                            },
+                          ),
                   ),
                 ],
               ),
@@ -122,8 +138,11 @@ class FolderDrawer extends StatelessWidget {
         return KarmanDialogWindow(
           controller: controller,
           onSave: () {
-            final updatedFolder =
-                TaskFolder(folder_id: folder.folder_id, name: controller.text);
+            final updatedFolder = TaskFolder(
+              folder_id: folder.folder_id,
+              name: controller.text,
+              icon: folder.icon, // Preserve the existing icon
+            );
             taskController.updateFolder(updatedFolder);
             controller.clear();
             Navigator.of(context).pop();

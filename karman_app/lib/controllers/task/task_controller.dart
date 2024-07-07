@@ -22,6 +22,10 @@ class TaskController extends ChangeNotifier {
     notifyListeners();
   }
 
+  List<Task> getTasksForFolder(int folderId) {
+    return _tasks.where((task) => task.folderId == folderId).toList();
+  }
+
   Future<Task?> addTask(Task task) async {
     try {
       final id = await _taskService.createTask(task);
@@ -59,11 +63,12 @@ class TaskController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addFolder(TaskFolder folder) async {
+  Future<TaskFolder?> addFolder(TaskFolder folder) async {
     final id = await _taskService.createFolder(folder);
     final newFolder = TaskFolder(folder_id: id, name: folder.name);
     _folders.add(newFolder);
     notifyListeners();
+    return newFolder;
   }
 
   Future<void> updateFolder(TaskFolder folder) async {
@@ -78,6 +83,15 @@ class TaskController extends ChangeNotifier {
   Future<void> deleteFolder(int id) async {
     await _taskService.deleteFolder(id);
     _folders.removeWhere((folder) => folder.folder_id == id);
+    _tasks.removeWhere((task) => task.folderId == id);
     notifyListeners();
+  }
+
+  TaskFolder? getFolderById(int folderId) {
+    try {
+      return _folders.firstWhere((folder) => folder.folder_id == folderId);
+    } catch (e) {
+      return null;
+    }
   }
 }

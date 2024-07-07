@@ -8,7 +8,8 @@ class TaskDatabase {
     await database.execute('''
       CREATE TABLE IF NOT EXISTS $folderTableName (
         folder_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL
+        name TEXT NOT NULL,
+        icon INTEGER NOT NULL
       )
     ''');
 

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:karman_app/components/icon_selection_dialog.dart.dart';
 import 'package:karman_app/models/task/task_folder.dart';
 
 class FolderTile extends StatelessWidget {
@@ -8,6 +9,7 @@ class FolderTile extends StatelessWidget {
   final Function() onTap;
   final Function(BuildContext) onEdit;
   final Function(BuildContext) onDelete;
+  final Function(IconData) onIconChanged;
 
   const FolderTile({
     Key? key,
@@ -15,6 +17,7 @@ class FolderTile extends StatelessWidget {
     required this.onTap,
     required this.onEdit,
     required this.onDelete,
+    required this.onIconChanged,
   }) : super(key: key);
 
   @override
@@ -59,10 +62,20 @@ class FolderTile extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    CupertinoIcons.folder_fill,
-                    color: Colors.white,
-                    size: 24,
+                  GestureDetector(
+                    onTap: () {
+                      showCupertinoDialog(
+                        context: context,
+                        builder: (context) => IconSelectionDialog(
+                          onIconSelected: onIconChanged,
+                        ),
+                      );
+                    },
+                    child: Icon(
+                      folder.icon,
+                      color: Colors.white,
+                      size: 24,
+                    ),
                   ),
                   SizedBox(width: 16),
                   Expanded(
@@ -71,7 +84,6 @@ class FolderTile extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
