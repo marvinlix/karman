@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:karman_app/components/dialog_window.dart';
+import 'package:karman_app/components/task/completed_task_header.dart';
 import 'package:karman_app/controllers/task/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/models/task/task_folder.dart';
@@ -131,8 +132,11 @@ class _TasksPageState extends State<TasksPage> {
                 setState(() {
                   _sortedTasks.insert(0, task);
                 });
-                _listKey.currentState!
-                    .insertItem(0, duration: Duration(milliseconds: 250));
+                // Add this null check
+                if (_listKey.currentState != null) {
+                  _listKey.currentState!
+                      .insertItem(0, duration: Duration(milliseconds: 250));
+                }
               }
             });
             _taskController.clear();
@@ -218,7 +222,15 @@ class _TasksPageState extends State<TasksPage> {
                   ),
           ),
           child: SafeArea(
-            child: _buildTasksList(folders, tasks),
+            child: Column(
+              children: [
+                SizedBox(height: 8),
+                CompletedTasksHeader(currentFolderId: currentFolderId),
+                Expanded(
+                  child: _buildTasksList(folders, tasks),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -247,17 +259,21 @@ class _TasksPageState extends State<TasksPage> {
         ),
       );
     } else {
-      // Only update _sortedTasks if it's empty or the tasks have changed
       if (_sortedTasks.isEmpty || !listEquals(_sortedTasks, tasks)) {
         _sortedTasks = List.from(tasks);
         _sortTasks(_sortedTasks);
       }
 
-      return AnimatedList(
-        key: _listKey,
-        initialItemCount: _sortedTasks.length,
-        itemBuilder: (context, index, animation) {
-          return _buildAnimatedItem(_sortedTasks[index], animation);
+      // Wrap AnimatedList in a Builder to ensure it's rebuilt when needed
+      return Builder(
+        builder: (context) {
+          return AnimatedList(
+            key: _listKey,
+            initialItemCount: _sortedTasks.length,
+            itemBuilder: (context, index, animation) {
+              return _buildAnimatedItem(_sortedTasks[index], animation);
+            },
+          );
         },
       );
     }

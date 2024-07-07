@@ -33,7 +33,7 @@ class TaskController extends ChangeNotifier {
         dueDate: task.dueDate,
         reminder: task.reminder,
         folderId: task.folderId,
-        isCompleted: false, // Assuming new tasks are not completed by default
+        isCompleted: false,
       );
       _tasks.add(newTask);
       notifyListeners();
