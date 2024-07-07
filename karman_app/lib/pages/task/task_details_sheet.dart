@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:karman_app/components/date_time/date_button.dart';
 import 'package:karman_app/components/date_time/reminders.dart';
+import 'package:karman_app/components/task/task_note.dart';
 import 'package:karman_app/controllers/task/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/services/notification_service.dart';
@@ -24,6 +25,8 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   late DateTime? _dueDate;
   late int _priority;
   late DateTime? _reminder;
+  bool _isDateEnabled = false;
+  bool _isReminderEnabled = false;
 
   @override
   void initState() {
@@ -32,6 +35,8 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
     _dueDate = widget.task.dueDate;
     _priority = widget.task.priority;
     _reminder = widget.task.reminder;
+    _isDateEnabled = widget.task.dueDate != null;
+    _isReminderEnabled = widget.task.reminder != null;
   }
 
   @override
@@ -46,14 +51,13 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
       name: widget.task.name,
       note: _noteController.text,
       priority: _priority,
-      dueDate: _dueDate,
-      reminder: _reminder,
+      dueDate: _isDateEnabled ? _dueDate : null,
+      reminder: _isReminderEnabled ? _reminder : null,
       folderId: widget.task.folderId,
     );
 
     context.read<TaskController>().updateTask(updatedTask);
 
-    // Handle notifications
     if (updatedTask.reminder != null) {
       NotificationService.scheduleNotification(
         id: updatedTask.taskId!,
@@ -123,41 +127,53 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Note:',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                        SizedBox(height: 10),
-                        CupertinoTextField(
+                        TaskNote(
                           controller: _noteController,
-                          placeholder: 'Add a note...',
-                          style: TextStyle(color: Colors.white),
-                          decoration: BoxDecoration(
-                            color: CupertinoColors
-                                .tertiarySystemBackground.darkColor,
-                            borderRadius: BorderRadius.circular(8),
+                          hintText: 'Note...',
+                        ),
+                        SizedBox(height: 30),
+                        _buildToggleRow(
+                          icon: CupertinoIcons.calendar,
+                          title: 'Date',
+                          isEnabled: _isDateEnabled,
+                          onToggle: (value) {
+                            setState(() {
+                              _isDateEnabled = value;
+                              if (!value) _dueDate = null;
+                            });
+                          },
+                          child: DateButton(
+                            selectedDate: _dueDate,
+                            onDateSelected: (date) {
+                              setState(() {
+                                _dueDate = date;
+                              });
+                            },
+                            isEnabled: _isDateEnabled,
                           ),
                         ),
                         SizedBox(height: 20),
-                        Text(
-                          'Due Date:',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                        SizedBox(height: 10),
-                        DateButton(
-                          selectedDate: _dueDate,
-                          onDateSelected: (date) {
+                        _buildToggleRow(
+                          icon: CupertinoIcons.bell,
+                          title: 'Reminder',
+                          isEnabled: _isReminderEnabled,
+                          onToggle: (value) {
                             setState(() {
-                              _dueDate = date;
+                              _isReminderEnabled = value;
+                              if (!value) _reminder = null;
                             });
                           },
+                          child: ReminderButton(
+                            selectedDateTime: _reminder,
+                            onReminderSet: (DateTime newDateTime) {
+                              setState(() {
+                                _reminder = newDateTime;
+                              });
+                            },
+                            isEnabled: _isReminderEnabled,
+                          ),
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          'Priority:',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                        SizedBox(height: 10),
+                        SizedBox(height: 30),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
@@ -165,33 +181,6 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                             _buildPriorityOption(2, Colors.yellow),
                             _buildPriorityOption(3, Colors.red),
                           ],
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          'Reminder:',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                        SizedBox(height: 10),
-                        ReminderButton(
-                          selectedDate: _reminder,
-                          selectedTime: _reminder != null
-                              ? TimeOfDay.fromDateTime(_reminder!)
-                              : null,
-                          onReminderSet: (date, time) {
-                            setState(() {
-                              if (date != null && time != null) {
-                                _reminder = DateTime(
-                                  date.year,
-                                  date.month,
-                                  date.day,
-                                  time.hour,
-                                  time.minute,
-                                );
-                              } else {
-                                _reminder = null;
-                              }
-                            });
-                          },
                         ),
                       ],
                     ),
@@ -202,6 +191,27 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildToggleRow({
+    required IconData icon,
+    required String title,
+    required bool isEnabled,
+    required Function(bool) onToggle,
+    required Widget child,
+  }) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.white),
+        SizedBox(width: 10),
+        Expanded(child: child),
+        CupertinoSwitch(
+          value: isEnabled,
+          onChanged: onToggle,
+          activeColor: Colors.white,
+        ),
+      ],
     );
   }
 

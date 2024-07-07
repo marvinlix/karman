@@ -21,7 +21,7 @@ class Task {
 
   Map<String, dynamic> toMap() {
     return {
-      'task_id': taskId, // Changed from id to task_id
+      'task_id': taskId, 
       'name': name,
       'note': note,
       'priority': priority,
@@ -58,7 +58,7 @@ class Task {
     bool? isCompleted,
   }) {
     return Task(
-      taskId: taskId ?? this.taskId, // Changed from id to task_id
+      taskId: taskId ?? this.taskId, 
       name: name ?? this.name,
       note: note ?? this.note,
       priority: priority ?? this.priority,

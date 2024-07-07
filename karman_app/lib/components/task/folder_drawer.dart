@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:karman_app/components/dialog_window.dart';
-import 'package:karman_app/components/folder_tile.dart';
+import 'package:karman_app/components/task/folder_tile.dart';
 import 'package:karman_app/controllers/task/task_controller.dart';
 import 'package:karman_app/models/task/task_folder.dart';
 import 'package:provider/provider.dart';
