@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:karman_app/components/dialog_window.dart';
 import 'package:karman_app/controllers/task/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
@@ -7,7 +8,6 @@ import 'package:karman_app/models/task/task_folder.dart';
 import 'package:karman_app/pages/task/task_details_sheet.dart';
 import 'package:karman_app/pages/task/task_tile.dart';
 import 'package:karman_app/components/folder_drawer.dart';
-import 'package:karman_app/services/notification_service.dart';
 import 'package:provider/provider.dart';
 
 class TasksPage extends StatefulWidget {
@@ -19,6 +19,8 @@ class TasksPage extends StatefulWidget {
 
 class _TasksPageState extends State<TasksPage> {
   int currentFolderId = 1; // Assuming 1 is the default folder ID
+  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+  List<Task> _sortedTasks = [];
 
   @override
   void initState() {
@@ -38,9 +40,41 @@ class _TasksPageState extends State<TasksPage> {
     _folderController.clear();
   }
 
+  void _sortTasks(List<Task> tasks) {
+    tasks.sort((a, b) {
+      if (a.isCompleted == b.isCompleted) {
+        return 0;
+      }
+      return a.isCompleted ? 1 : -1;
+    });
+  }
+
   void _toggleTaskCompletion(Task task) {
+    final taskIndex = _sortedTasks.indexWhere((t) => t.task_id == task.task_id);
     final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
+
     context.read<TaskController>().updateTask(updatedTask);
+
+    setState(() {
+      _sortedTasks[taskIndex] = updatedTask;
+    });
+
+    _listKey.currentState!.removeItem(
+      taskIndex,
+      (context, animation) => _buildAnimatedItem(updatedTask, animation),
+      duration: Duration(milliseconds: 250),
+    );
+
+    Future.delayed(Duration(milliseconds: 250), () {
+      setState(() {
+        _sortTasks(_sortedTasks);
+      });
+
+      final newIndex =
+          _sortedTasks.indexWhere((t) => t.task_id == updatedTask.task_id);
+      _listKey.currentState!
+          .insertItem(newIndex, duration: Duration(milliseconds: 250));
+    });
   }
 
   void _editTask(BuildContext context, Task task) {
@@ -67,7 +101,17 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   void _deleteTask(BuildContext context, int id) {
-    context.read<TaskController>().deleteTask(id);
+    final index = _sortedTasks.indexWhere((task) => task.task_id == id);
+    if (index != -1) {
+      final removedTask = _sortedTasks.removeAt(index);
+      context.read<TaskController>().deleteTask(id);
+
+      _listKey.currentState!.removeItem(
+        index,
+        (context, animation) => _buildAnimatedItem(removedTask, animation),
+        duration: Duration(milliseconds: 250),
+      );
+    }
   }
 
   void _addTask() {
@@ -82,7 +126,15 @@ class _TasksPageState extends State<TasksPage> {
               priority: 1,
               folderId: currentFolderId,
             );
-            context.read<TaskController>().addTask(newTask);
+            context.read<TaskController>().addTask(newTask).then((task) {
+              if (task != null) {
+                setState(() {
+                  _sortedTasks.insert(0, task);
+                });
+                _listKey.currentState!
+                    .insertItem(0, duration: Duration(milliseconds: 250));
+              }
+            });
             _taskController.clear();
             Navigator.of(context).pop();
           },
@@ -195,22 +247,35 @@ class _TasksPageState extends State<TasksPage> {
         ),
       );
     } else {
-      return ListView.builder(
-        padding: EdgeInsets.all(16.0),
-        itemCount: tasks.length,
-        itemBuilder: (context, index) {
-          final task = tasks[index];
-          return GestureDetector(
-            onTap: () => _openTaskDetails(task),
-            child: TaskTile(
-              task: task,
-              onChanged: (value) => _toggleTaskCompletion(task),
-              onEdit: (context) => _editTask(context, task),
-              onDelete: (context) => _deleteTask(context, task.task_id!),
-            ),
-          );
+      // Only update _sortedTasks if it's empty or the tasks have changed
+      if (_sortedTasks.isEmpty || !listEquals(_sortedTasks, tasks)) {
+        _sortedTasks = List.from(tasks);
+        _sortTasks(_sortedTasks);
+      }
+
+      return AnimatedList(
+        key: _listKey,
+        initialItemCount: _sortedTasks.length,
+        itemBuilder: (context, index, animation) {
+          return _buildAnimatedItem(_sortedTasks[index], animation);
         },
       );
     }
+  }
+
+  Widget _buildAnimatedItem(Task task, Animation<double> animation) {
+    return SizeTransition(
+      sizeFactor: animation,
+      child: GestureDetector(
+        onTap: () => _openTaskDetails(task),
+        child: TaskTile(
+          key: ValueKey(task.task_id),
+          task: task,
+          onChanged: (value) => _toggleTaskCompletion(task),
+          onEdit: (context) => _editTask(context, task),
+          onDelete: (context) => _deleteTask(context, task.task_id!),
+        ),
+      ),
+    );
   }
 }

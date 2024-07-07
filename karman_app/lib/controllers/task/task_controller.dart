@@ -22,19 +22,26 @@ class TaskController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> addTask(Task task) async {
-    final id = await _taskService.createTask(task);
-    final newTask = Task(
-      task_id: id,
-      name: task.name,
-      note: task.note,
-      priority: task.priority,
-      dueDate: task.dueDate,
-      reminder: task.reminder,
-      folderId: task.folderId,
-    );
-    _tasks.add(newTask);
-    notifyListeners();
+  Future<Task?> addTask(Task task) async {
+    try {
+      final id = await _taskService.createTask(task);
+      final newTask = Task(
+        task_id: id,
+        name: task.name,
+        note: task.note,
+        priority: task.priority,
+        dueDate: task.dueDate,
+        reminder: task.reminder,
+        folderId: task.folderId,
+        isCompleted: false, // Assuming new tasks are not completed by default
+      );
+      _tasks.add(newTask);
+      notifyListeners();
+      return newTask;
+    } catch (e) {
+      print('Error adding task: $e');
+      return null;
+    }
   }
 
   Future<void> updateTask(Task task) async {
