@@ -2,25 +2,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:karman_app/components/date_time/date_button.dart';
 import 'package:karman_app/components/date_time/reminders.dart';
+import 'package:karman_app/controllers/task/task_controller.dart';
+import 'package:karman_app/models/task/task.dart';
+import 'package:karman_app/services/notification_service.dart';
+import 'package:provider/provider.dart';
 
 class TaskDetailsSheet extends StatefulWidget {
-  final String taskName;
-  final String initialNote;
-  final DateTime? initialDueDate;
-  final String initialPriority;
-  final DateTime? initialReminderDate;
-  final TimeOfDay? initialReminderTime;
-  final Function(String, DateTime?, String, DateTime?, TimeOfDay?) onSave;
+  final Task task;
 
   const TaskDetailsSheet({
     super.key,
-    required this.taskName,
-    required this.initialNote,
-    required this.initialDueDate,
-    required this.initialPriority,
-    this.initialReminderDate,
-    this.initialReminderTime,
-    required this.onSave,
+    required this.task,
   });
 
   @override
@@ -30,18 +22,16 @@ class TaskDetailsSheet extends StatefulWidget {
 class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   late TextEditingController _noteController;
   late DateTime? _dueDate;
-  late String _priority;
-  late DateTime? _reminderDate;
-  late TimeOfDay? _reminderTime;
+  late int _priority;
+  late DateTime? _reminder;
 
   @override
   void initState() {
     super.initState();
-    _noteController = TextEditingController(text: widget.initialNote);
-    _dueDate = widget.initialDueDate;
-    _priority = widget.initialPriority;
-    _reminderDate = widget.initialReminderDate;
-    _reminderTime = widget.initialReminderTime;
+    _noteController = TextEditingController(text: widget.task.note);
+    _dueDate = widget.task.dueDate;
+    _priority = widget.task.priority;
+    _reminder = widget.task.reminder;
   }
 
   @override
@@ -51,8 +41,31 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   }
 
   void _saveChanges() {
-    widget.onSave(_noteController.text, _dueDate, _priority, _reminderDate,
-        _reminderTime);
+    final updatedTask = Task(
+      task_id: widget.task.task_id,
+      name: widget.task.name,
+      note: _noteController.text,
+      priority: _priority,
+      dueDate: _dueDate,
+      reminder: _reminder,
+      folderId: widget.task.folderId,
+    );
+
+    context.read<TaskController>().updateTask(updatedTask);
+
+    // Handle notifications
+    if (updatedTask.reminder != null) {
+      NotificationService.scheduleNotification(
+        id: updatedTask.task_id!,
+        title: 'Task Reminder',
+        body: updatedTask.name,
+        scheduledDate: updatedTask.reminder!,
+        payload: 'task_${updatedTask.task_id}',
+      );
+    } else {
+      NotificationService.cancelNotification(updatedTask.task_id!);
+    }
+
     Navigator.of(context).pop();
   }
 
@@ -79,7 +92,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                   children: [
                     Center(
                       child: Text(
-                        widget.taskName,
+                        widget.task.name,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 30,
@@ -148,9 +161,9 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildPriorityOption('Low', Colors.green),
-                            _buildPriorityOption('Medium', Colors.yellow),
-                            _buildPriorityOption('High', Colors.red),
+                            _buildPriorityOption(1, Colors.green),
+                            _buildPriorityOption(2, Colors.yellow),
+                            _buildPriorityOption(3, Colors.red),
                           ],
                         ),
                         SizedBox(height: 20),
@@ -160,12 +173,23 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                         ),
                         SizedBox(height: 10),
                         ReminderButton(
-                          selectedDate: _reminderDate,
-                          selectedTime: _reminderTime,
+                          selectedDate: _reminder,
+                          selectedTime: _reminder != null
+                              ? TimeOfDay.fromDateTime(_reminder!)
+                              : null,
                           onReminderSet: (date, time) {
                             setState(() {
-                              _reminderDate = date;
-                              _reminderTime = time;
+                              if (date != null && time != null) {
+                                _reminder = DateTime(
+                                  date.year,
+                                  date.month,
+                                  date.day,
+                                  time.hour,
+                                  time.minute,
+                                );
+                              } else {
+                                _reminder = null;
+                              }
                             });
                           },
                         ),
@@ -181,7 +205,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
     );
   }
 
-  Widget _buildPriorityOption(String priority, Color color) {
+  Widget _buildPriorityOption(int priority, Color color) {
     bool isSelected = _priority == priority;
     return GestureDetector(
       onTap: () {
@@ -212,7 +236,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
           ),
           SizedBox(height: 5),
           Text(
-            priority,
+            priority == 1 ? 'Low' : (priority == 2 ? 'Medium' : 'High'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 12,
