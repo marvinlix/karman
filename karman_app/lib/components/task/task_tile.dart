@@ -76,7 +76,6 @@ class TaskTile extends StatelessWidget {
                               ? Colors.grey[700]
                               : Colors.white,
                           fontSize: 20,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
