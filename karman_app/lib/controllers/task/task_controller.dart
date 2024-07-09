@@ -65,7 +65,11 @@ class TaskController extends ChangeNotifier {
 
   Future<TaskFolder?> addFolder(TaskFolder folder) async {
     final id = await _taskService.createFolder(folder);
-    final newFolder = TaskFolder(folder_id: id, name: folder.name);
+    final newFolder = TaskFolder(
+      folder_id: id,
+      name: folder.name,
+      icon: folder.icon,
+    );
     _folders.add(newFolder);
     notifyListeners();
     return newFolder;

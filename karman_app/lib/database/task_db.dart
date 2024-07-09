@@ -9,7 +9,8 @@ class TaskDatabase {
       CREATE TABLE IF NOT EXISTS $folderTableName (
         folder_id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        icon INTEGER NOT NULL
+        icon_code_point INTEGER NOT NULL,
+        icon_font_family TEXT NOT NULL
       )
     ''');
 

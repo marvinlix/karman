@@ -15,7 +15,8 @@ class TaskFolder {
     return {
       'folder_id': folder_id,
       'name': name,
-      'icon': icon.codePoint,
+      'icon_code_point': icon.codePoint,
+      'icon_font_family': icon.fontFamily,
     };
   }
 
@@ -23,8 +24,11 @@ class TaskFolder {
     return TaskFolder(
       folder_id: map['folder_id'],
       name: map['name'],
-      icon: IconData(map['icon'],
-          fontFamily: CupertinoIcons.folder_fill.fontFamily),
+      icon: IconData(
+        map['icon_code_point'],
+        fontFamily: map['icon_font_family'],
+        fontPackage: CupertinoIcons.folder_fill.fontPackage,
+      ),
     );
   }
 }

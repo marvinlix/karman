@@ -12,11 +12,11 @@ class FolderDrawer extends StatelessWidget {
   final VoidCallback onCreateFolder;
 
   const FolderDrawer({
-    Key? key,
+    super.key,
     required this.onFolderSelected,
     required this.controller,
     required this.onCreateFolder,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +40,7 @@ class FolderDrawer extends StatelessWidget {
               child: Column(
                 children: [
                   Container(
-                    padding: EdgeInsets.fromLTRB(
-                        20, 20, 20, 10), // Reduced bottom padding
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
                     child: Stack(
                       children: [
                         Center(
@@ -90,8 +89,7 @@ class FolderDrawer extends StatelessWidget {
                         ? Center(
                             child: Text(
                               'Create a folder to get started',
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 18),
+                              style: TextStyle(color: Colors.white, fontSize: 18),
                             ),
                           )
                         : ListView.builder(
@@ -106,8 +104,8 @@ class FolderDrawer extends StatelessWidget {
                                 },
                                 onEdit: (context) => _editFolder(
                                     context, taskController, folders[index]),
-                                onDelete: (context) => _deleteFolder(context,
-                                    taskController, folders[index].folder_id!),
+                                onDelete: (context) => _deleteFolder(
+                                    context, taskController, folders[index].folder_id!, index),
                                 onIconChanged: (IconData newIcon) {
                                   final updatedFolder = TaskFolder(
                                     folder_id: folders[index].folder_id,
@@ -141,7 +139,7 @@ class FolderDrawer extends StatelessWidget {
             final updatedFolder = TaskFolder(
               folder_id: folder.folder_id,
               name: controller.text,
-              icon: folder.icon, // Preserve the existing icon
+              icon: folder.icon,
             );
             taskController.updateFolder(updatedFolder);
             controller.clear();
@@ -157,8 +155,13 @@ class FolderDrawer extends StatelessWidget {
     );
   }
 
-  void _deleteFolder(
-      BuildContext context, TaskController taskController, int id) {
-    taskController.deleteFolder(id);
+  void _deleteFolder(BuildContext context, TaskController taskController, int id, int index) {
+    taskController.deleteFolder(id).then((_) {
+      if (taskController.folders.isNotEmpty) {
+        int nextIndex = index < taskController.folders.length ? index : taskController.folders.length - 1;
+        onFolderSelected(taskController.folders[nextIndex]);
+      }
+      Navigator.of(context).pop(); // Close the drawer after deletion
+    });
   }
 }
