@@ -92,28 +92,26 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
             children: [
               Container(
                 padding: EdgeInsets.all(20),
-                child: Stack(
+                child: Row(
                   children: [
-                    Center(
+                    Expanded(
                       child: Text(
                         widget.task.name,
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+
                         ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: CupertinoButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: _saveChanges,
-                        child: Icon(
-                          CupertinoIcons.check_mark_circled,
-                          color: Colors.white,
-                          size: 30,
-                        ),
+                    CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: _saveChanges,
+                      child: Icon(
+                        CupertinoIcons.check_mark_circled,
+                        color: Colors.white,
+                        size: 30,
                       ),
                     ),
                   ],
