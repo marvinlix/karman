@@ -20,7 +20,7 @@ class TasksPage extends StatefulWidget {
 
 class _TasksPageState extends State<TasksPage> {
   int currentFolderId = 1; // Assuming 1 is the default folder ID
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+  GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
   List<Task> _sortedTasks = [];
 
   @override
@@ -66,7 +66,7 @@ class _TasksPageState extends State<TasksPage> {
       _sortedTasks[taskIndex] = updatedTask;
     });
 
-    _listKey.currentState!.removeItem(
+    _listKey.currentState?.removeItem(
       taskIndex,
       (context, animation) => _buildAnimatedItem(updatedTask, animation),
       duration: Duration(milliseconds: 250),
@@ -79,8 +79,8 @@ class _TasksPageState extends State<TasksPage> {
 
       final newIndex =
           _sortedTasks.indexWhere((t) => t.taskId == updatedTask.taskId);
-      _listKey.currentState!
-          .insertItem(newIndex, duration: Duration(milliseconds: 250));
+      _listKey.currentState
+          ?.insertItem(newIndex, duration: Duration(milliseconds: 250));
     });
   }
 
@@ -113,11 +113,17 @@ class _TasksPageState extends State<TasksPage> {
       final removedTask = _sortedTasks.removeAt(index);
       context.read<TaskController>().deleteTask(id);
 
-      _listKey.currentState!.removeItem(
+      _listKey.currentState?.removeItem(
         index,
         (context, animation) => _buildAnimatedItem(removedTask, animation),
         duration: Duration(milliseconds: 250),
       );
+    }
+  }
+
+  void _clearCompletedTasks(BuildContext context, List<Task> completedTasks) {
+    for (var task in completedTasks.reversed) {
+      _deleteTask(context, task.taskId!);
     }
   }
 
@@ -138,10 +144,8 @@ class _TasksPageState extends State<TasksPage> {
                 setState(() {
                   _sortedTasks.insert(0, task);
                 });
-                if (_listKey.currentState != null) {
-                  _listKey.currentState!
-                      .insertItem(0, duration: Duration(milliseconds: 250));
-                }
+                _listKey.currentState
+                    ?.insertItem(0, duration: Duration(milliseconds: 250));
               }
             });
             _taskController.clear();
@@ -202,6 +206,12 @@ class _TasksPageState extends State<TasksPage> {
       builder: (context, taskController, child) {
         final folders = taskController.folders;
         final tasks = taskController.getTasksForFolder(currentFolderId);
+
+        if (!listEquals(_sortedTasks, tasks)) {
+          _sortedTasks = List.from(tasks);
+          _sortTasks(_sortedTasks);
+          _listKey = GlobalKey<AnimatedListState>();
+        }
 
         if (folders.isEmpty) {
           return CupertinoPageScaffold(
@@ -281,7 +291,12 @@ class _TasksPageState extends State<TasksPage> {
             child: Column(
               children: [
                 SizedBox(height: 8),
-                CompletedTasksHeader(currentFolderId: currentFolderId),
+                CompletedTasksHeader(
+                  currentFolderId: currentFolderId,
+                  onClearCompletedTasks: (completedTasks) {
+                    _clearCompletedTasks(context, completedTasks);
+                  },
+                ),
                 Expanded(
                   child: _buildTasksList(folders, tasks),
                 ),
@@ -306,20 +321,11 @@ class _TasksPageState extends State<TasksPage> {
         ),
       );
     } else {
-      if (_sortedTasks.isEmpty || !listEquals(_sortedTasks, tasks)) {
-        _sortedTasks = List.from(tasks);
-        _sortTasks(_sortedTasks);
-      }
-
-      return Builder(
-        builder: (context) {
-          return AnimatedList(
-            key: _listKey,
-            initialItemCount: _sortedTasks.length,
-            itemBuilder: (context, index, animation) {
-              return _buildAnimatedItem(_sortedTasks[index], animation);
-            },
-          );
+      return AnimatedList(
+        key: _listKey,
+        initialItemCount: _sortedTasks.length,
+        itemBuilder: (context, index, animation) {
+          return _buildAnimatedItem(_sortedTasks[index], animation);
         },
       );
     }

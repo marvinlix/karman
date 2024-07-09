@@ -5,8 +5,13 @@ import 'package:karman_app/models/task/task.dart';
 
 class CompletedTasksHeader extends StatelessWidget {
   final int currentFolderId;
+  final Function(List<Task>) onClearCompletedTasks;
 
-  const CompletedTasksHeader({super.key, required this.currentFolderId});
+  const CompletedTasksHeader({
+    Key? key,
+    required this.currentFolderId,
+    required this.onClearCompletedTasks,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +41,7 @@ class CompletedTasksHeader extends StatelessWidget {
               CupertinoButton(
                 padding: EdgeInsets.zero,
                 onPressed: isActive
-                    ? () => _showClearConfirmation(
-                        context, taskController, completedTasks)
+                    ? () => _showClearConfirmation(context, completedTasks)
                     : null,
                 child: Text(
                   'Clear',
@@ -56,18 +60,15 @@ class CompletedTasksHeader extends StatelessWidget {
     );
   }
 
-  void _showClearConfirmation(BuildContext context,
-      TaskController taskController, List<Task> completedTasks) {
+  void _showClearConfirmation(BuildContext context, List<Task> completedTasks) {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          content: Text(
-            'Clear all completed tasks?',
+          title: Text(
+            'Clear completed tasks?',
             style: TextStyle(
-              color: CupertinoColors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+              fontSize: 18,
             ),
           ),
           actions: <Widget>[
@@ -80,10 +81,8 @@ class CompletedTasksHeader extends StatelessWidget {
             CupertinoDialogAction(
               isDestructiveAction: true,
               onPressed: () {
-                for (var task in completedTasks) {
-                  taskController.deleteTask(task.taskId!);
-                }
                 Navigator.of(context).pop();
+                onClearCompletedTasks(completedTasks);
               },
               child: Text('Clear'),
             ),
