@@ -60,7 +60,6 @@ class HabitService {
   }
 
   Future<void> updateStreaks() async {
-    final db = await _databaseService.database;
     final habits = await getHabits();
 
     for (var habit in habits) {
