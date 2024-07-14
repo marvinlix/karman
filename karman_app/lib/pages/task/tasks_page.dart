@@ -15,12 +15,7 @@ class TasksPage extends StatefulWidget {
 
 class _TasksPageState extends State<TasksPage> {
   List<Task> _sortedTasks = [];
-  final Map<int, bool> _expandedSections = {
-    1: true,
-    2: true,
-    3: true,
-    0: true
-  }; // Use 0 for completed tasks
+  final Map<int, bool> _expandedSections = {1: true, 2: true, 3: true, 0: true};
 
   @override
   void initState() {
@@ -152,28 +147,30 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   Widget _buildTasksList(List<Task> tasks) {
-    if (tasks.isEmpty) {
-      return Center(
-        child: Text(
-          'This space craves your brilliant ideas. Add one!',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: CupertinoColors.white,
-          ),
-          textAlign: TextAlign.center,
-        ),
-      );
-    } else {
-      return ListView(
-        children: [
-          _buildPrioritySection(3, tasks),
-          _buildPrioritySection(2, tasks),
-          _buildPrioritySection(1, tasks),
-          _buildCompletedSection(tasks),
-        ],
-      );
-    }
+    return AnimatedSize(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      child: tasks.isEmpty
+          ? Center(
+              child: Text(
+                'This space craves your brilliant ideas. Add one!',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: CupertinoColors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            )
+          : ListView(
+              children: [
+                _buildPrioritySection(3, tasks),
+                _buildPrioritySection(2, tasks),
+                _buildPrioritySection(1, tasks),
+                _buildCompletedSection(tasks),
+              ],
+            ),
+    );
   }
 
   Widget _buildPrioritySection(int priority, List<Task> allTasks) {
@@ -181,59 +178,83 @@ class _TasksPageState extends State<TasksPage> {
         .where((task) => task.priority == priority && !task.isCompleted)
         .toList();
 
-    if (tasksInPriority.isEmpty) {
-      return SizedBox.shrink();
-    }
-
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: () => _toggleSection(priority),
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            color: CupertinoColors.black,
-            child: Row(
+    return AnimatedSize(
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      child: tasksInPriority.isEmpty
+          ? SizedBox.shrink()
+          : Column(
               children: [
-                Icon(
-                  _expandedSections[priority]!
-                      ? CupertinoIcons.flag_circle
-                      : CupertinoIcons.flag_circle_fill,
-                  color: priority == 3
-                      ? Colors.red
-                      : (priority == 2 ? Colors.yellow : Colors.green),
+                GestureDetector(
+                  onTap: () => _toggleSection(priority),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                    color: CupertinoColors.black,
+                    child: Row(
+                      children: [
+                        Icon(
+                          _expandedSections[priority]!
+                              ? CupertinoIcons.flag_circle
+                              : CupertinoIcons.flag_circle_fill,
+                          color: priority == 3
+                              ? Colors.red
+                              : (priority == 2 ? Colors.yellow : Colors.green),
+                        ),
+                        SizedBox(width: 10),
+                        Text(
+                          priority == 3
+                              ? 'High'
+                              : (priority == 2 ? 'Medium' : 'Low'),
+                          style: TextStyle(
+                              color: CupertinoColors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Spacer(),
+                        Icon(
+                          _expandedSections[priority]!
+                              ? CupertinoIcons.chevron_up
+                              : CupertinoIcons.chevron_down,
+                          color: CupertinoColors.white,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                SizedBox(width: 10),
-                Text(
-                  priority == 3 ? 'High' : (priority == 2 ? 'Medium' : 'Low'),
-                  style: TextStyle(
-                      color: CupertinoColors.white,
-                      fontWeight: FontWeight.bold),
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 300),
+                  height: _expandedSections[priority]!
+                      ? tasksInPriority.length * 70.0
+                      : 0,
+                  child: AnimatedOpacity(
+                    duration: Duration(milliseconds: 300),
+                    opacity: _expandedSections[priority]! ? 1.0 : 0.0,
+                    child: ListView(
+                      physics: NeverScrollableScrollPhysics(),
+                      children: tasksInPriority
+                          .map(
+                            (task) => AnimatedSwitcher(
+                              duration: Duration(milliseconds: 300),
+                              child: GestureDetector(
+                                key: ValueKey(task.taskId),
+                                onTap: () => _openTaskDetails(task),
+                                child: TaskTile(
+                                  key: ValueKey(task.taskId),
+                                  task: task,
+                                  onChanged: (value) =>
+                                      _toggleTaskCompletion(task),
+                                  onDelete: (context) =>
+                                      _deleteTask(context, task.taskId!),
+                                ),
+                              ),
+                            ),
+                          )
+                          .toList(),
+                    ),
+                  ),
                 ),
-                Spacer(),
-                Icon(
-                  _expandedSections[priority]!
-                      ? CupertinoIcons.chevron_up
-                      : CupertinoIcons.chevron_down,
-                  color: CupertinoColors.white,
-                ),
+                SizedBox(height: 20),
               ],
             ),
-          ),
-        ),
-        if (_expandedSections[priority]!)
-          ...tasksInPriority.map(
-            (task) => GestureDetector(
-              onTap: () => _openTaskDetails(task),
-              child: TaskTile(
-                key: ValueKey(task.taskId),
-                task: task,
-                onChanged: (value) => _toggleTaskCompletion(task),
-                onDelete: (context) => _deleteTask(context, task.taskId!),
-              ),
-            ),
-          ),
-        SizedBox(height: 40), // Add vertical space between sections
-      ],
     );
   }
 
@@ -277,18 +298,35 @@ class _TasksPageState extends State<TasksPage> {
             ),
           ),
         ),
-        if (_expandedSections[0]!)
-          ...completedTasks.map(
-            (task) => GestureDetector(
-              onTap: () => _openTaskDetails(task),
-              child: TaskTile(
-                key: ValueKey(task.taskId),
-                task: task,
-                onChanged: (value) => _toggleTaskCompletion(task),
-                onDelete: (context) => _deleteTask(context, task.taskId!),
-              ),
+        AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          height: _expandedSections[0]! ? completedTasks.length * 70.0 : 0,
+          child: AnimatedOpacity(
+            duration: Duration(milliseconds: 300),
+            opacity: _expandedSections[0]! ? 1.0 : 0.0,
+            child: ListView(
+              physics: NeverScrollableScrollPhysics(),
+              children: completedTasks
+                  .map(
+                    (task) => AnimatedSwitcher(
+                      duration: Duration(milliseconds: 300),
+                      child: GestureDetector(
+                        key: ValueKey(task.taskId),
+                        onTap: () => _openTaskDetails(task),
+                        child: TaskTile(
+                          key: ValueKey(task.taskId),
+                          task: task,
+                          onChanged: (value) => _toggleTaskCompletion(task),
+                          onDelete: (context) =>
+                              _deleteTask(context, task.taskId!),
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
+        ),
       ],
     );
   }
