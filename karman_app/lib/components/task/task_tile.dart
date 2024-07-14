@@ -18,7 +18,7 @@ class TaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Material(
         color: Colors.transparent,
         child: Slidable(
@@ -47,7 +47,7 @@ class TaskTile extends StatelessWidget {
               ),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.black,
                     border: Border(
@@ -66,16 +66,16 @@ class TaskTile extends StatelessWidget {
                           color: task.isCompleted
                               ? Colors.grey[700]
                               : Colors.white,
-                          fontSize: 20,
+                          fontSize: 18,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Row(
                         children: [
                           if (task.dueDate != null) _buildDateIcon(),
-                          if (task.dueDate != null) const SizedBox(width: 12),
+                          if (task.dueDate != null) const SizedBox(width: 24),
                           if (task.reminder != null) _buildReminderIcon(),
-                          if (task.reminder != null) const SizedBox(width: 12),
+                          if (task.reminder != null) const SizedBox(width: 24),
                           if (task.note != null && task.note!.isNotEmpty)
                             _buildNoteIcon(),
                         ],
