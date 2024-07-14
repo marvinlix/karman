@@ -9,13 +9,13 @@ import 'package:karman_app/services/notification_service.dart';
 import 'package:provider/provider.dart';
 
 class TaskDetailsSheet extends StatefulWidget {
-  final Task task;
+  final Task? task;
   final bool isNewTask;
 
   const TaskDetailsSheet({
     Key? key,
-    required this.task,
-    this.isNewTask = false,
+    this.task,
+    required this.isNewTask,
   }) : super(key: key);
 
   @override
@@ -34,13 +34,13 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.task.name);
-    _noteController = TextEditingController(text: widget.task.note);
-    _dueDate = widget.task.dueDate;
-    _priority = widget.task.priority;
-    _reminder = widget.task.reminder;
-    _isDateEnabled = widget.task.dueDate != null;
-    _isReminderEnabled = widget.task.reminder != null;
+    _nameController = TextEditingController(text: widget.task?.name ?? '');
+    _noteController = TextEditingController(text: widget.task?.note ?? '');
+    _dueDate = widget.task?.dueDate;
+    _priority = widget.task?.priority ?? 1;
+    _reminder = widget.task?.reminder;
+    _isDateEnabled = widget.task?.dueDate != null;
+    _isReminderEnabled = widget.task?.reminder != null;
 
     if (widget.isNewTask) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -79,16 +79,20 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
     }
 
     final updatedTask = Task(
-      taskId: widget.task.taskId,
+      taskId: widget.task?.taskId,
       name: _nameController.text.trim(),
       note: _noteController.text,
       priority: _priority,
       dueDate: _isDateEnabled ? _dueDate : null,
       reminder: _isReminderEnabled ? _reminder : null,
-      isCompleted: widget.task.isCompleted,
+      isCompleted: widget.task?.isCompleted ?? false,
     );
 
-    context.read<TaskController>().updateTask(updatedTask);
+    if (widget.isNewTask) {
+      context.read<TaskController>().addTask(updatedTask);
+    } else {
+      context.read<TaskController>().updateTask(updatedTask);
+    }
 
     if (updatedTask.reminder != null) {
       NotificationService.scheduleNotification(
@@ -98,7 +102,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
         scheduledDate: updatedTask.reminder!,
         payload: 'task_${updatedTask.taskId}',
       );
-    } else {
+    } else if (updatedTask.taskId != null) {
       NotificationService.cancelNotification(updatedTask.taskId!);
     }
 

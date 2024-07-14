@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:karman_app/controllers/task/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/pages/task/task_details_sheet.dart';
@@ -28,11 +27,9 @@ class _TasksPageState extends State<TasksPage> {
   void _sortTasks(List<Task> tasks) {
     _sortedTasks = List.from(tasks);
     _sortedTasks.sort((a, b) {
-      // Sort completed tasks to the bottom
       if (a.isCompleted != b.isCompleted) {
         return a.isCompleted ? 1 : -1;
       }
-      // Sort non-completed tasks by priority
       return b.priority.compareTo(a.priority);
     });
   }
@@ -56,36 +53,19 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   void _addTask() {
-    final newTask = Task(
-      name: '',
-      priority: 1,
-    );
-    context.read<TaskController>().addTask(newTask).then((task) {
-      if (task != null) {
-        _openTaskDetails(task);
-      }
-    });
+    _openTaskDetails(null);
   }
 
-  void _openTaskDetails(Task task) {
-    final isNewTask = task.name.isEmpty;
+  void _openTaskDetails(Task? task) {
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
         return TaskDetailsSheet(
           task: task,
-          isNewTask: isNewTask,
+          isNewTask: task == null,
         );
       },
-    ).then((saved) {
-      // If the task wasn't saved (sheet was dismissed) and it's a new task with an empty name, delete it
-      if (saved != true &&
-          isNewTask &&
-          task.name.isEmpty &&
-          task.taskId != null) {
-        context.read<TaskController>().deleteTask(task.taskId!);
-      }
-      // Re-sort tasks after editing
+    ).then((_) {
       setState(() {
         _sortTasks(context.read<TaskController>().tasks);
       });
