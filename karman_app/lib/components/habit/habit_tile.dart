@@ -2,22 +2,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:karman_app/components/icon_selection_dialog.dart.dart';
-import 'package:karman_app/models/task/task_folder.dart';
+import 'package:karman_app/models/habits/habit.dart';
 
-class FolderTile extends StatelessWidget {
-  final TaskFolder folder;
-  final Function() onTap;
-  final Function(BuildContext) onEdit;
-  final Function(BuildContext) onDelete;
+class HabitTile extends StatelessWidget {
+  final Habit habit;
+  final VoidCallback onTap;
+  final VoidCallback onCheckmark;
   final Function(IconData) onIconChanged;
+  final Function(BuildContext)? onEdit;
+  final Function(BuildContext)? onDelete;
 
-  const FolderTile({
+  const HabitTile({
     Key? key,
-    required this.folder,
+    required this.habit,
     required this.onTap,
-    required this.onEdit,
-    required this.onDelete,
+    required this.onCheckmark,
     required this.onIconChanged,
+    this.onEdit,
+    this.onDelete,
   }) : super(key: key);
 
   @override
@@ -27,35 +29,35 @@ class FolderTile extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: Slidable(
-          key: ValueKey(folder.folder_id),
+          key: ValueKey(habit.habitId),
           endActionPane: ActionPane(
-            motion: DrawerMotion(),
+            motion: const DrawerMotion(),
             children: [
               SlidableAction(
                 onPressed: onEdit,
-                backgroundColor: Colors.transparent,
+                backgroundColor: Colors.black,
                 foregroundColor: Colors.blueAccent,
                 icon: CupertinoIcons.pen,
                 label: 'Edit',
               ),
               SlidableAction(
                 onPressed: onDelete,
-                backgroundColor: Colors.transparent,
+                backgroundColor: Colors.black,
                 foregroundColor: Colors.redAccent,
                 icon: CupertinoIcons.delete,
                 label: 'Delete',
               ),
             ],
           ),
-          child: InkWell(
+          child: GestureDetector(
             onTap: onTap,
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               decoration: BoxDecoration(
-                color: CupertinoColors.darkBackgroundGray,
+                color: CupertinoColors.black,
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.grey[700]!,
+                    color: CupertinoColors.systemGrey.darkColor,
                     width: 1,
                   ),
                 ),
@@ -72,26 +74,63 @@ class FolderTile extends StatelessWidget {
                       );
                     },
                     child: Icon(
-                      folder.icon,
-                      color: Colors.white,
+                      habit.icon ?? CupertinoIcons.circle,
+                      color: CupertinoColors.white,
                       size: 24,
                     ),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Text(
-                      folder.name,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
+                      habit.name,
+                      style: const TextStyle(
+                        color: CupertinoColors.white,
+                        fontSize: 18,
                       ),
                     ),
                   ),
+                  const SizedBox(width: 16),
+                  _buildStreakIcon(),
+                  const SizedBox(width: 16),
+                  _buildCheckmarkIcon(),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildStreakIcon() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(
+          CupertinoIcons.flame,
+          color: CupertinoColors.systemOrange,
+          size: 20,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          '${habit.currentStreak}',
+          style: const TextStyle(
+            color: CupertinoColors.white,
+            fontSize: 16,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCheckmarkIcon() {
+    return GestureDetector(
+      onTap: onCheckmark,
+      child: Icon(
+        CupertinoIcons.checkmark_circle_fill,
+        color:
+            habit.status ? CupertinoColors.white : CupertinoColors.systemGrey,
+        size: 20,
       ),
     );
   }

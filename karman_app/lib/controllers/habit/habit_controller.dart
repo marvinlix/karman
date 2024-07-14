@@ -25,13 +25,14 @@ class HabitController extends ChangeNotifier {
   Future<void> addHabit(Habit habit) async {
     final id = await _habitService.createHabit(habit);
     final newHabit = Habit(
-      id: id,
+      habitId: id,
       name: habit.name,
       status: habit.status,
       startDate: habit.startDate,
       endDate: habit.endDate,
       currentStreak: habit.currentStreak,
       longestStreak: habit.longestStreak,
+      icon: habit.icon,
     );
     _habits.add(newHabit);
     notifyListeners();
@@ -39,7 +40,7 @@ class HabitController extends ChangeNotifier {
 
   Future<void> updateHabit(Habit habit) async {
     await _habitService.updateHabit(habit);
-    final index = _habits.indexWhere((h) => h.id == habit.id);
+    final index = _habits.indexWhere((h) => h.habitId == habit.habitId);
     if (index != -1) {
       _habits[index] = habit;
       notifyListeners();
@@ -48,7 +49,7 @@ class HabitController extends ChangeNotifier {
 
   Future<void> deleteHabit(int id) async {
     await _habitService.deleteHabit(id);
-    _habits.removeWhere((habit) => habit.id == id);
+    _habits.removeWhere((habit) => habit.habitId == id);
     _habitLogs.remove(id);
     notifyListeners();
   }
@@ -82,5 +83,31 @@ class HabitController extends ChangeNotifier {
     await _habitService.deleteHabitLog(logId);
     _habitLogs[habitId]?.removeWhere((log) => log.id == logId);
     notifyListeners();
+  }
+
+  Future<void> toggleHabitStatus(Habit habit) async {
+    final updatedHabit = Habit(
+      habitId: habit.habitId,
+      name: habit.name,
+      status: !habit.status,
+      startDate: habit.startDate,
+      endDate: habit.endDate,
+      currentStreak: habit.status ? 0 : habit.currentStreak + 1,
+      longestStreak: habit.status
+          ? habit.longestStreak
+          : (habit.currentStreak + 1 > habit.longestStreak
+              ? habit.currentStreak + 1
+              : habit.longestStreak),
+      icon: habit.icon,
+    );
+    await updateHabit(updatedHabit);
+
+    // Add a new habit log
+    final newLog = HabitLog(
+      habitId: habit.habitId!,
+      date: DateTime.now().toString(),
+      status: updatedHabit.status,
+    );
+    await addHabitLog(newLog);
   }
 }

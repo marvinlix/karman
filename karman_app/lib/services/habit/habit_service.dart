@@ -26,6 +26,8 @@ class HabitService {
 
   Future<int> deleteHabit(int id) async {
     final db = await _databaseService.database;
+    // Delete associated logs first
+    await _habitDatabase.deleteHabitLogs(db, id);
     return await _habitDatabase.deleteHabit(db, id);
   }
 
@@ -49,5 +51,41 @@ class HabitService {
   Future<int> deleteHabitLog(int id) async {
     final db = await _databaseService.database;
     return await _habitDatabase.deleteHabitLog(db, id);
+  }
+
+  Future<HabitLog?> getLatestHabitLog(int habitId) async {
+    final db = await _databaseService.database;
+    final logData = await _habitDatabase.getLatestHabitLog(db, habitId);
+    return logData != null ? HabitLog.fromMap(logData) : null;
+  }
+
+  Future<void> updateStreaks() async {
+    final db = await _databaseService.database;
+    final habits = await getHabits();
+
+    for (var habit in habits) {
+      final latestLog = await getLatestHabitLog(habit.habitId!);
+      if (latestLog != null) {
+        final today = DateTime.now();
+        final latestLogDate = DateTime.parse(latestLog.date);
+
+        if (latestLogDate.year == today.year &&
+            latestLogDate.month == today.month &&
+            latestLogDate.day == today.day - 1) {
+          // The habit was completed yesterday, increment the streak
+          habit = habit.copyWith(
+            currentStreak: habit.currentStreak + 1,
+            longestStreak: habit.currentStreak + 1 > habit.longestStreak
+                ? habit.currentStreak + 1
+                : habit.longestStreak,
+          );
+        } else if (latestLogDate.isBefore(today.subtract(Duration(days: 1)))) {
+          // The habit was not completed yesterday, reset the streak
+          habit = habit.copyWith(currentStreak: 0);
+        }
+
+        await updateHabit(habit);
+      }
+    }
   }
 }

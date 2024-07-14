@@ -1,13 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:karman_app/components/dialog_window.dart';
-import 'package:karman_app/components/task/completed_task_header.dart';
 import 'package:karman_app/controllers/task/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
-import 'package:karman_app/models/task/task_folder.dart';
 import 'package:karman_app/pages/task/task_details_sheet.dart';
 import 'package:karman_app/components/task/task_tile.dart';
-import 'package:karman_app/components/task/folder_drawer.dart';
+import 'package:karman_app/components/task/completed_task_header.dart';
 import 'package:provider/provider.dart';
 
 class TasksPage extends StatefulWidget {
@@ -18,216 +15,94 @@ class TasksPage extends StatefulWidget {
 }
 
 class _TasksPageState extends State<TasksPage> {
-  int currentFolderId = 1; // Assuming 1 is the default folder ID
+  List<Task> _sortedTasks = [];
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TaskController>().loadTasks();
-      context.read<TaskController>().loadFolders();
     });
-  }
-
-  final TextEditingController _taskController = TextEditingController();
-  final TextEditingController _folderController = TextEditingController();
-
-  void _addFolder() {
-    final newFolder = TaskFolder(name: _folderController.text);
-    context.read<TaskController>().addFolder(newFolder).then((folder) {
-      if (folder != null && folder.folder_id != null) {
-        setState(() {
-          currentFolderId = folder.folder_id!;
-        });
-      }
-    });
-    _folderController.clear();
   }
 
   void _sortTasks(List<Task> tasks) {
-    tasks.sort((a, b) {
-      if (a.isCompleted == b.isCompleted) {
-        return 0;
+    _sortedTasks = List.from(tasks);
+    _sortedTasks.sort((a, b) {
+      // Sort completed tasks to the bottom
+      if (a.isCompleted != b.isCompleted) {
+        return a.isCompleted ? 1 : -1;
       }
-      return a.isCompleted ? 1 : -1;
+      // Sort non-completed tasks by priority
+      return b.priority.compareTo(a.priority);
     });
   }
 
   void _toggleTaskCompletion(Task task) {
     final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
     context.read<TaskController>().updateTask(updatedTask);
-  }
-
-  void _editTask(BuildContext context, Task task) {
-    _taskController.text = task.name;
-    showCupertinoDialog(
-      context: context,
-      builder: (context) {
-        return KarmanDialogWindow(
-          controller: _taskController,
-          onSave: () {
-            final updatedTask = task.copyWith(name: _taskController.text);
-            context.read<TaskController>().updateTask(updatedTask);
-            _taskController.clear();
-            Navigator.of(context).pop();
-          },
-          onCancel: () {
-            _taskController.clear();
-            Navigator.of(context).pop();
-          },
-          initialText: task.name,
-        );
-      },
-    );
+    setState(() {
+      _sortTasks(context.read<TaskController>().tasks);
+    });
   }
 
   void _deleteTask(BuildContext context, int id) {
     context.read<TaskController>().deleteTask(id);
   }
 
-  void _clearCompletedTasks(BuildContext context, List<Task> completedTasks) {
+  void _clearCompletedTasks(List<Task> completedTasks) {
     for (var task in completedTasks) {
       _deleteTask(context, task.taskId!);
     }
   }
 
   void _addTask() {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) {
-        return KarmanDialogWindow(
-          controller: _taskController,
-          onSave: () {
-            final newTask = Task(
-              name: _taskController.text,
-              priority: 1,
-              folderId: currentFolderId,
-            );
-            context.read<TaskController>().addTask(newTask);
-            _taskController.clear();
-            Navigator.of(context).pop();
-          },
-          onCancel: () {
-            _taskController.clear();
-            Navigator.of(context).pop();
-          },
-        );
-      },
+    final newTask = Task(
+      name: '',
+      priority: 1,
     );
-  }
-
-  void _openDrawer() {
-    showCupertinoModalPopup(
-      context: context,
-      builder: (context) {
-        return FolderDrawer(
-          onFolderSelected: (folder) {
-            setState(() {
-              currentFolderId = folder.folder_id!;
-            });
-          },
-          controller: _folderController,
-          onCreateFolder: _addFolder,
-        );
-      },
-    );
+    context.read<TaskController>().addTask(newTask).then((task) {
+      if (task != null) {
+        _openTaskDetails(task);
+      }
+    });
   }
 
   void _openTaskDetails(Task task) {
+    final isNewTask = task.name.isEmpty;
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
         return TaskDetailsSheet(
           task: task,
+          isNewTask: isNewTask,
         );
       },
-    );
-  }
-
-  String getAppbarTitle(List<TaskFolder> folders) {
-    if (folders.isEmpty) {
-      return "¯\\_(ツ)_/¯";
-    } else {
-      final currentFolder = folders.firstWhere(
-        (folder) => folder.folder_id == currentFolderId,
-        orElse: () => TaskFolder(folder_id: -1, name: 'Unknown Folder'),
-      );
-      return currentFolder.name;
-    }
+    ).then((saved) {
+      // If the task wasn't saved (sheet was dismissed) and it's a new task with an empty name, delete it
+      if (saved != true &&
+          isNewTask &&
+          task.name.isEmpty &&
+          task.taskId != null) {
+        context.read<TaskController>().deleteTask(task.taskId!);
+      }
+      // Re-sort tasks after editing
+      setState(() {
+        _sortTasks(context.read<TaskController>().tasks);
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<TaskController>(
       builder: (context, taskController, child) {
-        final folders = taskController.folders;
-        final tasks = taskController.getTasksForFolder(currentFolderId);
-        _sortTasks(tasks);
-
-        if (folders.isEmpty) {
-          return CupertinoPageScaffold(
-            navigationBar: CupertinoNavigationBar(
-              backgroundColor: Colors.black,
-              middle: Text(
-                "Folder-less and fancy-free!",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              leading: CupertinoButton(
-                padding: EdgeInsets.zero,
-                onPressed: _openDrawer,
-                child: Icon(
-                  CupertinoIcons.square_stack,
-                  color: CupertinoColors.white,
-                  size: 20,
-                ),
-              ),
-            ),
-            child: SafeArea(
-              child: const Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Your tasks are feeling homeless!",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 30),
-                    Text(
-                      "Click the icon in the top left to create a new folder.",
-                      style: TextStyle(fontSize: 16),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }
+        _sortTasks(taskController.tasks);
 
         return CupertinoPageScaffold(
+          backgroundColor: CupertinoColors.black,
           navigationBar: CupertinoNavigationBar(
-            backgroundColor: Colors.black,
-            middle: Text(
-              getAppbarTitle(folders),
-              style: TextStyle(
-                fontSize: 20,
-              ),
-            ),
-            leading: CupertinoButton(
-              padding: EdgeInsets.zero,
-              onPressed: _openDrawer,
-              child: Icon(
-                CupertinoIcons.square_stack,
-                color: CupertinoColors.white,
-                size: 20,
-              ),
-            ),
+            backgroundColor: CupertinoColors.black,
+            border: null,
             trailing: CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: _addTask,
@@ -241,15 +116,11 @@ class _TasksPageState extends State<TasksPage> {
           child: SafeArea(
             child: Column(
               children: [
-                SizedBox(height: 8),
                 CompletedTasksHeader(
-                  currentFolderId: currentFolderId,
-                  onClearCompletedTasks: (completedTasks) {
-                    _clearCompletedTasks(context, completedTasks);
-                  },
+                  onClearCompletedTasks: _clearCompletedTasks,
                 ),
                 Expanded(
-                  child: _buildTasksList(tasks),
+                  child: _buildTasksList(_sortedTasks),
                 ),
               ],
             ),
@@ -267,6 +138,7 @@ class _TasksPageState extends State<TasksPage> {
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
+            color: CupertinoColors.white,
           ),
           textAlign: TextAlign.center,
         ),
@@ -282,7 +154,7 @@ class _TasksPageState extends State<TasksPage> {
               key: ValueKey(task.taskId),
               task: task,
               onChanged: (value) => _toggleTaskCompletion(task),
-              onEdit: (context) => _editTask(context, task),
+              onEdit: (context) => _openTaskDetails(task),
               onDelete: (context) => _deleteTask(context, task.taskId!),
             ),
           );

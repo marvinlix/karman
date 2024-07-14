@@ -23,7 +23,6 @@ void main() async {
 
   // Load initial data
   await taskController.loadTasks();
-  await taskController.loadFolders();
   await habitController.loadHabits();
 
   runApp(MultiProvider(

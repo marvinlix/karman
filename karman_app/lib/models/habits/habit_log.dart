@@ -1,7 +1,7 @@
 class HabitLog {
   final int? id;
   final int habitId;
-  final DateTime date;
+  final String date;
   final bool status;
 
   HabitLog({
@@ -14,8 +14,8 @@ class HabitLog {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'habit_id': habitId,
-      'date': date.toIso8601String(),
+      'habitId': habitId,
+      'date': date,
       'status': status ? 1 : 0,
     };
   }
@@ -23,9 +23,23 @@ class HabitLog {
   factory HabitLog.fromMap(Map<String, dynamic> map) {
     return HabitLog(
       id: map['id'],
-      habitId: map['habit_id'],
-      date: DateTime.parse(map['date']),
+      habitId: map['habitId'],
+      date: map['date'],
       status: map['status'] == 1,
+    );
+  }
+
+  HabitLog copyWith({
+    int? id,
+    int? habitId,
+    String? date,
+    bool? status,
+  }) {
+    return HabitLog(
+      id: id ?? this.id,
+      habitId: habitId ?? this.habitId,
+      date: date ?? this.date,
+      status: status ?? this.status,
     );
   }
 }

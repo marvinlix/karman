@@ -4,23 +4,18 @@ import 'package:karman_app/controllers/task/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 
 class CompletedTasksHeader extends StatelessWidget {
-  final int currentFolderId;
   final Function(List<Task>) onClearCompletedTasks;
 
   const CompletedTasksHeader({
-    Key? key,
-    required this.currentFolderId,
+    super.key,
     required this.onClearCompletedTasks,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Consumer<TaskController>(
       builder: (context, taskController, child) {
-        final tasks = taskController.tasks
-            .where((task) => task.folderId == currentFolderId)
-            .toList();
-        final completedTasks = tasks.where((task) => task.isCompleted).toList();
+        final completedTasks = taskController.getCompletedTasks();
         final completedCount = completedTasks.length;
         final isActive = completedCount > 0;
 
