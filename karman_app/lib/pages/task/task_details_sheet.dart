@@ -58,23 +58,21 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
 
   final FocusNode _nameFocusNode = FocusNode();
 
+  bool _isDateInPast(DateTime date) {
+    final now = DateTime.now();
+    return date.isBefore(now);
+  }
+
   void _saveChanges() {
     if (_nameController.text.trim().isEmpty) {
-      showCupertinoDialog(
-        context: context,
-        builder: (BuildContext context) => CupertinoAlertDialog(
-          title: Text('Invalid Task Name'),
-          content: Text('Task name cannot be empty.'),
-          actions: <CupertinoDialogAction>[
-            CupertinoDialogAction(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
+      _showQuirkyDialog('A Task Without a Name?',
+          'Your task is feeling a bit shy and nameless. How about giving it a snazzy title to boost its confidence?');
+      return;
+    }
+
+    if (_isReminderEnabled && _reminder != null && _isDateInPast(_reminder!)) {
+      _showQuirkyDialog('Time Travel Not Invented Yet!',
+          'Unless you have a time machine, we can\'t remind you in the past.');
       return;
     }
 
@@ -107,6 +105,24 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
     }
 
     Navigator.of(context).pop(true);
+  }
+
+  void _showQuirkyDialog(String title, String content) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: Text(title, style: TextStyle(fontSize: 18)),
+        content: Text(content),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            child: Text('Got it!'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
