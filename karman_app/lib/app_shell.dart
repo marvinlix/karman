@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:karman_app/pages/habit/habits_page.dart';
-import 'package:karman_app/pages/pomodoro/pomodoro_page.dart';
 import 'package:karman_app/pages/setting/settings_page.dart';
 import 'package:karman_app/pages/task/tasks_page.dart';
-import 'package:karman_app/pages/zen/zen_page.dart';
+import 'package:karman_app/pages/focus/focus_page.dart';
 
 class AppShell extends StatelessWidget {
   @override
@@ -18,19 +17,15 @@ class AppShell extends StatelessWidget {
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.clock),
+            icon: Icon(CupertinoIcons.leaf_arrow_circlepath),
             label: 'Habit',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.circle),
-            label: 'Zen',
+            icon: Icon(CupertinoIcons.sun_min),
+            label: 'Focus',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.timer),
-            label: 'Pomodoro',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.settings),
+            icon: Icon(CupertinoIcons.gear),
             label: 'Settings',
           ),
         ],
@@ -42,10 +37,8 @@ class AppShell extends StatelessWidget {
           case 1:
             return CupertinoTabView(builder: (context) => HabitsPage());
           case 2:
-            return CupertinoTabView(builder: (context) => ZenPage());
+            return CupertinoTabView(builder: (context) => FocusPage());
           case 3:
-            return CupertinoTabView(builder: (context) => PomodoroPage());
-          case 4:
             return CupertinoTabView(builder: (context) => SettingsPage());
           default:
             return CupertinoTabView(builder: (context) => TasksPage());

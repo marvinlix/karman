@@ -1,16 +1,16 @@
 import 'package:flutter/cupertino.dart';
 
-class PomodoroPage extends StatelessWidget {
-  const PomodoroPage({super.key});
+class FocusPage extends StatelessWidget {
+  const FocusPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
-        middle: Text('Pomodoro'),
+        middle: Text('Foucs'),
       ),
       child: Center(
-        child: Text('Pomodoro Page'),
+        child: Text('Focus Page'),
       ),
     );
   }
