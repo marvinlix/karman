@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:karman_app/controllers/task/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/pages/task/task_details_sheet.dart';
 import 'package:karman_app/components/task/task_tile.dart';
-import 'package:karman_app/components/task/completed_task_header.dart';
 import 'package:provider/provider.dart';
 
 class TasksPage extends StatefulWidget {
@@ -15,6 +15,12 @@ class TasksPage extends StatefulWidget {
 
 class _TasksPageState extends State<TasksPage> {
   List<Task> _sortedTasks = [];
+  final Map<int, bool> _expandedSections = {
+    1: true,
+    2: true,
+    3: true,
+    0: true
+  }; // Use 0 for completed tasks
 
   @override
   void initState() {
@@ -46,12 +52,6 @@ class _TasksPageState extends State<TasksPage> {
     context.read<TaskController>().deleteTask(id);
   }
 
-  void _clearCompletedTasks(List<Task> completedTasks) {
-    for (var task in completedTasks) {
-      _deleteTask(context, task.taskId!);
-    }
-  }
-
   void _addTask() {
     _openTaskDetails(null);
   }
@@ -72,38 +72,79 @@ class _TasksPageState extends State<TasksPage> {
     });
   }
 
+  void _toggleSection(int priority) {
+    setState(() {
+      _expandedSections[priority] = !_expandedSections[priority]!;
+    });
+  }
+
+  void _clearCompletedTasks() {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: Text('Clear Completed Tasks'),
+        content: Text('Are you sure you want to delete all completed tasks?'),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            child: Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.of(context).pop();
+              context.read<TaskController>().clearCompletedTasks();
+            },
+            child: Text('Clear'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<TaskController>(
       builder: (context, taskController, child) {
         _sortTasks(taskController.tasks);
+        final incompleteTasks =
+            _sortedTasks.where((task) => !task.isCompleted).length;
+        final hasCompletedTasks = _sortedTasks.any((task) => task.isCompleted);
 
         return CupertinoPageScaffold(
           backgroundColor: CupertinoColors.black,
           navigationBar: CupertinoNavigationBar(
             backgroundColor: CupertinoColors.black,
             border: null,
+            leading: CupertinoButton(
+              padding: EdgeInsets.zero,
+              onPressed: hasCompletedTasks ? _clearCompletedTasks : null,
+              child: Icon(
+                CupertinoIcons.bin_xmark_fill,
+                color: hasCompletedTasks
+                    ? CupertinoColors.white
+                    : CupertinoColors.systemGrey,
+                size: 20,
+              ),
+            ),
+            middle: Text(
+              '$incompleteTasks tasks left',
+              style: TextStyle(color: CupertinoColors.white),
+            ),
             trailing: CupertinoButton(
               padding: EdgeInsets.zero,
               onPressed: _addTask,
               child: Icon(
-                CupertinoIcons.plus,
+                CupertinoIcons.plus_circle_fill,
                 color: CupertinoColors.white,
-                size: 20,
+                size: 22,
               ),
             ),
           ),
           child: SafeArea(
-            child: Column(
-              children: [
-                CompletedTasksHeader(
-                  onClearCompletedTasks: _clearCompletedTasks,
-                ),
-                Expanded(
-                  child: _buildTasksList(_sortedTasks),
-                ),
-              ],
-            ),
+            child: _buildTasksList(_sortedTasks),
           ),
         );
       },
@@ -124,22 +165,131 @@ class _TasksPageState extends State<TasksPage> {
         ),
       );
     } else {
-      return ListView.builder(
-        itemCount: tasks.length,
-        itemBuilder: (context, index) {
-          final task = tasks[index];
-          return GestureDetector(
-            onTap: () => _openTaskDetails(task),
-            child: TaskTile(
-              key: ValueKey(task.taskId),
-              task: task,
-              onChanged: (value) => _toggleTaskCompletion(task),
-              onEdit: (context) => _openTaskDetails(task),
-              onDelete: (context) => _deleteTask(context, task.taskId!),
-            ),
-          );
-        },
+      return ListView(
+        children: [
+          _buildPrioritySection(3, tasks),
+          _buildPrioritySection(2, tasks),
+          _buildPrioritySection(1, tasks),
+          _buildCompletedSection(tasks),
+        ],
       );
     }
+  }
+
+  Widget _buildPrioritySection(int priority, List<Task> allTasks) {
+    final tasksInPriority = allTasks
+        .where((task) => task.priority == priority && !task.isCompleted)
+        .toList();
+
+    if (tasksInPriority.isEmpty) {
+      return SizedBox.shrink();
+    }
+
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () => _toggleSection(priority),
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            color: CupertinoColors.black,
+            child: Row(
+              children: [
+                Icon(
+                  _expandedSections[priority]!
+                      ? CupertinoIcons.flag_circle
+                      : CupertinoIcons.flag_circle_fill,
+                  color: priority == 3
+                      ? Colors.red
+                      : (priority == 2 ? Colors.yellow : Colors.green),
+                ),
+                SizedBox(width: 10),
+                Text(
+                  priority == 3 ? 'High' : (priority == 2 ? 'Medium' : 'Low'),
+                  style: TextStyle(
+                      color: CupertinoColors.white,
+                      fontWeight: FontWeight.bold),
+                ),
+                Spacer(),
+                Icon(
+                  _expandedSections[priority]!
+                      ? CupertinoIcons.chevron_up
+                      : CupertinoIcons.chevron_down,
+                  color: CupertinoColors.white,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_expandedSections[priority]!)
+          ...tasksInPriority.map(
+            (task) => GestureDetector(
+              onTap: () => _openTaskDetails(task),
+              child: TaskTile(
+                key: ValueKey(task.taskId),
+                task: task,
+                onChanged: (value) => _toggleTaskCompletion(task),
+                onDelete: (context) => _deleteTask(context, task.taskId!),
+              ),
+            ),
+          ),
+        SizedBox(height: 40), // Add vertical space between sections
+      ],
+    );
+  }
+
+  Widget _buildCompletedSection(List<Task> allTasks) {
+    final completedTasks = allTasks.where((task) => task.isCompleted).toList();
+
+    if (completedTasks.isEmpty) {
+      return SizedBox.shrink();
+    }
+
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () => _toggleSection(0),
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            color: CupertinoColors.black,
+            child: Row(
+              children: [
+                Icon(
+                  _expandedSections[0]!
+                      ? CupertinoIcons.checkmark_circle
+                      : CupertinoIcons.checkmark_circle_fill,
+                  color: CupertinoColors.systemGrey,
+                ),
+                SizedBox(width: 10),
+                Text(
+                  'Completed',
+                  style: TextStyle(
+                      color: CupertinoColors.white,
+                      fontWeight: FontWeight.bold),
+                ),
+                Spacer(),
+                Icon(
+                  _expandedSections[0]!
+                      ? CupertinoIcons.chevron_up
+                      : CupertinoIcons.chevron_down,
+                  color: CupertinoColors.white,
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_expandedSections[0]!)
+          ...completedTasks.map(
+            (task) => GestureDetector(
+              onTap: () => _openTaskDetails(task),
+              child: TaskTile(
+                key: ValueKey(task.taskId),
+                task: task,
+                onChanged: (value) => _toggleTaskCompletion(task),
+                onDelete: (context) => _deleteTask(context, task.taskId!),
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }

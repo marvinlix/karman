@@ -28,4 +28,9 @@ class TaskService {
     final db = await _databaseService.database;
     await _taskDatabase.deleteTask(db, id);
   }
+
+  Future<void> deleteCompletedTasks() async {
+    final db = await _databaseService.database;
+    await _taskDatabase.deleteCompletedTasks(db);
+  }
 }

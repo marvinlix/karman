@@ -42,4 +42,12 @@ class TaskDatabase {
       whereArgs: [id],
     );
   }
+
+  Future<int> deleteCompletedTasks(Database db) async {
+    return await db.delete(
+      tableName,
+      where: 'is_completed = ?',
+      whereArgs: [1],
+    );
+  }
 }

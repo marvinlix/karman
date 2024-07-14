@@ -6,16 +6,14 @@ import 'package:karman_app/models/task/task.dart';
 class TaskTile extends StatelessWidget {
   final Task task;
   final Function(bool?)? onChanged;
-  final Function(BuildContext)? onEdit;
   final Function(BuildContext)? onDelete;
 
   const TaskTile({
-    Key? key,
+    super.key,
     required this.task,
     required this.onChanged,
-    required this.onEdit,
     required this.onDelete,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +26,6 @@ class TaskTile extends StatelessWidget {
           endActionPane: ActionPane(
             motion: const DrawerMotion(),
             children: [
-              SlidableAction(
-                onPressed: onEdit,
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.blueAccent,
-                icon: CupertinoIcons.pen,
-                label: 'Edit',
-              ),
               SlidableAction(
                 onPressed: onDelete,
                 backgroundColor: Colors.black,
@@ -81,11 +72,12 @@ class TaskTile extends StatelessWidget {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          _buildPriorityIcon(),
-                          const SizedBox(width: 12),
                           if (task.dueDate != null) _buildDateIcon(),
                           if (task.dueDate != null) const SizedBox(width: 12),
                           if (task.reminder != null) _buildReminderIcon(),
+                          if (task.reminder != null) const SizedBox(width: 12),
+                          if (task.note != null && task.note!.isNotEmpty)
+                            _buildNoteIcon(),
                         ],
                       ),
                     ],
@@ -99,29 +91,15 @@ class TaskTile extends StatelessWidget {
     );
   }
 
-  Widget _buildPriorityIcon() {
-    Color color;
-    switch (task.priority) {
-      case 1:
-        color = Colors.green;
-        break;
-      case 2:
-        color = Colors.yellow;
-        break;
-      case 3:
-        color = Colors.red;
-        break;
-      default:
-        color = Colors.grey;
-    }
-    return Icon(CupertinoIcons.flag_fill, color: color, size: 16);
-  }
-
   Widget _buildDateIcon() {
     return const Icon(CupertinoIcons.calendar, color: Colors.white, size: 16);
   }
 
   Widget _buildReminderIcon() {
     return const Icon(CupertinoIcons.clock, color: Colors.white, size: 16);
+  }
+
+  Widget _buildNoteIcon() {
+    return const Icon(CupertinoIcons.doc_text, color: Colors.white, size: 16);
   }
 }
