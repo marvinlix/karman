@@ -1,31 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:karman_app/components/icon_selection_dialog.dart.dart';
+import 'package:karman_app/controllers/habit/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
+import 'package:karman_app/pages/habit/habit_completion_sheet.dart';
+import 'package:karman_app/pages/habit/habit_details_sheet.dart';
+import 'package:provider/provider.dart';
 
 class HabitTile extends StatelessWidget {
   final Habit habit;
-  final VoidCallback onTap;
-  final VoidCallback onCheckmark;
-  final Function(IconData) onIconChanged;
-  final Function(BuildContext)? onEdit;
-  final Function(BuildContext)? onDelete;
 
   const HabitTile({
-    Key? key,
+    super.key,
     required this.habit,
-    required this.onTap,
-    required this.onCheckmark,
-    required this.onIconChanged,
-    this.onEdit,
-    this.onDelete,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Material(
         color: Colors.transparent,
         child: Slidable(
@@ -34,14 +27,7 @@ class HabitTile extends StatelessWidget {
             motion: const DrawerMotion(),
             children: [
               SlidableAction(
-                onPressed: onEdit,
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.blueAccent,
-                icon: CupertinoIcons.pen,
-                label: 'Edit',
-              ),
-              SlidableAction(
-                onPressed: onDelete,
+                onPressed: (context) => _deleteHabit(context),
                 backgroundColor: Colors.black,
                 foregroundColor: Colors.redAccent,
                 icon: CupertinoIcons.delete,
@@ -50,49 +36,35 @@ class HabitTile extends StatelessWidget {
             ],
           ),
           child: GestureDetector(
-            onTap: onTap,
+            onTap: () => _showHabitDetailsSheet(context),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               decoration: BoxDecoration(
-                color: CupertinoColors.black,
+                color: Colors.black,
                 border: Border(
                   bottom: BorderSide(
-                    color: CupertinoColors.systemGrey.darkColor,
+                    color: Colors.grey[800]!,
                     width: 1,
                   ),
                 ),
               ),
               child: Row(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      showCupertinoDialog(
-                        context: context,
-                        builder: (context) => IconSelectionDialog(
-                          onIconSelected: onIconChanged,
-                        ),
-                      );
-                    },
-                    child: Icon(
-                      habit.icon ?? CupertinoIcons.circle,
-                      color: CupertinoColors.white,
-                      size: 24,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
                   Expanded(
                     child: Text(
-                      habit.name,
-                      style: const TextStyle(
+                      habit.habitName,
+                      style: TextStyle(
                         color: CupertinoColors.white,
                         fontSize: 18,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  SizedBox(width: 16),
                   _buildStreakIcon(),
-                  const SizedBox(width: 16),
-                  _buildCheckmarkIcon(),
+                  SizedBox(width: 16),
+                  _buildStageImage(),
+                  SizedBox(width: 16),
+                  _buildCompletionIcon(context),
                 ],
               ),
             ),
@@ -103,35 +75,78 @@ class HabitTile extends StatelessWidget {
   }
 
   Widget _buildStreakIcon() {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Icon(
-          CupertinoIcons.flame,
-          color: CupertinoColors.systemOrange,
-          size: 20,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          '${habit.currentStreak}',
-          style: const TextStyle(
-            color: CupertinoColors.white,
-            fontSize: 16,
-          ),
-        ),
-      ],
+    IconData iconData = CupertinoIcons.flame_fill;
+    Color iconColor;
+
+    if (habit.currentStreak == 0) {
+      iconColor = CupertinoColors.systemGrey;
+    } else if (habit.currentStreak < 10) {
+      iconColor = CupertinoColors.white;
+    } else if (habit.currentStreak < 21) {
+      iconColor = CupertinoColors.systemYellow;
+    } else {
+      iconColor = CupertinoColors.systemRed;
+    }
+
+    return Icon(
+      iconData,
+      color: iconColor,
+      size: 24,
     );
   }
 
-  Widget _buildCheckmarkIcon() {
+  Widget _buildStageImage() {
+    String imagePath;
+    if (habit.currentStreak < 10) {
+      imagePath = 'lib/assets/images/habit_stages/baby.png';
+    } else if (habit.currentStreak < 50) {
+      imagePath = 'lib/assets/images/habit_stages/man.png';
+    } else {
+      imagePath = 'lib/assets/images/habit_stages/gigachad.png';
+    }
+
+    return Image.asset(
+      imagePath,
+      width: 30,
+      height: 30,
+    );
+  }
+
+  Widget _buildCompletionIcon(BuildContext context) {
     return GestureDetector(
-      onTap: onCheckmark,
+      onTap: habit.isCompletedToday
+          ? null
+          : () => _showHabitCompletionSheet(context),
       child: Icon(
-        CupertinoIcons.checkmark_circle_fill,
-        color:
-            habit.status ? CupertinoColors.white : CupertinoColors.systemGrey,
-        size: 20,
+        habit.isCompletedToday
+            ? CupertinoIcons.lock_fill
+            : CupertinoIcons.check_mark_circled,
+        color: habit.isCompletedToday
+            ? CupertinoColors.systemGrey
+            : CupertinoColors.white,
+        size: 28,
       ),
     );
+  }
+
+  void _showHabitDetailsSheet(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => HabitDetailsSheet(habit: habit),
+    );
+  }
+
+  void _showHabitCompletionSheet(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => HabitCompletionSheet(habit: habit),
+    );
+  }
+
+  void _deleteHabit(BuildContext context) {
+    if (habit.habitId != null) {
+      Provider.of<HabitController>(context, listen: false)
+          .deleteHabit(habit.habitId!);
+    }
   }
 }

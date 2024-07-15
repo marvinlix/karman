@@ -1,73 +1,79 @@
-import 'package:flutter/cupertino.dart';
-
 class Habit {
   final int? habitId;
-  final String name;
-  final bool status;
-  final DateTime startDate;
-  final DateTime? endDate;
-  final int currentStreak;
-  final int longestStreak;
-  final IconData? icon;
+  final String habitName;
+  final Duration? reminderTime;
+  int currentStreak;
+  int bestStreak;
+  bool isCompletedToday;
 
   Habit({
     this.habitId,
-    required this.name,
-    required this.status,
-    required this.startDate,
-    this.endDate,
-    required this.currentStreak,
-    required this.longestStreak,
-    this.icon,
+    required this.habitName,
+    this.reminderTime,
+    this.currentStreak = 0,
+    this.bestStreak = 0,
+    this.isCompletedToday = false,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'habitId': habitId,
-      'name': name,
-      'status': status ? 1 : 0,
-      'start_date': startDate.toIso8601String(),
-      'end_date': endDate?.toIso8601String(),
-      'current_streak': currentStreak,
-      'longest_streak': longestStreak,
-      'icon': icon?.codePoint,
+      'habitName': habitName,
+      'reminderTime': reminderTime?.inMinutes,
+      'currentStreak': currentStreak,
+      'bestStreak': bestStreak,
+      'isCompletedToday': isCompletedToday ? 1 : 0,
     };
   }
 
   factory Habit.fromMap(Map<String, dynamic> map) {
     return Habit(
       habitId: map['habitId'],
-      name: map['name'],
-      status: map['status'] == 1,
-      startDate: DateTime.parse(map['start_date']),
-      endDate: map['end_date'] != null ? DateTime.parse(map['end_date']) : null,
-      currentStreak: map['current_streak'],
-      longestStreak: map['longest_streak'],
-      icon: map['icon'] != null
-          ? IconData(map['icon'], fontFamily: 'CupertinoIcons')
+      habitName: map['habitName'],
+      reminderTime: map['reminderTime'] != null
+          ? Duration(minutes: map['reminderTime'])
           : null,
+      currentStreak: map['currentStreak'],
+      bestStreak: map['bestStreak'],
+      isCompletedToday: map['isCompletedToday'] == 1,
     );
   }
 
   Habit copyWith({
     int? habitId,
-    String? name,
-    bool? status,
-    DateTime? startDate,
-    DateTime? endDate,
+    String? habitName,
+    Duration? reminderTime,
     int? currentStreak,
-    int? longestStreak,
-    IconData? icon,
+    int? bestStreak,
+    bool? isCompletedToday,
   }) {
     return Habit(
       habitId: habitId ?? this.habitId,
-      name: name ?? this.name,
-      status: status ?? this.status,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
+      habitName: habitName ?? this.habitName,
+      reminderTime: reminderTime ?? this.reminderTime,
       currentStreak: currentStreak ?? this.currentStreak,
-      longestStreak: longestStreak ?? this.longestStreak,
-      icon: icon ?? this.icon,
+      bestStreak: bestStreak ?? this.bestStreak,
+      isCompletedToday: isCompletedToday ?? this.isCompletedToday,
     );
+  }
+
+  void resetStreak() {
+    currentStreak = 0;
+    isCompletedToday = false;
+  }
+
+  void incrementStreak() {
+    currentStreak++;
+    if (currentStreak > bestStreak) {
+      bestStreak = currentStreak;
+    }
+    isCompletedToday = true;
+  }
+
+  String get formattedReminderTime {
+    if (reminderTime == null) return 'No reminder set';
+    final hours = reminderTime!.inHours;
+    final minutes = reminderTime!.inMinutes % 60;
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}';
   }
 }

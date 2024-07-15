@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
-import 'package:karman_app/components/dialog_window.dart';
 import 'package:karman_app/components/habit/habit_tile.dart';
 import 'package:karman_app/controllers/habit/habit_controller.dart';
-import 'package:provider/provider.dart';
 import 'package:karman_app/models/habits/habit.dart';
+import 'package:karman_app/pages/habit/habit_details_sheet.dart';
+import 'package:provider/provider.dart';
 
 class HabitsPage extends StatefulWidget {
   const HabitsPage({super.key});
 
   @override
-  State<HabitsPage> createState() => _HabitsPageState();
+  _HabitsPageState createState() => _HabitsPageState();
 }
 
 class _HabitsPageState extends State<HabitsPage> {
@@ -19,7 +19,10 @@ class _HabitsPageState extends State<HabitsPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<HabitController>(context, listen: false).loadHabits();
+      final habitController =
+          Provider.of<HabitController>(context, listen: false);
+      habitController.checkAndResetStreaks();
+      habitController.loadHabits();
     });
   }
 
@@ -29,6 +32,49 @@ class _HabitsPageState extends State<HabitsPage> {
     super.dispose();
   }
 
+  void _showAddHabitDialog() {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('Add New Habit'),
+          content: CupertinoTextField(
+            controller: _habitNameController,
+            placeholder: 'Enter habit name',
+          ),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.pop(context);
+                _habitNameController.clear();
+              },
+            ),
+            CupertinoDialogAction(
+              child: Text('Add'),
+              onPressed: () {
+                if (_habitNameController.text.isNotEmpty) {
+                  final newHabit = Habit(habitName: _habitNameController.text);
+                  Provider.of<HabitController>(context, listen: false)
+                      .addHabit(newHabit);
+                  Navigator.pop(context);
+                  _habitNameController.clear();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showHabitDetailsSheet(BuildContext context, Habit habit) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => HabitDetailsSheet(habit: habit),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<HabitController>(
@@ -36,139 +82,36 @@ class _HabitsPageState extends State<HabitsPage> {
         return CupertinoPageScaffold(
           navigationBar: CupertinoNavigationBar(
             backgroundColor: CupertinoColors.black,
-            middle: const Text(
-              'Habits',
-              style: TextStyle(color: CupertinoColors.white),
-            ),
             trailing: CupertinoButton(
               padding: EdgeInsets.zero,
-              onPressed: () => _showAddHabitDialog(context, habitController),
-              child: const Icon(
-                CupertinoIcons.add,
+              onPressed: _showAddHabitDialog,
+              child: Icon(
+                CupertinoIcons.add_circled_solid,
                 color: CupertinoColors.white,
+                size: 22,
               ),
             ),
           ),
           child: SafeArea(
-            child: ListView.builder(
-              itemCount: habitController.habits.length,
-              itemBuilder: (context, index) {
-                final habit = habitController.habits[index];
-                return HabitTile(
-                  habit: habit,
-                  onTap: () => _showHabitDetails(context, habit),
-                  onCheckmark: () => habitController.toggleHabitStatus(habit),
-                  onIconChanged: (IconData selectedIcon) =>
-                      _updateHabitIcon(habitController, habit, selectedIcon),
-                  onEdit: (_) => _editHabit(context, habitController, habit),
-                  onDelete: (_) =>
-                      _deleteHabit(context, habitController, habit),
-                );
-              },
-            ),
+            child: habitController.habits.isEmpty
+                ? Center(
+                    child: Text(
+                      'No habits yet. Add one to get started!',
+                      style: TextStyle(color: CupertinoColors.systemGrey),
+                    ),
+                  )
+                : ListView.builder(
+                    itemCount: habitController.habits.length,
+                    itemBuilder: (context, index) {
+                      final habit = habitController.habits[index];
+                      return HabitTile(
+                        habit: habit,
+                      );
+                    },
+                  ),
           ),
         );
       },
-    );
-  }
-
-  void _showAddHabitDialog(BuildContext context, HabitController controller) {
-    _habitNameController.clear();
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => KarmanDialogWindow(
-        title: 'Add Habit',
-        placeholder: 'Enter habit name',
-        controller: _habitNameController,
-        onSave: () async {
-          if (_habitNameController.text.isNotEmpty) {
-            await _addHabit(controller, _habitNameController.text);
-            Navigator.pop(context);
-          }
-        },
-        onCancel: () => Navigator.pop(context),
-      ),
-    );
-  }
-
-  Future<void> _addHabit(HabitController controller, String name) async {
-    final newHabit = Habit(
-      name: name,
-      status: false,
-      startDate: DateTime.now(),
-      currentStreak: 0,
-      longestStreak: 0,
-    );
-    await controller.addHabit(newHabit);
-  }
-
-  void _showHabitDetails(BuildContext context, Habit habit) {
-    // TODO: Implement habit details page navigation
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: Text(habit.name),
-        content: const Text('Habit details page to be implemented.'),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('OK'),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _updateHabitIcon(
-      HabitController controller, Habit habit, IconData selectedIcon) async {
-    final updatedHabit = habit.copyWith(icon: selectedIcon);
-    await controller.updateHabit(updatedHabit);
-  }
-
-  void _editHabit(
-      BuildContext context, HabitController controller, Habit habit) {
-    _habitNameController.text = habit.name;
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => KarmanDialogWindow(
-        title: 'Edit Habit',
-        placeholder: 'Enter habit name',
-        controller: _habitNameController,
-        onSave: () async {
-          if (_habitNameController.text.isNotEmpty) {
-            final updatedHabit =
-                habit.copyWith(name: _habitNameController.text);
-            await controller.updateHabit(updatedHabit);
-            Navigator.pop(context);
-          }
-        },
-        onCancel: () => Navigator.pop(context),
-      ),
-    );
-  }
-
-  void _deleteHabit(
-      BuildContext context, HabitController controller, Habit habit) {
-    showCupertinoDialog(
-      context: context,
-      builder: (context) => CupertinoAlertDialog(
-        title: const Text('Delete Habit'),
-        content: Text('Are you sure you want to delete "${habit.name}"?'),
-        actions: [
-          CupertinoDialogAction(
-            child: const Text('Cancel'),
-            onPressed: () => Navigator.pop(context),
-          ),
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            child: const Text('Delete'),
-            onPressed: () async {
-              await controller.deleteHabit(habit.habitId!);
-              Navigator.pop(context);
-            },
-          ),
-        ],
-      ),
     );
   }
 }

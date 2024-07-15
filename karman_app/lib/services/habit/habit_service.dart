@@ -59,32 +59,47 @@ class HabitService {
     return logData != null ? HabitLog.fromMap(logData) : null;
   }
 
-  Future<void> updateStreaks() async {
+  Future<void> resetStreaksIfNeeded() async {
+    final db = await _databaseService.database;
     final habits = await getHabits();
+    final today = DateTime.now();
 
     for (var habit in habits) {
       final latestLog = await getLatestHabitLog(habit.habitId!);
       if (latestLog != null) {
-        final today = DateTime.now();
-        final latestLogDate = DateTime.parse(latestLog.date);
-
-        if (latestLogDate.year == today.year &&
-            latestLogDate.month == today.month &&
-            latestLogDate.day == today.day - 1) {
-          // The habit was completed yesterday, increment the streak
-          habit = habit.copyWith(
-            currentStreak: habit.currentStreak + 1,
-            longestStreak: habit.currentStreak + 1 > habit.longestStreak
-                ? habit.currentStreak + 1
-                : habit.longestStreak,
-          );
-        } else if (latestLogDate.isBefore(today.subtract(Duration(days: 1)))) {
-          // The habit was not completed yesterday, reset the streak
-          habit = habit.copyWith(currentStreak: 0);
+        final daysSinceLastLog = today.difference(latestLog.date).inDays;
+        if (daysSinceLastLog > 1 ||
+            (daysSinceLastLog == 1 && !latestLog.completedForToday)) {
+          habit.resetStreak();
+          await updateHabit(habit);
         }
-
-        await updateHabit(habit);
       }
     }
+
+    // Reset isCompletedToday for all habits
+    await _habitDatabase.resetAllHabitsCompletionStatus(db);
+  }
+
+  Future<void> completeHabitForToday(Habit habit, String? log) async {
+    final today = DateTime.now();
+    final todayLog = HabitLog(
+      habitId: habit.habitId!,
+      completedForToday: true,
+      date: today,
+      log: log,
+    );
+
+    await createHabitLog(todayLog);
+
+    habit.incrementStreak();
+    habit.isCompletedToday = true;
+    await updateHabit(habit);
+  }
+
+  Future<bool> isHabitCompletedToday(int habitId) async {
+    final db = await _databaseService.database;
+    final today = DateTime.now().toIso8601String().split('T')[0];
+    final logs = await _habitDatabase.getHabitLogsForDate(db, habitId, today);
+    return logs.isNotEmpty && logs.first['completedForToday'] == 1;
   }
 }
