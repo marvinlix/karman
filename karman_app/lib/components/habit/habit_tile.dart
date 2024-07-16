@@ -59,11 +59,9 @@ class HabitTile extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(width: 16),
+                  SizedBox(width: 32),
                   _buildStreakIcon(),
-                  SizedBox(width: 16),
-                  _buildStageImage(),
-                  SizedBox(width: 16),
+                  SizedBox(width: 48),
                   _buildCompletionIcon(context),
                 ],
               ),
@@ -75,41 +73,35 @@ class HabitTile extends StatelessWidget {
   }
 
   Widget _buildStreakIcon() {
-    IconData iconData = CupertinoIcons.flame_fill;
-    Color iconColor;
-
-    if (habit.currentStreak == 0) {
-      iconColor = CupertinoColors.systemGrey;
-    } else if (habit.currentStreak < 10) {
-      iconColor = CupertinoColors.white;
-    } else if (habit.currentStreak < 21) {
-      iconColor = CupertinoColors.systemYellow;
-    } else {
-      iconColor = CupertinoColors.systemRed;
-    }
-
-    return Icon(
-      iconData,
-      color: iconColor,
-      size: 24,
+    return Row(
+      children: [
+        Icon(
+          CupertinoIcons.flame_fill,
+          color: _getStreakColor(),
+          size: 24,
+        ),
+        SizedBox(width: 4),
+        Text(
+          habit.currentStreak.toString(),
+          style: TextStyle(
+            color: CupertinoColors.white,
+            fontSize: 16,
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildStageImage() {
-    String imagePath;
-    if (habit.currentStreak < 10) {
-      imagePath = 'lib/assets/images/habit_stages/baby.png';
-    } else if (habit.currentStreak < 50) {
-      imagePath = 'lib/assets/images/habit_stages/man.png';
+  Color _getStreakColor() {
+    if (habit.currentStreak == 0) {
+      return CupertinoColors.systemGrey;
+    } else if (habit.currentStreak < 10) {
+      return CupertinoColors.white;
+    } else if (habit.currentStreak < 21) {
+      return CupertinoColors.systemYellow;
     } else {
-      imagePath = 'lib/assets/images/habit_stages/gigachad.png';
+      return CupertinoColors.systemRed;
     }
-
-    return Image.asset(
-      imagePath,
-      width: 30,
-      height: 30,
-    );
   }
 
   Widget _buildCompletionIcon(BuildContext context) {

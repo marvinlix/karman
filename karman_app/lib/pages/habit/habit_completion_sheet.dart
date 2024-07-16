@@ -37,67 +37,29 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.5,
-        minChildSize: 0.2,
-        maxChildSize: 0.9,
-        builder: (BuildContext context, ScrollController scrollController) {
-          return Container(
-            decoration: BoxDecoration(
-              color: CupertinoColors.darkBackgroundGray,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+      child: Container(
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: CupertinoColors.darkBackgroundGray,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Complete ${widget.habit.habitName}',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            child: Column(
-              children: [
-                _buildDragHandle(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    controller: scrollController,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Complete ${widget.habit.habitName}',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          _buildLogField(),
-                          SizedBox(height: 20),
-                          _buildSlideToAct(),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildDragHandle() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 10),
-      child: Center(
-        child: Container(
-          width: 40,
-          height: 4,
-          decoration: BoxDecoration(
-            color: CupertinoColors.systemGrey,
-            borderRadius: BorderRadius.circular(2),
-          ),
+            SizedBox(height: 20),
+            _buildLogField(),
+            SizedBox(height: 20),
+            _buildSlideToAct(),
+            SizedBox(height: 40),
+          ],
         ),
       ),
     );
@@ -122,16 +84,20 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
 
   Widget _buildSlideToAct() {
     return SlideAction(
-      innerColor: CupertinoColors.white,
-      outerColor: CupertinoColors.systemGrey,
+      innerColor: CupertinoColors.darkBackgroundGray,
+      outerColor: CupertinoColors.tertiarySystemBackground.darkColor,
       sliderButtonIcon: Icon(
-        CupertinoIcons.circle_grid_hex,
-        color: CupertinoColors.black,
+        CupertinoIcons.leaf_arrow_circlepath,
+        color: CupertinoColors.white,
       ),
       sliderRotate: false,
       elevation: 0,
-      text: 'Complete your habit',
-      textColor: CupertinoColors.black,
+      text: 'Complete your habit →',
+      textStyle: TextStyle(
+        color: CupertinoColors.white,
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+      ),
       onSubmit: _completeHabit,
     );
   }
@@ -142,10 +108,10 @@ class TaskNote extends StatefulWidget {
   final String hintText;
 
   const TaskNote({
-    Key? key,
+    super.key,
     required this.controller,
     this.hintText = 'Add a note...',
-  }) : super(key: key);
+  });
 
   @override
   _TaskNoteState createState() => _TaskNoteState();

@@ -12,6 +12,7 @@ class AppShell extends StatelessWidget {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         currentIndex: 1,
+        iconSize: 32,
         backgroundColor: CupertinoColors.black,
         activeColor: CupertinoColors.white,
         items: const [
@@ -24,7 +25,7 @@ class AppShell extends StatelessWidget {
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.sun_min),
+            icon: Icon(CupertinoIcons.circle_grid_hex),
             label: 'Focus',
           ),
           // BottomNavigationBarItem(

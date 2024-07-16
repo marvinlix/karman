@@ -8,10 +8,12 @@ import 'package:provider/provider.dart';
 
 class HabitDetailsSheet extends StatefulWidget {
   final Habit habit;
+  final bool isNewHabit;
 
   const HabitDetailsSheet({
     super.key,
     required this.habit,
+    this.isNewHabit = false,
   });
 
   @override
@@ -30,8 +32,8 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
     if (widget.habit.reminderTime != null) {
       final minutes = widget.habit.reminderTime!.inMinutes;
       _reminderTime = TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60);
+      _isReminderEnabled = true;
     }
-    _isReminderEnabled = widget.habit.reminderTime != null;
   }
 
   @override
@@ -54,7 +56,11 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
           : null,
     );
 
-    context.read<HabitController>().updateHabit(updatedHabit);
+    if (widget.isNewHabit) {
+      context.read<HabitController>().addHabit(updatedHabit);
+    } else {
+      context.read<HabitController>().updateHabit(updatedHabit);
+    }
 
     if (updatedHabit.reminderTime != null) {
       final now = DateTime.now();
@@ -66,7 +72,6 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
         _reminderTime!.minute,
       );
 
-      // If the scheduled time is in the past, add one day
       if (scheduledDate.isBefore(now)) {
         scheduledDate.add(Duration(days: 1));
       }
@@ -107,62 +112,27 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.5,
-        minChildSize: 0.2,
-        maxChildSize: 0.9,
-        builder: (BuildContext context, ScrollController scrollController) {
-          return Container(
-            decoration: BoxDecoration(
-              color: CupertinoColors.darkBackgroundGray,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
-              ),
-            ),
-            child: Column(
-              children: [
-                _buildDragHandle(),
-                Expanded(
-                  child: SingleChildScrollView(
-                    controller: scrollController,
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildHabitNameField(),
-                          SizedBox(height: 20),
-                          _buildReminderToggle(),
-                          SizedBox(height: 20),
-                          _buildStreakInfo(),
-                          SizedBox(height: 20),
-                          _buildViewLogsButton(),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildDragHandle() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 10),
-      child: Center(
-        child: Container(
-          width: 40,
-          height: 4,
-          decoration: BoxDecoration(
-            color: CupertinoColors.systemGrey,
-            borderRadius: BorderRadius.circular(2),
-          ),
+      child: Container(
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: CupertinoColors.darkBackgroundGray,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHabitNameField(),
+            SizedBox(height: 30),
+            _buildReminderToggle(),
+            if (!widget.isNewHabit) ...[
+              SizedBox(height: 25),
+              _buildBestStreakInfo(),
+              SizedBox(height: 30),
+              _buildViewLogsButton(),
+              SizedBox(height: 40),
+            ],
+          ],
         ),
       ),
     );
@@ -207,10 +177,11 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
           child: GestureDetector(
             onTap: _isReminderEnabled ? _showTimePicker : null,
             child: Text(
-              _reminderTime != null
-                  ? '${_reminderTime!.hour.toString().padLeft(2, '0')}:${_reminderTime!.minute.toString().padLeft(2, '0')}'
-                  : 'Set reminder time',
-              style: TextStyle(color: Colors.white),
+              _reminderTime != null ? _formatTime(_reminderTime!) : 'Reminder',
+              style: TextStyle(
+                color: _isReminderEnabled ? Colors.white : Colors.grey,
+                fontSize: 18,
+              ),
             ),
           ),
         ),
@@ -226,6 +197,13 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
         ),
       ],
     );
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final hour = time.hourOfPeriod;
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour:$minute $period';
   }
 
   void _showTimePicker() {
@@ -258,34 +236,40 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
     );
   }
 
-  Widget _buildStreakInfo() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildBestStreakInfo() {
+    return Row(
       children: [
+        Icon(CupertinoIcons.flame, color: Colors.white),
+        SizedBox(width: 10),
         Text(
-          'Current Streak: ${widget.habit.currentStreak}',
-          style: TextStyle(color: Colors.white, fontSize: 16),
-        ),
-        SizedBox(height: 8),
-        Text(
-          'Best Streak: ${widget.habit.bestStreak}',
-          style: TextStyle(color: Colors.white, fontSize: 16),
+          'Best: ${widget.habit.bestStreak}',
+          style: TextStyle(color: Colors.white, fontSize: 18),
         ),
       ],
     );
   }
 
   Widget _buildViewLogsButton() {
-    return CupertinoButton(
-      color: CupertinoColors.activeBlue,
-      child: Text('View Logs'),
-      onPressed: () {
+    return GestureDetector(
+      onTap: () {
         Navigator.of(context).push(
           CupertinoPageRoute(
             builder: (context) => HabitLogsPage(habit: widget.habit),
           ),
         );
       },
+      child: const Row(
+        children: [
+          Icon(CupertinoIcons.doc, color: Colors.white),
+          SizedBox(width: 10),
+          Text(
+            'View Logs',
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          Spacer(),
+          Icon(CupertinoIcons.chevron_right, color: Colors.white),
+        ],
+      ),
     );
   }
 }

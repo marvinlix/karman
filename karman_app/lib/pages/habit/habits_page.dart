@@ -13,8 +13,6 @@ class HabitsPage extends StatefulWidget {
 }
 
 class _HabitsPageState extends State<HabitsPage> {
-  final TextEditingController _habitNameController = TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -26,52 +24,13 @@ class _HabitsPageState extends State<HabitsPage> {
     });
   }
 
-  @override
-  void dispose() {
-    _habitNameController.dispose();
-    super.dispose();
-  }
-
-  void _showAddHabitDialog() {
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('Add New Habit'),
-          content: CupertinoTextField(
-            controller: _habitNameController,
-            placeholder: 'Enter habit name',
-          ),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.pop(context);
-                _habitNameController.clear();
-              },
-            ),
-            CupertinoDialogAction(
-              child: Text('Add'),
-              onPressed: () {
-                if (_habitNameController.text.isNotEmpty) {
-                  final newHabit = Habit(habitName: _habitNameController.text);
-                  Provider.of<HabitController>(context, listen: false)
-                      .addHabit(newHabit);
-                  Navigator.pop(context);
-                  _habitNameController.clear();
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showHabitDetailsSheet(BuildContext context, Habit habit) {
+  void _showAddHabitSheet() {
     showCupertinoModalPopup(
       context: context,
-      builder: (BuildContext context) => HabitDetailsSheet(habit: habit),
+      builder: (BuildContext context) => HabitDetailsSheet(
+        habit: Habit(habitName: ''),
+        isNewHabit: true,
+      ),
     );
   }
 
@@ -79,12 +38,17 @@ class _HabitsPageState extends State<HabitsPage> {
   Widget build(BuildContext context) {
     return Consumer<HabitController>(
       builder: (context, habitController, child) {
+        final incompleteHabits = habitController.habits
+            .where((habit) => !habit.isCompletedToday)
+            .length;
+
         return CupertinoPageScaffold(
           navigationBar: CupertinoNavigationBar(
             backgroundColor: CupertinoColors.black,
+            middle: Text('$incompleteHabits habits left'),
             trailing: CupertinoButton(
               padding: EdgeInsets.zero,
-              onPressed: _showAddHabitDialog,
+              onPressed: _showAddHabitSheet,
               child: Icon(
                 CupertinoIcons.add_circled_solid,
                 color: CupertinoColors.white,
