@@ -112,27 +112,34 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: Container(
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: CupertinoColors.darkBackgroundGray,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHabitNameField(),
-            SizedBox(height: 30),
-            _buildReminderToggle(),
-            if (!widget.isNewHabit) ...[
-              SizedBox(height: 25),
-              _buildBestStreakInfo(),
+      child: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 20,
+            right: 20,
+            top: 20,
+          ),
+          decoration: BoxDecoration(
+            color: CupertinoColors.darkBackgroundGray,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHabitNameField(),
               SizedBox(height: 30),
-              _buildViewLogsButton(),
-              SizedBox(height: 40),
+              _buildReminderToggle(),
+              if (!widget.isNewHabit) ...[
+                SizedBox(height: 25),
+                _buildBestStreakInfo(),
+                SizedBox(height: 30),
+                _buildViewLogsButton(),
+                SizedBox(height: 40),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

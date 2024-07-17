@@ -59,9 +59,9 @@ class HabitTile extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(width: 32),
+                  SizedBox(width: 16),
                   _buildStreakIcon(),
-                  SizedBox(width: 48),
+                  SizedBox(width: 16),
                   _buildCompletionIcon(context),
                 ],
               ),
@@ -73,22 +73,26 @@ class HabitTile extends StatelessWidget {
   }
 
   Widget _buildStreakIcon() {
-    return Row(
-      children: [
-        Icon(
-          CupertinoIcons.flame_fill,
-          color: _getStreakColor(),
-          size: 24,
-        ),
-        SizedBox(width: 4),
-        Text(
-          habit.currentStreak.toString(),
-          style: TextStyle(
-            color: CupertinoColors.white,
-            fontSize: 16,
+    return SizedBox(
+      width: 80,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Icon(
+            CupertinoIcons.flame_fill,
+            color: _getStreakColor(),
+            size: 24,
           ),
-        ),
-      ],
+          SizedBox(width: 4),
+          Text(
+            habit.currentStreak.toString(),
+            style: TextStyle(
+              color: CupertinoColors.white,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -105,18 +109,22 @@ class HabitTile extends StatelessWidget {
   }
 
   Widget _buildCompletionIcon(BuildContext context) {
-    return GestureDetector(
-      onTap: habit.isCompletedToday
-          ? null
-          : () => _showHabitCompletionSheet(context),
-      child: Icon(
-        habit.isCompletedToday
-            ? CupertinoIcons.lock_fill
-            : CupertinoIcons.check_mark_circled,
-        color: habit.isCompletedToday
-            ? CupertinoColors.systemGrey
-            : CupertinoColors.white,
-        size: 28,
+    return Container(
+      width: 40,
+      alignment: Alignment.centerRight,
+      child: GestureDetector(
+        onTap: habit.isCompletedToday
+            ? null
+            : () => _showHabitCompletionSheet(context),
+        child: Icon(
+          habit.isCompletedToday
+              ? CupertinoIcons.lock_fill
+              : CupertinoIcons.check_mark_circled,
+          color: habit.isCompletedToday
+              ? CupertinoColors.systemGrey
+              : CupertinoColors.white,
+          size: 28,
+        ),
       ),
     );
   }

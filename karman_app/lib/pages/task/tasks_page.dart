@@ -114,14 +114,13 @@ class _TasksPageState extends State<TasksPage> {
             backgroundColor: CupertinoColors.black,
             border: null,
             leading: CupertinoButton(
-              padding: EdgeInsets.zero,
               onPressed: hasCompletedTasks ? _clearCompletedTasks : null,
               child: Icon(
                 CupertinoIcons.bin_xmark_fill,
                 color: hasCompletedTasks
                     ? CupertinoColors.white
                     : CupertinoColors.systemGrey,
-                size: 20,
+                size: 32,
               ),
             ),
             middle: Text(
@@ -129,12 +128,11 @@ class _TasksPageState extends State<TasksPage> {
               style: TextStyle(color: CupertinoColors.white),
             ),
             trailing: CupertinoButton(
-              padding: EdgeInsets.zero,
               onPressed: _addTask,
               child: Icon(
                 CupertinoIcons.plus_circle_fill,
                 color: CupertinoColors.white,
-                size: 22,
+                size: 32,
               ),
             ),
           ),
@@ -156,8 +154,7 @@ class _TasksPageState extends State<TasksPage> {
                 'This space craves your brilliant ideas. Add one!',
                 style: TextStyle(
                   fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: CupertinoColors.white,
+                  color: CupertinoColors.systemGrey,
                 ),
                 textAlign: TextAlign.center,
               ),

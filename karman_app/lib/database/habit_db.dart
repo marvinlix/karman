@@ -28,13 +28,22 @@ class HabitDatabase {
     ''');
   }
 
-  // CRUD operations for habits
   Future<int> createHabit(Database db, Map<String, dynamic> habit) async {
     return await db.insert(tableName, habit);
   }
 
   Future<List<Map<String, dynamic>>> getHabits(Database db) async {
     return await db.query(tableName);
+  }
+
+  Future<Map<String, dynamic>?> getHabit(Database db, int habitId) async {
+    final habits = await db.query(
+      tableName,
+      where: 'habitId = ?',
+      whereArgs: [habitId],
+      limit: 1,
+    );
+    return habits.isNotEmpty ? habits.first : null;
   }
 
   Future<int> updateHabit(Database db, Map<String, dynamic> habit) async {
@@ -54,7 +63,6 @@ class HabitDatabase {
     );
   }
 
-  // CRUD operations for habit logs
   Future<int> createHabitLog(Database db, Map<String, dynamic> log) async {
     return await db.insert(logTableName, log);
   }
@@ -66,23 +74,6 @@ class HabitDatabase {
       where: 'habitId = ?',
       whereArgs: [habitId],
       orderBy: 'date DESC',
-    );
-  }
-
-  Future<int> updateHabitLog(Database db, Map<String, dynamic> log) async {
-    return await db.update(
-      logTableName,
-      log,
-      where: 'id = ?',
-      whereArgs: [log['id']],
-    );
-  }
-
-  Future<int> deleteHabitLog(Database db, int id) async {
-    return await db.delete(
-      logTableName,
-      where: 'id = ?',
-      whereArgs: [id],
     );
   }
 

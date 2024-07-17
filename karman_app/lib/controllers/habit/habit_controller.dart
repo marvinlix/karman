@@ -7,13 +7,19 @@ class HabitController extends ChangeNotifier {
   final HabitService _habitService = HabitService();
 
   List<Habit> _habits = [];
-  final Map<int, List<HabitLog>> _habitLogs = {};
+  Map<int, List<HabitLog>> _habitLogs = {};
 
   List<Habit> get habits => _habits;
   Map<int, List<HabitLog>> get habitLogs => _habitLogs;
 
   Future<void> loadHabits() async {
+    await checkAndResetStreaks(); // Add this line
     _habits = await _habitService.getHabits();
+    for (var habit in _habits) {
+      await loadHabitLogs(habit.habitId!);
+      habit.isCompletedToday =
+          await _habitService.isHabitCompletedToday(habit.habitId!);
+    }
     notifyListeners();
   }
 
@@ -38,9 +44,7 @@ class HabitController extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteHabit(int? id) async {
-    if (id == null) return;
-
+  Future<void> deleteHabit(int id) async {
     await _habitService.deleteHabit(id);
     _habits.removeWhere((habit) => habit.habitId == id);
     _habitLogs.remove(id);
@@ -48,63 +52,19 @@ class HabitController extends ChangeNotifier {
   }
 
   Future<void> completeHabitForToday(Habit habit, String? log) async {
-    final today = DateTime.now();
-    final todayLog = HabitLog(
-      habitId: habit.habitId!,
-      completedForToday: true,
-      date: today,
-      log: log,
-    );
-
-    await _habitService.createHabitLog(todayLog);
-
-    habit.incrementStreak();
-    habit.isCompletedToday = true;
-    await updateHabit(habit);
-
-    // Update local data
-    _habitLogs[habit.habitId!] ??= [];
-    _habitLogs[habit.habitId!]!.add(todayLog);
-
-    notifyListeners();
-  }
-
-  Future<void> resetStreaksIfNeeded() async {
-    final today = DateTime.now();
-    for (var habit in _habits) {
-      final logs = _habitLogs[habit.habitId] ?? [];
-      final yesterdayLog = logs.lastWhere(
-        (log) => log.date.difference(today).inDays == -1,
-        orElse: () => HabitLog(
-          habitId: habit.habitId!,
-          completedForToday: false,
-          date: today.subtract(Duration(days: 1)),
-        ),
-      );
-
-      if (!yesterdayLog.completedForToday) {
-        habit.resetStreak();
-        await updateHabit(habit);
-      }
-
-      // Reset isCompletedToday for the new day
-      if (habit.isCompletedToday) {
-        habit.isCompletedToday = false;
-        await updateHabit(habit);
+    await _habitService.completeHabitForToday(habit, log);
+    final updatedHabit = await _habitService.getHabit(habit.habitId!);
+    if (updatedHabit != null) {
+      final index = _habits.indexWhere((h) => h.habitId == habit.habitId);
+      if (index != -1) {
+        _habits[index] = updatedHabit;
       }
     }
+    await loadHabitLogs(habit.habitId!);
     notifyListeners();
   }
 
-  // Call this method when the app starts or when the date changes
   Future<void> checkAndResetStreaks() async {
-    await resetStreaksIfNeeded();
-    await loadHabits(); // Reload habits to get updated streak information
-    notifyListeners();
-  }
-
-  Future<List<HabitLog>>? loadHabitLogsById(String habitId) async {
-    final logs = await _habitService.getHabitLogs(int.parse(habitId));
-    return logs;
+    await _habitService.resetStreaksIfNeeded();
   }
 }

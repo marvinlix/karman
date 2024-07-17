@@ -37,29 +37,36 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: Container(
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: CupertinoColors.darkBackgroundGray,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Complete ${widget.habit.habitName}',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+      child: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 20,
+            right: 20,
+            top: 20,
+          ),
+          decoration: BoxDecoration(
+            color: CupertinoColors.darkBackgroundGray,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Complete ${widget.habit.habitName}',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            _buildLogField(),
-            SizedBox(height: 20),
-            _buildSlideToAct(),
-            SizedBox(height: 40),
-          ],
+              SizedBox(height: 20),
+              _buildLogField(),
+              SizedBox(height: 20),
+              _buildSlideToAct(),
+              SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
@@ -98,6 +105,12 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
         fontSize: 20,
         fontWeight: FontWeight.bold,
       ),
+      submittedIcon: Icon(
+        CupertinoIcons.check_mark,
+        color: CupertinoColors.white,
+        size: 40,
+      ),
+      animationDuration: Duration(milliseconds: 350),
       onSubmit: _completeHabit,
     );
   }
