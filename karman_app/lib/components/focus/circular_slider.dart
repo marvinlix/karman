@@ -22,7 +22,7 @@ class CircularSlider extends StatelessWidget {
     return SleekCircularSlider(
       appearance: CircularSliderAppearance(
         animDurationMultiplier: 0.8,
-        size: 300,
+        size: 350,
         startAngle: 270,
         angleRange: 360,
         customWidths: CustomSliderWidths(
@@ -38,7 +38,7 @@ class CircularSlider extends StatelessWidget {
         ),
         infoProperties: InfoProperties(
           mainLabelStyle: TextStyle(
-            fontSize: 50,
+            fontSize: 60,
             fontWeight: FontWeight.bold,
             color: CupertinoColors.white,
           ),

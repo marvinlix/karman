@@ -1,6 +1,8 @@
-import 'package:flutter/cupertino.dart';
-import 'package:karman_app/components/focus/circular_slider.dart';
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
+import 'package:just_audio/just_audio.dart';
+import 'package:karman_app/components/focus/circular_slider.dart';
+import 'package:karman_app/components/focus/radial_menu.dart';
 
 class FocusPage extends StatefulWidget {
   const FocusPage({super.key});
@@ -15,6 +17,32 @@ class _FocusPageState extends State<FocusPage> {
   late Timer _timer;
   int _remainingSeconds = 300;
   int _totalSeconds = 300;
+  String? _currentSound;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+
+  final List<Map<String, dynamic>> sounds = [
+    {'name': 'None', 'icon': CupertinoIcons.nosign, 'file': null},
+    {
+      'name': 'Rain',
+      'icon': CupertinoIcons.cloud_rain,
+      'file': 'lib/assets/audio/rain.mp3'
+    },
+    {
+      'name': 'Ocean',
+      'icon': CupertinoIcons.drop,
+      'file': 'lib/assets/audio/ocean.mp3'
+    },
+    {
+      'name': 'Forest',
+      'icon': CupertinoIcons.tree,
+      'file': 'lib/assets/audio/forest.mp3'
+    },
+    {
+      'name': 'Airplane',
+      'icon': CupertinoIcons.airplane,
+      'file': 'lib/assets/audio/airplane.mp3'
+    },
+  ];
 
   @override
   void initState() {
@@ -24,6 +52,7 @@ class _FocusPageState extends State<FocusPage> {
   @override
   void dispose() {
     _timer.cancel();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -40,8 +69,10 @@ class _FocusPageState extends State<FocusPage> {
       _isTimerRunning = !_isTimerRunning;
       if (_isTimerRunning) {
         _startTimer();
+        _playSelectedSound();
       } else {
         _stopTimer();
+        _audioPlayer.stop();
       }
     });
   }
@@ -54,6 +85,7 @@ class _FocusPageState extends State<FocusPage> {
           _remainingSeconds--;
         } else {
           _stopTimer();
+          _audioPlayer.stop();
         }
       });
     });
@@ -64,6 +96,37 @@ class _FocusPageState extends State<FocusPage> {
     _isTimerRunning = false;
     _remainingSeconds = _timerValue * 60;
     _totalSeconds = _remainingSeconds;
+  }
+
+  void _playSelectedSound() async {
+    if (_currentSound != null) {
+      await _audioPlayer.setAsset(_currentSound!);
+      await _audioPlayer.setLoopMode(LoopMode.one);
+      _audioPlayer.play();
+    }
+  }
+
+  void _showRadialMenu() {
+    if (_isTimerRunning) {
+      showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext context) => RadialMenu(
+          items: sounds,
+          onItemSelected: (Map<String, dynamic> sound) {
+            setState(() {
+              _currentSound = sound['file'];
+              if (sound['file'] == null) {
+                _audioPlayer.stop();
+              } else {
+                _playSelectedSound();
+              }
+            });
+          },
+          onDismiss: () => Navigator.of(context).pop(),
+          currentSound: _currentSound,
+        ),
+      );
+    }
   }
 
   String _formatTime(int seconds) {
@@ -82,19 +145,13 @@ class _FocusPageState extends State<FocusPage> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         backgroundColor: CupertinoColors.black,
-        leading: CupertinoButton(
-          onPressed: () {},
+        trailing: CupertinoButton(
+          onPressed: _isTimerRunning ? _showRadialMenu : null,
           child: Icon(
             CupertinoIcons.music_note_2,
-            color: CupertinoColors.white,
-            size: 32,
-          ),
-        ),
-        trailing: CupertinoButton(
-          onPressed: () {},
-          child: Icon(
-            CupertinoIcons.flame_fill,
-            color: CupertinoColors.white,
+            color: _isTimerRunning
+                ? CupertinoColors.white
+                : CupertinoColors.systemGrey,
             size: 32,
           ),
         ),
