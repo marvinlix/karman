@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:karman_app/components/focus/circular_slider.dart';
-import 'package:karman_app/components/focus/radial_menu.dart';
+import 'package:karman_app/components/focus/rolling_menu.dart';
 import 'package:karman_app/manager/sound_manager.dart';
 
 class FocusPage extends StatefulWidget {
@@ -11,7 +11,8 @@ class FocusPage extends StatefulWidget {
   _FocusPageState createState() => _FocusPageState();
 }
 
-class _FocusPageState extends State<FocusPage> {
+class _FocusPageState extends State<FocusPage>
+    with SingleTickerProviderStateMixin {
   int _timerValue = 5;
   bool _isTimerRunning = false;
   late Timer _timer;
@@ -19,10 +20,25 @@ class _FocusPageState extends State<FocusPage> {
   int _totalSeconds = 300;
   final SoundManager _soundManager = SoundManager();
 
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+  bool _isMenuOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+  }
+
   @override
   void dispose() {
     _timer.cancel();
     _soundManager.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -65,6 +81,11 @@ class _FocusPageState extends State<FocusPage> {
     _isTimerRunning = false;
     _soundManager.stopBackgroundSound();
 
+    // Close the menu if it's open
+    if (_isMenuOpen) {
+      _toggleMenu();
+    }
+
     Future.delayed(Duration(seconds: 1), () {
       _soundManager.playChime();
     });
@@ -75,27 +96,15 @@ class _FocusPageState extends State<FocusPage> {
     });
   }
 
-  void _showRadialMenu() {
-    if (_isTimerRunning) {
-      showCupertinoModalPopup(
-        context: context,
-        builder: (BuildContext context) => RadialMenu(
-          items: _soundManager.sounds,
-          onItemSelected: (Map<String, dynamic> sound) {
-            setState(() {
-              _soundManager.currentSound = sound['file'];
-              if (sound['file'] == null) {
-                _soundManager.stopBackgroundSound();
-              } else {
-                _soundManager.playSelectedSound();
-              }
-            });
-          },
-          onDismiss: () => Navigator.of(context).pop(),
-          currentSound: _soundManager.currentSound,
-        ),
-      );
-    }
+  void _toggleMenu() {
+    setState(() {
+      _isMenuOpen = !_isMenuOpen;
+      if (_isMenuOpen) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    });
   }
 
   String _formatTime(int seconds) {
@@ -115,7 +124,7 @@ class _FocusPageState extends State<FocusPage> {
       navigationBar: CupertinoNavigationBar(
         backgroundColor: CupertinoColors.black,
         trailing: CupertinoButton(
-          onPressed: _isTimerRunning ? _showRadialMenu : null,
+          onPressed: _isTimerRunning ? _toggleMenu : null,
           child: Icon(
             CupertinoIcons.music_note_2,
             color: _isTimerRunning
@@ -126,18 +135,55 @@ class _FocusPageState extends State<FocusPage> {
         ),
       ),
       child: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.only(bottom: 20),
-            child: CircularSlider(
-              onValueChanged: _onSliderValueChanged,
-              currentValue: _timerValue,
-              isTimerRunning: _isTimerRunning,
-              timeDisplay: _formatTime(_remainingSeconds),
-              progress: _progress,
-              onPlayPause: _toggleTimer,
+        child: Stack(
+          children: [
+            Center(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 20),
+                child: CircularSlider(
+                  onValueChanged: _onSliderValueChanged,
+                  currentValue: _timerValue,
+                  isTimerRunning: _isTimerRunning,
+                  timeDisplay: _formatTime(_remainingSeconds),
+                  progress: _progress,
+                  onPlayPause: _toggleTimer,
+                ),
+              ),
             ),
-          ),
+            Positioned(
+              top: 0,
+              right: 0,
+              left: 0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  SizedBox(height: 44), // Height of CupertinoNavigationBar
+                  SizeTransition(
+                    sizeFactor: _animation,
+                    axisAlignment: -1,
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: RollingMenu(
+                        items: _soundManager.sounds,
+                        onItemSelected: (Map<String, dynamic> sound) {
+                          setState(() {
+                            _soundManager.currentSound = sound['file'];
+                            if (sound['file'] == null) {
+                              _soundManager.stopBackgroundSound();
+                            } else {
+                              _soundManager.playSelectedSound();
+                            }
+                            _toggleMenu();
+                          });
+                        },
+                        currentSound: _soundManager.currentSound,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
