@@ -19,6 +19,7 @@ class _FocusPageState extends State<FocusPage> {
   int _totalSeconds = 300;
   String? _currentSound;
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final AudioPlayer _chimePlayer = AudioPlayer();
 
   final List<Map<String, dynamic>> sounds = [
     {'name': 'None', 'icon': CupertinoIcons.nosign, 'file': null},
@@ -53,6 +54,7 @@ class _FocusPageState extends State<FocusPage> {
   void dispose() {
     _timer.cancel();
     _audioPlayer.dispose();
+    _chimePlayer.dispose();
     super.dispose();
   }
 
@@ -85,7 +87,6 @@ class _FocusPageState extends State<FocusPage> {
           _remainingSeconds--;
         } else {
           _stopTimer();
-          _audioPlayer.stop();
         }
       });
     });
@@ -94,8 +95,26 @@ class _FocusPageState extends State<FocusPage> {
   void _stopTimer() {
     _timer.cancel();
     _isTimerRunning = false;
-    _remainingSeconds = _timerValue * 60;
-    _totalSeconds = _remainingSeconds;
+    _audioPlayer.stop();
+
+    // Play chime after 2 seconds
+    Future.delayed(Duration(seconds: 1), () {
+      _playChime();
+    });
+
+    setState(() {
+      _remainingSeconds = _timerValue * 60;
+      _totalSeconds = _remainingSeconds;
+    });
+  }
+
+  void _playChime() async {
+    try {
+      await _chimePlayer.setAsset('lib/assets/audio/subtle_chime.mp3');
+      await _chimePlayer.play();
+    } catch (e) {
+      print('Error playing chime: $e');
+    }
   }
 
   void _playSelectedSound() async {
@@ -158,13 +177,16 @@ class _FocusPageState extends State<FocusPage> {
       ),
       child: SafeArea(
         child: Center(
-          child: CircularSlider(
-            onValueChanged: _onSliderValueChanged,
-            currentValue: _timerValue,
-            isTimerRunning: _isTimerRunning,
-            timeDisplay: _formatTime(_remainingSeconds),
-            progress: _progress,
-            onPlayPause: _toggleTimer,
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 20),
+            child: CircularSlider(
+              onValueChanged: _onSliderValueChanged,
+              currentValue: _timerValue,
+              isTimerRunning: _isTimerRunning,
+              timeDisplay: _formatTime(_remainingSeconds),
+              progress: _progress,
+              onPlayPause: _toggleTimer,
+            ),
           ),
         ),
       ),
