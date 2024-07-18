@@ -35,7 +35,7 @@ class RollingMenu extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? CupertinoColors.activeBlue
+                        ? item['color']
                         : CupertinoColors.darkBackgroundGray,
                     shape: BoxShape.circle,
                   ),

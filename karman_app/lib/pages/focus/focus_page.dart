@@ -57,8 +57,7 @@ class _FocusPageState extends State<FocusPage>
         _startTimer();
         _soundManager.playSelectedSound();
       } else {
-        _stopTimer();
-        _soundManager.stopBackgroundSound();
+        _stopTimer(playChime: false);
       }
     });
   }
@@ -70,13 +69,13 @@ class _FocusPageState extends State<FocusPage>
         if (_remainingSeconds > 0) {
           _remainingSeconds--;
         } else {
-          _stopTimer();
+          _stopTimer(playChime: true);
         }
       });
     });
   }
 
-  void _stopTimer() {
+  void _stopTimer({required bool playChime}) {
     _timer.cancel();
     _isTimerRunning = false;
     _soundManager.stopBackgroundSound();
@@ -86,9 +85,11 @@ class _FocusPageState extends State<FocusPage>
       _toggleMenu();
     }
 
-    Future.delayed(Duration(seconds: 1), () {
-      _soundManager.playChime();
-    });
+    if (playChime) {
+      Future.delayed(Duration(seconds: 1), () {
+        _soundManager.playChime();
+      });
+    }
 
     setState(() {
       _remainingSeconds = _timerValue * 60;
@@ -126,7 +127,7 @@ class _FocusPageState extends State<FocusPage>
         trailing: CupertinoButton(
           onPressed: _isTimerRunning ? _toggleMenu : null,
           child: Icon(
-            CupertinoIcons.music_note_2,
+            _soundManager.currentIcon,
             color: _isTimerRunning
                 ? CupertinoColors.white
                 : CupertinoColors.systemGrey,
@@ -170,7 +171,7 @@ class _FocusPageState extends State<FocusPage>
                             _soundManager.currentSound = sound['file'];
                             if (sound['file'] == null) {
                               _soundManager.stopBackgroundSound();
-                            } else {
+                            } else if (_isTimerRunning) {
                               _soundManager.playSelectedSound();
                             }
                             _toggleMenu();

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:karman_app/pages/habit/habits_page.dart';
 // import 'package:karman_app/pages/setting/settings_page.dart';
 import 'package:karman_app/pages/task/tasks_page.dart';
@@ -25,7 +26,7 @@ class AppShell extends StatelessWidget {
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.circle_grid_hex),
+            icon: Icon(Icons.self_improvement_outlined),
             label: 'Focus',
           ),
           // BottomNavigationBarItem(

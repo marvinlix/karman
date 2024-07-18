@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
 class SoundManager {
@@ -6,26 +7,35 @@ class SoundManager {
   final AudioPlayer chimePlayer = AudioPlayer();
 
   final List<Map<String, dynamic>> sounds = [
-    {'name': 'None', 'icon': CupertinoIcons.nosign, 'file': null},
+    {
+      'name': 'None',
+      'icon': CupertinoIcons.speaker_slash_fill,
+      'file': null,
+      'color': CupertinoColors.systemGrey
+    },
     {
       'name': 'Rain',
-      'icon': CupertinoIcons.cloud_rain,
-      'file': 'lib/assets/audio/rain.mp3'
+      'icon': CupertinoIcons.cloud_heavyrain_fill,
+      'file': 'lib/assets/audio/rain.mp3',
+      'color': CupertinoColors.systemCyan
     },
     {
       'name': 'Ocean',
-      'icon': CupertinoIcons.drop,
-      'file': 'lib/assets/audio/ocean.mp3'
+      'icon': Icons.waves,
+      'file': 'lib/assets/audio/ocean.mp3',
+      'color': CupertinoColors.activeBlue
     },
     {
       'name': 'Forest',
-      'icon': CupertinoIcons.tree,
-      'file': 'lib/assets/audio/forest.mp3'
+      'icon': Icons.forest,
+      'file': 'lib/assets/audio/forest.mp3',
+      'color': CupertinoColors.systemGreen
     },
     {
       'name': 'Airplane',
       'icon': CupertinoIcons.airplane,
-      'file': 'lib/assets/audio/airplane.mp3'
+      'file': 'lib/assets/audio/airplane.mp3',
+      'color': CupertinoColors.systemIndigo
     },
   ];
 
@@ -55,5 +65,12 @@ class SoundManager {
   void dispose() {
     backgroundPlayer.dispose();
     chimePlayer.dispose();
+  }
+
+  IconData get currentIcon {
+    if (currentSound == null) {
+      return CupertinoIcons.speaker_slash_fill;
+    }
+    return sounds.firstWhere((sound) => sound['file'] == currentSound)['icon'];
   }
 }
