@@ -158,28 +158,13 @@ class _FocusPageState extends State<FocusPage> {
       ),
       child: SafeArea(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CircularSlider(
-                onValueChanged: _onSliderValueChanged,
-                currentValue: _timerValue,
-                isTimerRunning: _isTimerRunning,
-                timeDisplay: _formatTime(_remainingSeconds),
-                progress: _progress,
-              ),
-              SizedBox(height: 20),
-              CupertinoButton(
-                onPressed: _toggleTimer,
-                child: Icon(
-                  _isTimerRunning
-                      ? CupertinoIcons.stop_circle
-                      : CupertinoIcons.play_circle,
-                  color: CupertinoColors.white,
-                  size: 48,
-                ),
-              ),
-            ],
+          child: CircularSlider(
+            onValueChanged: _onSliderValueChanged,
+            currentValue: _timerValue,
+            isTimerRunning: _isTimerRunning,
+            timeDisplay: _formatTime(_remainingSeconds),
+            progress: _progress,
+            onPlayPause: _toggleTimer,
           ),
         ),
       ),
