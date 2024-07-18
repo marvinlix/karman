@@ -159,14 +159,17 @@ class _TasksPageState extends State<TasksPage> {
                 textAlign: TextAlign.center,
               ),
             )
-          : ListView(
-              children: [
-                _buildPrioritySection(3, tasks),
-                _buildPrioritySection(2, tasks),
-                _buildPrioritySection(1, tasks),
-                _buildCompletedSection(tasks),
-              ],
-            ),
+          : Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: ListView(
+                children: [
+                  _buildPrioritySection(3, tasks),
+                  _buildPrioritySection(2, tasks),
+                  _buildPrioritySection(1, tasks),
+                  _buildCompletedSection(tasks),
+                ],
+              ),
+          ),
     );
   }
 
