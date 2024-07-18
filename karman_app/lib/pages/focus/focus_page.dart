@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:karman_app/components/focus/circular_slider.dart';
 import 'package:karman_app/components/focus/radial_menu.dart';
+import 'package:karman_app/manager/sound_manager.dart';
 
 class FocusPage extends StatefulWidget {
   const FocusPage({super.key});
@@ -17,44 +17,12 @@ class _FocusPageState extends State<FocusPage> {
   late Timer _timer;
   int _remainingSeconds = 300;
   int _totalSeconds = 300;
-  String? _currentSound;
-  final AudioPlayer _audioPlayer = AudioPlayer();
-  final AudioPlayer _chimePlayer = AudioPlayer();
-
-  final List<Map<String, dynamic>> sounds = [
-    {'name': 'None', 'icon': CupertinoIcons.nosign, 'file': null},
-    {
-      'name': 'Rain',
-      'icon': CupertinoIcons.cloud_rain,
-      'file': 'lib/assets/audio/rain.mp3'
-    },
-    {
-      'name': 'Ocean',
-      'icon': CupertinoIcons.drop,
-      'file': 'lib/assets/audio/ocean.mp3'
-    },
-    {
-      'name': 'Forest',
-      'icon': CupertinoIcons.tree,
-      'file': 'lib/assets/audio/forest.mp3'
-    },
-    {
-      'name': 'Airplane',
-      'icon': CupertinoIcons.airplane,
-      'file': 'lib/assets/audio/airplane.mp3'
-    },
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  final SoundManager _soundManager = SoundManager();
 
   @override
   void dispose() {
     _timer.cancel();
-    _audioPlayer.dispose();
-    _chimePlayer.dispose();
+    _soundManager.dispose();
     super.dispose();
   }
 
@@ -71,10 +39,10 @@ class _FocusPageState extends State<FocusPage> {
       _isTimerRunning = !_isTimerRunning;
       if (_isTimerRunning) {
         _startTimer();
-        _playSelectedSound();
+        _soundManager.playSelectedSound();
       } else {
         _stopTimer();
-        _audioPlayer.stop();
+        _soundManager.stopBackgroundSound();
       }
     });
   }
@@ -95,11 +63,10 @@ class _FocusPageState extends State<FocusPage> {
   void _stopTimer() {
     _timer.cancel();
     _isTimerRunning = false;
-    _audioPlayer.stop();
+    _soundManager.stopBackgroundSound();
 
-    // Play chime after 2 seconds
     Future.delayed(Duration(seconds: 1), () {
-      _playChime();
+      _soundManager.playChime();
     });
 
     setState(() {
@@ -108,41 +75,24 @@ class _FocusPageState extends State<FocusPage> {
     });
   }
 
-  void _playChime() async {
-    try {
-      await _chimePlayer.setAsset('lib/assets/audio/subtle_chime.mp3');
-      await _chimePlayer.play();
-    } catch (e) {
-      print('Error playing chime: $e');
-    }
-  }
-
-  void _playSelectedSound() async {
-    if (_currentSound != null) {
-      await _audioPlayer.setAsset(_currentSound!);
-      await _audioPlayer.setLoopMode(LoopMode.one);
-      _audioPlayer.play();
-    }
-  }
-
   void _showRadialMenu() {
     if (_isTimerRunning) {
       showCupertinoModalPopup(
         context: context,
         builder: (BuildContext context) => RadialMenu(
-          items: sounds,
+          items: _soundManager.sounds,
           onItemSelected: (Map<String, dynamic> sound) {
             setState(() {
-              _currentSound = sound['file'];
+              _soundManager.currentSound = sound['file'];
               if (sound['file'] == null) {
-                _audioPlayer.stop();
+                _soundManager.stopBackgroundSound();
               } else {
-                _playSelectedSound();
+                _soundManager.playSelectedSound();
               }
             });
           },
           onDismiss: () => Navigator.of(context).pop(),
-          currentSound: _currentSound,
+          currentSound: _soundManager.currentSound,
         ),
       );
     }
