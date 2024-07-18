@@ -115,7 +115,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
       child: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 40,
             left: 20,
             right: 20,
             top: 20,

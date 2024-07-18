@@ -66,13 +66,16 @@ class _HabitsPageState extends State<HabitsPage> {
                       style: TextStyle(color: CupertinoColors.systemGrey),
                     ),
                   )
-                : ListView.builder(
-                    itemCount: habitController.habits.length,
-                    itemBuilder: (context, index) {
-                      final habit = habitController.habits[index];
-                      return HabitTile(habit: habit);
-                    },
-                  ),
+                : Padding(
+                  padding: EdgeInsets.only(top: 16),
+                  child: ListView.builder(
+                      itemCount: habitController.habits.length,
+                      itemBuilder: (context, index) {
+                        final habit = habitController.habits[index];
+                        return HabitTile(habit: habit);
+                      },
+                    ),
+                ),
           ),
         );
       },

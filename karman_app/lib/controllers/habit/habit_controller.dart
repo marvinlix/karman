@@ -17,7 +17,8 @@ class HabitController extends ChangeNotifier {
     _habits = await _habitService.getHabits();
     for (var habit in _habits) {
       await loadHabitLogs(habit.habitId!);
-      habit.isCompletedToday = await _habitService.isHabitCompletedToday(habit.habitId!);
+      habit.isCompletedToday =
+          await _habitService.isHabitCompletedToday(habit.habitId!);
     }
     notifyListeners();
   }
@@ -76,10 +77,10 @@ class HabitController extends ChangeNotifier {
     }
   }
 
-  void _scheduleReminder(Habit habit) {
+  Future<void> _scheduleReminder(Habit habit) async {
     if (habit.reminderTime != null && habit.habitId != null) {
       final now = DateTime.now();
-      final scheduledTime = DateTime(
+      var scheduledTime = DateTime(
         now.year,
         now.month,
         now.day,
@@ -87,19 +88,18 @@ class HabitController extends ChangeNotifier {
         habit.reminderTime!.inMinutes % 60,
       );
 
+      // If the scheduled time for today has already passed, schedule for tomorrow
       if (scheduledTime.isBefore(now)) {
-        scheduledTime.add(Duration(days: 1));
+        scheduledTime = scheduledTime.add(Duration(days: 1));
       }
 
-      NotificationService.scheduleNotification(
+      await NotificationService.scheduleNotification(
         id: habit.habitId!,
         title: 'Habit Reminder',
         body: habit.habitName,
         scheduledDate: scheduledTime,
         payload: 'habit_${habit.habitId}',
       );
-    } else if (habit.habitId != null) {
-      NotificationService.cancelNotification(habit.habitId!);
     }
   }
 }

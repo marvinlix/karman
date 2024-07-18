@@ -38,7 +38,7 @@ class HabitTile extends StatelessWidget {
           child: GestureDetector(
             onTap: () => _showHabitDetailsSheet(context),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
               decoration: BoxDecoration(
                 color: Colors.black,
                 border: Border(
@@ -55,7 +55,7 @@ class HabitTile extends StatelessWidget {
                       habit.habitName,
                       style: TextStyle(
                         color: CupertinoColors.white,
-                        fontSize: 18,
+                        fontSize: 20,
                       ),
                     ),
                   ),
