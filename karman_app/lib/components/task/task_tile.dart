@@ -38,16 +38,20 @@ class TaskTile extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Checkbox(
-                value: task.isCompleted,
-                onChanged: onChanged,
-                checkColor: Colors.black,
-                activeColor: Colors.white,
-                shape: const CircleBorder(),
+              Transform.scale(
+                scale: 1.2,
+                child: Checkbox(
+                  value: task.isCompleted,
+                  onChanged: onChanged,
+                  checkColor: Colors.black,
+                  activeColor: Colors.white,
+                  shape: const CircleBorder(),
+                ),
               ),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
                   decoration: BoxDecoration(
                     color: Colors.black,
                     border: Border(
@@ -66,10 +70,10 @@ class TaskTile extends StatelessWidget {
                           color: task.isCompleted
                               ? Colors.grey[700]
                               : Colors.white,
-                          fontSize: 18,
+                          fontSize: 20,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 8),
                       Row(
                         children: [
                           if (task.dueDate != null) _buildDateIcon(),
@@ -92,14 +96,14 @@ class TaskTile extends StatelessWidget {
   }
 
   Widget _buildDateIcon() {
-    return const Icon(CupertinoIcons.calendar, color: Colors.white, size: 16);
+    return const Icon(CupertinoIcons.calendar, color: Colors.white, size: 20);
   }
 
   Widget _buildReminderIcon() {
-    return const Icon(CupertinoIcons.clock, color: Colors.white, size: 16);
+    return const Icon(CupertinoIcons.clock, color: Colors.white, size: 20);
   }
 
   Widget _buildNoteIcon() {
-    return const Icon(CupertinoIcons.doc_text, color: Colors.white, size: 16);
+    return const Icon(CupertinoIcons.doc_text, color: Colors.white, size: 20);
   }
 }
