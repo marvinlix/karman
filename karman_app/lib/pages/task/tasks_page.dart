@@ -77,8 +77,7 @@ class _TasksPageState extends State<TasksPage> {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) => CupertinoAlertDialog(
-        title: Text('Clear Completed Tasks'),
-        content: Text('Are you sure you want to delete all completed tasks?'),
+        title: Text('Clear Completed Tasks?'),
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
             child: Text('Cancel'),
@@ -136,8 +135,11 @@ class _TasksPageState extends State<TasksPage> {
               ),
             ),
           ),
-          child: SafeArea(
-            child: _buildTasksList(_sortedTasks),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: SafeArea(
+              child: _buildTasksList(_sortedTasks),
+            ),
           ),
         );
       },
@@ -145,32 +147,25 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   Widget _buildTasksList(List<Task> tasks) {
-    return AnimatedSize(
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      child: tasks.isEmpty
-          ? Center(
-              child: Text(
-                'This space craves your brilliant ideas. Add one!',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: CupertinoColors.systemGrey,
-                ),
-                textAlign: TextAlign.center,
+    return tasks.isEmpty
+        ? Center(
+            child: Text(
+              'This space craves your brilliant ideas. Add one!',
+              style: TextStyle(
+                fontSize: 18,
+                color: CupertinoColors.systemGrey,
               ),
-            )
-          : Padding(
-            padding: const EdgeInsets.only(top: 16.0),
-            child: ListView(
-                children: [
-                  _buildPrioritySection(3, tasks),
-                  _buildPrioritySection(2, tasks),
-                  _buildPrioritySection(1, tasks),
-                  _buildCompletedSection(tasks),
-                ],
-              ),
-          ),
-    );
+              textAlign: TextAlign.center,
+            ),
+          )
+        : ListView(
+            children: [
+              _buildPrioritySection(3, tasks),
+              _buildPrioritySection(2, tasks),
+              _buildPrioritySection(1, tasks),
+              _buildCompletedSection(tasks),
+            ],
+          );
   }
 
   Widget _buildPrioritySection(int priority, List<Task> allTasks) {
@@ -178,83 +173,64 @@ class _TasksPageState extends State<TasksPage> {
         .where((task) => task.priority == priority && !task.isCompleted)
         .toList();
 
-    return AnimatedSize(
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      child: tasksInPriority.isEmpty
-          ? SizedBox.shrink()
-          : Column(
+    if (tasksInPriority.isEmpty) {
+      return SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: () => _toggleSection(priority),
+          child: Container(
+            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+            color: CupertinoColors.black,
+            child: Row(
               children: [
-                GestureDetector(
-                  onTap: () => _toggleSection(priority),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                    color: CupertinoColors.black,
-                    child: Row(
-                      children: [
-                        Icon(
-                          _expandedSections[priority]!
-                              ? CupertinoIcons.flag_circle
-                              : CupertinoIcons.flag_circle_fill,
-                          color: priority == 3
-                              ? Colors.red
-                              : (priority == 2 ? Colors.yellow : Colors.green),
-                        ),
-                        SizedBox(width: 10),
-                        Text(
-                          priority == 3
-                              ? 'High'
-                              : (priority == 2 ? 'Medium' : 'Low'),
-                          style: TextStyle(
-                              color: CupertinoColors.white,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Spacer(),
-                        Icon(
-                          _expandedSections[priority]!
-                              ? CupertinoIcons.chevron_up
-                              : CupertinoIcons.chevron_down,
-                          color: CupertinoColors.white,
-                        ),
-                      ],
-                    ),
-                  ),
+                Icon(
+                  _expandedSections[priority]!
+                      ? CupertinoIcons.flag_circle
+                      : CupertinoIcons.flag_circle_fill,
+                  color: priority == 3
+                      ? Colors.red
+                      : (priority == 2 ? Colors.yellow : Colors.green),
                 ),
-                AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  height: _expandedSections[priority]!
-                      ? tasksInPriority.length * 70.0
-                      : 0,
-                  child: AnimatedOpacity(
-                    duration: Duration(milliseconds: 300),
-                    opacity: _expandedSections[priority]! ? 1.0 : 0.0,
-                    child: ListView(
-                      physics: NeverScrollableScrollPhysics(),
-                      children: tasksInPriority
-                          .map(
-                            (task) => AnimatedSwitcher(
-                              duration: Duration(milliseconds: 300),
-                              child: GestureDetector(
-                                key: ValueKey(task.taskId),
-                                onTap: () => _openTaskDetails(task),
-                                child: TaskTile(
-                                  key: ValueKey(task.taskId),
-                                  task: task,
-                                  onChanged: (value) =>
-                                      _toggleTaskCompletion(task),
-                                  onDelete: (context) =>
-                                      _deleteTask(context, task.taskId!),
-                                ),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ),
+                SizedBox(width: 10),
+                Text(
+                  priority == 3 ? 'High' : (priority == 2 ? 'Medium' : 'Low'),
+                  style: TextStyle(
+                      color: CupertinoColors.white,
+                      fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 20),
+                Spacer(),
+                Icon(
+                  _expandedSections[priority]!
+                      ? CupertinoIcons.chevron_up
+                      : CupertinoIcons.chevron_down,
+                  color: CupertinoColors.white,
+                ),
               ],
             ),
+          ),
+        ),
+        if (_expandedSections[priority]!)
+          ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: tasksInPriority.length,
+            itemBuilder: (context, index) {
+              return TaskTile(
+                key: ValueKey(tasksInPriority[index].taskId),
+                task: tasksInPriority[index],
+                onChanged: (value) =>
+                    _toggleTaskCompletion(tasksInPriority[index]),
+                onDelete: (context) =>
+                    _deleteTask(context, tasksInPriority[index].taskId!),
+              );
+            },
+          ),
+        SizedBox(height: 16), // Add some space after each section
+      ],
     );
   }
 
@@ -266,6 +242,7 @@ class _TasksPageState extends State<TasksPage> {
     }
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
           onTap: () => _toggleSection(0),
@@ -298,35 +275,22 @@ class _TasksPageState extends State<TasksPage> {
             ),
           ),
         ),
-        AnimatedContainer(
-          duration: Duration(milliseconds: 300),
-          height: _expandedSections[0]! ? completedTasks.length * 70.0 : 0,
-          child: AnimatedOpacity(
-            duration: Duration(milliseconds: 300),
-            opacity: _expandedSections[0]! ? 1.0 : 0.0,
-            child: ListView(
-              physics: NeverScrollableScrollPhysics(),
-              children: completedTasks
-                  .map(
-                    (task) => AnimatedSwitcher(
-                      duration: Duration(milliseconds: 300),
-                      child: GestureDetector(
-                        key: ValueKey(task.taskId),
-                        onTap: () => _openTaskDetails(task),
-                        child: TaskTile(
-                          key: ValueKey(task.taskId),
-                          task: task,
-                          onChanged: (value) => _toggleTaskCompletion(task),
-                          onDelete: (context) =>
-                              _deleteTask(context, task.taskId!),
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
+        if (_expandedSections[0]!)
+          ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: completedTasks.length,
+            itemBuilder: (context, index) {
+              return TaskTile(
+                key: ValueKey(completedTasks[index].taskId),
+                task: completedTasks[index],
+                onChanged: (value) =>
+                    _toggleTaskCompletion(completedTasks[index]),
+                onDelete: (context) =>
+                    _deleteTask(context, completedTasks[index].taskId!),
+              );
+            },
           ),
-        ),
       ],
     );
   }

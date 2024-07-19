@@ -9,101 +9,105 @@ class TaskTile extends StatelessWidget {
   final Function(BuildContext)? onDelete;
 
   const TaskTile({
-    super.key,
+    Key? key,
     required this.task,
     required this.onChanged,
     required this.onDelete,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Material(
-        color: Colors.transparent,
-        child: Slidable(
-          key: ValueKey(task.taskId),
-          endActionPane: ActionPane(
-            motion: const DrawerMotion(),
-            children: [
-              SlidableAction(
-                onPressed: onDelete,
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.redAccent,
-                icon: CupertinoIcons.delete,
-                label: 'Delete',
+    return Material(
+      color: Colors.transparent,
+      child: Slidable(
+        key: ValueKey(task.taskId),
+        endActionPane: ActionPane(
+          motion: const DrawerMotion(),
+          children: [
+            SlidableAction(
+              onPressed: onDelete,
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.redAccent,
+              icon: CupertinoIcons.delete,
+              label: 'Delete',
+            ),
+          ],
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.black,
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.grey[800]!,
+                width: 1,
               ),
-            ],
+            ),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Transform.scale(
-                scale: 1.2,
-                child: Checkbox(
-                  value: task.isCompleted,
-                  onChanged: onChanged,
-                  checkColor: Colors.black,
-                  activeColor: Colors.white,
-                  shape: const CircleBorder(),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.grey[800]!,
-                        width: 1,
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 60, // Fixed width for checkbox area
+                  child: Center(
+                    child: Transform.scale(
+                      scale: 1.3,
+                      child: Checkbox(
+                        value: task.isCompleted,
+                        onChanged: onChanged,
+                        checkColor: Colors.black,
+                        activeColor: Colors.white,
+                        shape: const CircleBorder(),
                       ),
                     ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        task.name,
-                        style: TextStyle(
-                          color: task.isCompleted
-                              ? Colors.grey[700]
-                              : Colors.white,
-                          fontSize: 20,
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          task.name,
+                          style: TextStyle(
+                            color: task.isCompleted ? Colors.grey[700] : Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          if (task.dueDate != null) _buildDateIcon(),
-                          if (task.dueDate != null) const SizedBox(width: 24),
-                          if (task.reminder != null) _buildReminderIcon(),
-                          if (task.reminder != null) const SizedBox(width: 24),
-                          if (task.note != null && task.note!.isNotEmpty)
-                            _buildNoteIcon(),
-                        ],
-                      ),
-                    ],
+                        if (_hasAdditionalInfo)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8),
+                            child: Row(
+                              children: [
+                                if (task.dueDate != null) _buildIcon(CupertinoIcons.calendar),
+                                if (task.reminder != null) _buildIcon(CupertinoIcons.clock),
+                                if (task.note != null && task.note!.isNotEmpty) _buildIcon(CupertinoIcons.doc_text),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+                SizedBox(width: 16), // Add some padding on the right side
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildDateIcon() {
-    return const Icon(CupertinoIcons.calendar, color: Colors.white, size: 20);
+  Widget _buildIcon(IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 16),
+      child: Icon(icon, color: Colors.white, size: 20),
+    );
   }
 
-  Widget _buildReminderIcon() {
-    return const Icon(CupertinoIcons.clock, color: Colors.white, size: 20);
-  }
-
-  Widget _buildNoteIcon() {
-    return const Icon(CupertinoIcons.doc_text, color: Colors.white, size: 20);
-  }
+  bool get _hasAdditionalInfo =>
+      task.dueDate != null || task.reminder != null || (task.note != null && task.note!.isNotEmpty);
 }
