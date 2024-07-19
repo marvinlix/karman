@@ -10,6 +10,7 @@ class PrioritySection extends StatelessWidget {
   final Function(int) onToggle;
   final Function(Task) onTaskToggle;
   final Function(BuildContext, int) onTaskDelete;
+  final Function(Task) onTaskTap; 
 
   const PrioritySection({
     super.key,
@@ -19,11 +20,14 @@ class PrioritySection extends StatelessWidget {
     required this.onToggle,
     required this.onTaskToggle,
     required this.onTaskDelete,
+    required this.onTaskTap, 
   });
 
   @override
   Widget build(BuildContext context) {
-    final tasksInPriority = tasks.where((task) => task.priority == priority && !task.isCompleted).toList();
+    final tasksInPriority = tasks
+        .where((task) => task.priority == priority && !task.isCompleted)
+        .toList();
 
     if (tasksInPriority.isEmpty) {
       return SizedBox.shrink();
@@ -40,17 +44,25 @@ class PrioritySection extends StatelessWidget {
             child: Row(
               children: [
                 Icon(
-                  isExpanded ? CupertinoIcons.flag_circle : CupertinoIcons.flag_circle_fill,
-                  color: priority == 3 ? Colors.red : (priority == 2 ? Colors.yellow : Colors.green),
+                  isExpanded
+                      ? CupertinoIcons.flag_circle
+                      : CupertinoIcons.flag_circle_fill,
+                  color: priority == 3
+                      ? Colors.red
+                      : (priority == 2 ? Colors.yellow : Colors.green),
                 ),
                 SizedBox(width: 10),
                 Text(
                   priority == 3 ? 'High' : (priority == 2 ? 'Medium' : 'Low'),
-                  style: TextStyle(color: CupertinoColors.white, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: CupertinoColors.white,
+                      fontWeight: FontWeight.bold),
                 ),
                 Spacer(),
                 Icon(
-                  isExpanded ? CupertinoIcons.chevron_up : CupertinoIcons.chevron_down,
+                  isExpanded
+                      ? CupertinoIcons.chevron_up
+                      : CupertinoIcons.chevron_down,
                   color: CupertinoColors.white,
                 ),
               ],
@@ -67,7 +79,9 @@ class PrioritySection extends StatelessWidget {
                 key: ValueKey(tasksInPriority[index].taskId),
                 task: tasksInPriority[index],
                 onChanged: (value) => onTaskToggle(tasksInPriority[index]),
-                onDelete: (context) => onTaskDelete(context, tasksInPriority[index].taskId!),
+                onDelete: (context) =>
+                    onTaskDelete(context, tasksInPriority[index].taskId!),
+                onTap: () => onTaskTap(tasksInPriority[index]), 
               );
             },
           ),

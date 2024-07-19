@@ -8,6 +8,7 @@ class CompletedSection extends StatelessWidget {
   final VoidCallback onToggle;
   final Function(Task) onTaskToggle;
   final Function(BuildContext, int) onTaskDelete;
+  final Function(Task) onTaskTap;
 
   const CompletedSection({
     super.key,
@@ -16,6 +17,7 @@ class CompletedSection extends StatelessWidget {
     required this.onToggle,
     required this.onTaskToggle,
     required this.onTaskDelete,
+    required this.onTaskTap,
   });
 
   @override
@@ -72,6 +74,7 @@ class CompletedSection extends StatelessWidget {
                 onChanged: (value) => onTaskToggle(completedTasks[index]),
                 onDelete: (context) =>
                     onTaskDelete(context, completedTasks[index].taskId!),
+                onTap: () => onTaskTap(completedTasks[index]),
               );
             },
           ),

@@ -9,6 +9,7 @@ class TaskList extends StatelessWidget {
   final Function(int) onToggleSection;
   final Function(Task) onTaskToggle;
   final Function(BuildContext, int) onTaskDelete;
+  final Function(Task) onTaskTap; 
 
   const TaskList({
     super.key,
@@ -17,6 +18,7 @@ class TaskList extends StatelessWidget {
     required this.onToggleSection,
     required this.onTaskToggle,
     required this.onTaskDelete,
+    required this.onTaskTap, 
   });
 
   @override
@@ -41,6 +43,7 @@ class TaskList extends StatelessWidget {
                 onToggle: onToggleSection,
                 onTaskToggle: onTaskToggle,
                 onTaskDelete: onTaskDelete,
+                onTaskTap: onTaskTap, 
               ),
               PrioritySection(
                 priority: 2,
@@ -49,6 +52,7 @@ class TaskList extends StatelessWidget {
                 onToggle: onToggleSection,
                 onTaskToggle: onTaskToggle,
                 onTaskDelete: onTaskDelete,
+                onTaskTap: onTaskTap, 
               ),
               PrioritySection(
                 priority: 1,
@@ -57,6 +61,7 @@ class TaskList extends StatelessWidget {
                 onToggle: onToggleSection,
                 onTaskToggle: onTaskToggle,
                 onTaskDelete: onTaskDelete,
+                onTaskTap: onTaskTap, 
               ),
               CompletedSection(
                 tasks: tasks,
@@ -64,6 +69,7 @@ class TaskList extends StatelessWidget {
                 onToggle: () => onToggleSection(0),
                 onTaskToggle: onTaskToggle,
                 onTaskDelete: onTaskDelete,
+                onTaskTap: onTaskTap, 
               ),
             ],
           );

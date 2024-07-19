@@ -143,6 +143,7 @@ class _TasksPageState extends State<TasksPage> {
                 onToggleSection: _toggleSection,
                 onTaskToggle: _toggleTaskCompletion,
                 onTaskDelete: _deleteTask,
+                onTaskTap: _openTaskDetails,
               ),
             ),
           ),
