@@ -1,16 +1,19 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:karman_app/models/task/task.dart';
-import 'package:karman_app/components/task/task_tile.dart';
+import 'package:karman_app/components/task/taskPageWidgets/task_tile.dart';
 
-class CompletedSection extends StatelessWidget {
+class PrioritySection extends StatelessWidget {
+  final int priority;
   final List<Task> tasks;
   final bool isExpanded;
-  final VoidCallback onToggle;
+  final Function(int) onToggle;
   final Function(Task) onTaskToggle;
   final Function(BuildContext, int) onTaskDelete;
 
-  const CompletedSection({
+  const PrioritySection({
     super.key,
+    required this.priority,
     required this.tasks,
     required this.isExpanded,
     required this.onToggle,
@@ -20,9 +23,9 @@ class CompletedSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final completedTasks = tasks.where((task) => task.isCompleted).toList();
+    final tasksInPriority = tasks.where((task) => task.priority == priority && !task.isCompleted).toList();
 
-    if (completedTasks.isEmpty) {
+    if (tasksInPriority.isEmpty) {
       return SizedBox.shrink();
     }
 
@@ -30,30 +33,24 @@ class CompletedSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: onToggle,
+          onTap: () => onToggle(priority),
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
             color: CupertinoColors.black,
             child: Row(
               children: [
                 Icon(
-                  isExpanded
-                      ? CupertinoIcons.checkmark_circle
-                      : CupertinoIcons.checkmark_circle_fill,
-                  color: CupertinoColors.systemGrey,
+                  isExpanded ? CupertinoIcons.flag_circle : CupertinoIcons.flag_circle_fill,
+                  color: priority == 3 ? Colors.red : (priority == 2 ? Colors.yellow : Colors.green),
                 ),
                 SizedBox(width: 10),
                 Text(
-                  'Completed',
-                  style: TextStyle(
-                      color: CupertinoColors.white,
-                      fontWeight: FontWeight.bold),
+                  priority == 3 ? 'High' : (priority == 2 ? 'Medium' : 'Low'),
+                  style: TextStyle(color: CupertinoColors.white, fontWeight: FontWeight.bold),
                 ),
                 Spacer(),
                 Icon(
-                  isExpanded
-                      ? CupertinoIcons.chevron_up
-                      : CupertinoIcons.chevron_down,
+                  isExpanded ? CupertinoIcons.chevron_up : CupertinoIcons.chevron_down,
                   color: CupertinoColors.white,
                 ),
               ],
@@ -64,17 +61,17 @@ class CompletedSection extends StatelessWidget {
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: completedTasks.length,
+            itemCount: tasksInPriority.length,
             itemBuilder: (context, index) {
               return TaskTile(
-                key: ValueKey(completedTasks[index].taskId),
-                task: completedTasks[index],
-                onChanged: (value) => onTaskToggle(completedTasks[index]),
-                onDelete: (context) =>
-                    onTaskDelete(context, completedTasks[index].taskId!),
+                key: ValueKey(tasksInPriority[index].taskId),
+                task: tasksInPriority[index],
+                onChanged: (value) => onTaskToggle(tasksInPriority[index]),
+                onDelete: (context) => onTaskDelete(context, tasksInPriority[index].taskId!),
               );
             },
           ),
+        SizedBox(height: 16),
       ],
     );
   }

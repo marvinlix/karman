@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:karman_app/components/date_time/date_button.dart';
-import 'package:karman_app/components/date_time/reminders.dart';
-import 'package:karman_app/components/task/task_note.dart';
+import 'package:karman_app/components/task/taskDetailsWidgets/task_name_input.dart';
+import 'package:karman_app/components/task/taskDetailsWidgets/task_options_section.dart';
+import 'package:karman_app/components/task/taskDetailsWidgets/priority_selector.dart';
+import 'package:karman_app/components/task/taskDetailsWidgets/task_note.dart';
 import 'package:karman_app/controllers/task/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/services/notification_service.dart';
@@ -13,10 +13,10 @@ class TaskDetailsSheet extends StatefulWidget {
   final bool isNewTask;
 
   const TaskDetailsSheet({
-    Key? key,
+    super.key,
     this.task,
     required this.isNewTask,
-  }) : super(key: key);
+  });
 
   @override
   _TaskDetailsSheetState createState() => _TaskDetailsSheetState();
@@ -154,36 +154,10 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
               ),
               child: Column(
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: CupertinoTextField(
-                            controller: _nameController,
-                            focusNode: _nameFocusNode,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                            ),
-                            placeholder: 'Task Name',
-                            placeholderStyle: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 24,
-                            ),
-                          ),
-                        ),
-                        CupertinoButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: _saveChanges,
-                          child: Icon(
-                            CupertinoIcons.check_mark_circled,
-                            color: Colors.white,
-                            size: 30,
-                          ),
-                        ),
-                      ],
-                    ),
+                  TaskNameInput(
+                    controller: _nameController,
+                    focusNode: _nameFocusNode,
+                    onSave: _saveChanges,
                   ),
                   Expanded(
                     child: SingleChildScrollView(
@@ -198,55 +172,42 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                               hintText: 'Note...',
                             ),
                             SizedBox(height: 30),
-                            _buildToggleRow(
-                              icon: CupertinoIcons.calendar,
-                              title: 'Date',
-                              isEnabled: _isDateEnabled,
-                              onToggle: (value) {
+                            TaskOptionsSection(
+                              isDateEnabled: _isDateEnabled,
+                              isReminderEnabled: _isReminderEnabled,
+                              dueDate: _dueDate,
+                              reminder: _reminder,
+                              onDateToggle: (value) {
                                 setState(() {
                                   _isDateEnabled = value;
                                   if (!value) _dueDate = null;
                                 });
                               },
-                              child: DateButton(
-                                selectedDate: _dueDate,
-                                onDateSelected: (date) {
-                                  setState(() {
-                                    _dueDate = date;
-                                  });
-                                },
-                                isEnabled: _isDateEnabled,
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            _buildToggleRow(
-                              icon: CupertinoIcons.bell,
-                              title: 'Reminder',
-                              isEnabled: _isReminderEnabled,
-                              onToggle: (value) {
+                              onReminderToggle: (value) {
                                 setState(() {
                                   _isReminderEnabled = value;
                                   if (!value) _reminder = null;
                                 });
                               },
-                              child: ReminderButton(
-                                selectedDateTime: _reminder,
-                                onReminderSet: (DateTime newDateTime) {
-                                  setState(() {
-                                    _reminder = newDateTime;
-                                  });
-                                },
-                                isEnabled: _isReminderEnabled,
-                              ),
+                              onDateSelected: (date) {
+                                setState(() {
+                                  _dueDate = date;
+                                });
+                              },
+                              onReminderSet: (DateTime newDateTime) {
+                                setState(() {
+                                  _reminder = newDateTime;
+                                });
+                              },
                             ),
                             SizedBox(height: 30),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                _buildPriorityOption(1, Colors.green),
-                                _buildPriorityOption(2, Colors.yellow),
-                                _buildPriorityOption(3, Colors.red),
-                              ],
+                            PrioritySelector(
+                              selectedPriority: _priority,
+                              onPriorityChanged: (priority) {
+                                setState(() {
+                                  _priority = priority;
+                                });
+                              },
                             ),
                           ],
                         ),
@@ -258,70 +219,6 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
             ),
           );
         },
-      ),
-    );
-  }
-
-  Widget _buildToggleRow({
-    required IconData icon,
-    required String title,
-    required bool isEnabled,
-    required Function(bool) onToggle,
-    required Widget child,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.white),
-        SizedBox(width: 10),
-        Expanded(child: child),
-        CupertinoSwitch(
-          value: isEnabled,
-          onChanged: onToggle,
-          activeColor: Colors.white,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPriorityOption(int priority, Color color) {
-    bool isSelected = _priority == priority;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _priority = priority;
-        });
-      },
-      child: Column(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: isSelected ? color : Colors.transparent,
-              border: Border.all(
-                color: isSelected ? color : Colors.white,
-                width: 2,
-              ),
-            ),
-            child: Center(
-              child: Icon(
-                CupertinoIcons.flag_fill,
-                color: isSelected ? Colors.black : color,
-                size: 20,
-              ),
-            ),
-          ),
-          SizedBox(height: 5),
-          Text(
-            priority == 1 ? 'Low' : (priority == 2 ? 'Medium' : 'High'),
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ],
       ),
     );
   }

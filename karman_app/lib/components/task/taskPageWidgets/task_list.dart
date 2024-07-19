@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:karman_app/models/task/task.dart';
-import 'package:karman_app/components/task/priority_section.dart';
-import 'package:karman_app/components/task/completed_section.dart';
+import 'package:karman_app/components/task/taskPageWidgets/priority_section.dart';
+import 'package:karman_app/components/task/taskPageWidgets/completed_section.dart';
 
 class TaskList extends StatelessWidget {
   final List<Task> tasks;
