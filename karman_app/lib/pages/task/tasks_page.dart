@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:karman_app/controllers/task/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/pages/task/task_details_sheet.dart';
-import 'package:karman_app/components/task/task_tile.dart';
+import 'package:karman_app/components/task/task_list.dart';
 import 'package:provider/provider.dart';
 
 class TasksPage extends StatefulWidget {
@@ -138,160 +137,17 @@ class _TasksPageState extends State<TasksPage> {
           child: Padding(
             padding: const EdgeInsets.only(top: 16),
             child: SafeArea(
-              child: _buildTasksList(_sortedTasks),
+              child: TaskList(
+                tasks: _sortedTasks,
+                expandedSections: _expandedSections,
+                onToggleSection: _toggleSection,
+                onTaskToggle: _toggleTaskCompletion,
+                onTaskDelete: _deleteTask,
+              ),
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildTasksList(List<Task> tasks) {
-    return tasks.isEmpty
-        ? Center(
-            child: Text(
-              'This space craves your brilliant ideas. Add one!',
-              style: TextStyle(
-                fontSize: 18,
-                color: CupertinoColors.systemGrey,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          )
-        : ListView(
-            children: [
-              _buildPrioritySection(3, tasks),
-              _buildPrioritySection(2, tasks),
-              _buildPrioritySection(1, tasks),
-              _buildCompletedSection(tasks),
-            ],
-          );
-  }
-
-  Widget _buildPrioritySection(int priority, List<Task> allTasks) {
-    final tasksInPriority = allTasks
-        .where((task) => task.priority == priority && !task.isCompleted)
-        .toList();
-
-    if (tasksInPriority.isEmpty) {
-      return SizedBox.shrink();
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: () => _toggleSection(priority),
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            color: CupertinoColors.black,
-            child: Row(
-              children: [
-                Icon(
-                  _expandedSections[priority]!
-                      ? CupertinoIcons.flag_circle
-                      : CupertinoIcons.flag_circle_fill,
-                  color: priority == 3
-                      ? Colors.red
-                      : (priority == 2 ? Colors.yellow : Colors.green),
-                ),
-                SizedBox(width: 10),
-                Text(
-                  priority == 3 ? 'High' : (priority == 2 ? 'Medium' : 'Low'),
-                  style: TextStyle(
-                      color: CupertinoColors.white,
-                      fontWeight: FontWeight.bold),
-                ),
-                Spacer(),
-                Icon(
-                  _expandedSections[priority]!
-                      ? CupertinoIcons.chevron_up
-                      : CupertinoIcons.chevron_down,
-                  color: CupertinoColors.white,
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (_expandedSections[priority]!)
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: tasksInPriority.length,
-            itemBuilder: (context, index) {
-              return TaskTile(
-                key: ValueKey(tasksInPriority[index].taskId),
-                task: tasksInPriority[index],
-                onChanged: (value) =>
-                    _toggleTaskCompletion(tasksInPriority[index]),
-                onDelete: (context) =>
-                    _deleteTask(context, tasksInPriority[index].taskId!),
-              );
-            },
-          ),
-        SizedBox(height: 16), // Add some space after each section
-      ],
-    );
-  }
-
-  Widget _buildCompletedSection(List<Task> allTasks) {
-    final completedTasks = allTasks.where((task) => task.isCompleted).toList();
-
-    if (completedTasks.isEmpty) {
-      return SizedBox.shrink();
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        GestureDetector(
-          onTap: () => _toggleSection(0),
-          child: Container(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            color: CupertinoColors.black,
-            child: Row(
-              children: [
-                Icon(
-                  _expandedSections[0]!
-                      ? CupertinoIcons.checkmark_circle
-                      : CupertinoIcons.checkmark_circle_fill,
-                  color: CupertinoColors.systemGrey,
-                ),
-                SizedBox(width: 10),
-                Text(
-                  'Completed',
-                  style: TextStyle(
-                      color: CupertinoColors.white,
-                      fontWeight: FontWeight.bold),
-                ),
-                Spacer(),
-                Icon(
-                  _expandedSections[0]!
-                      ? CupertinoIcons.chevron_up
-                      : CupertinoIcons.chevron_down,
-                  color: CupertinoColors.white,
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (_expandedSections[0]!)
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: completedTasks.length,
-            itemBuilder: (context, index) {
-              return TaskTile(
-                key: ValueKey(completedTasks[index].taskId),
-                task: completedTasks[index],
-                onChanged: (value) =>
-                    _toggleTaskCompletion(completedTasks[index]),
-                onDelete: (context) =>
-                    _deleteTask(context, completedTasks[index].taskId!),
-              );
-            },
-          ),
-      ],
     );
   }
 }
