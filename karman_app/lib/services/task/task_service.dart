@@ -19,9 +19,10 @@ class TaskService {
     return tasksData.map((taskData) => Task.fromMap(taskData)).toList();
   }
 
-  Future<void> updateTask(Task task) async {
+  Future<Task> updateTask(Task task) async {
     final db = await _databaseService.database;
     await _taskDatabase.updateTask(db, task.toMap());
+    return task;
   }
 
   Future<void> deleteTask(int id) async {

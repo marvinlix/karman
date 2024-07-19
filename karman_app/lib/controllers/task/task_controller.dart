@@ -26,13 +26,14 @@ class TaskController extends ChangeNotifier {
     }
   }
 
-  Future<void> updateTask(Task task) async {
+  Future<Task> updateTask(Task task) async {
     await _taskService.updateTask(task);
     final index = _tasks.indexWhere((t) => t.taskId == task.taskId);
     if (index != -1) {
       _tasks[index] = task;
       notifyListeners();
     }
+    return task;
   }
 
   Future<void> deleteTask(int id) async {

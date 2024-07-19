@@ -63,7 +63,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
     return date.isBefore(now);
   }
 
-  void _saveChanges() {
+  void _saveChanges() async {
     if (_nameController.text.trim().isEmpty) {
       _showQuirkyDialog('A Task Without a Name?',
           'Your task is feeling a bit shy and nameless. How about giving it a snazzy title to boost its confidence?');
@@ -86,25 +86,33 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
       isCompleted: widget.task?.isCompleted ?? false,
     );
 
-    if (widget.isNewTask) {
-      context.read<TaskController>().addTask(updatedTask);
-    } else {
-      context.read<TaskController>().updateTask(updatedTask);
-    }
+    Task savedTask;
+    try {
+      if (widget.isNewTask) {
+        savedTask = await context.read<TaskController>().addTask(updatedTask);
+      } else {
+        savedTask =
+            await context.read<TaskController>().updateTask(updatedTask);
+      }
 
-    if (updatedTask.reminder != null) {
-      NotificationService.scheduleNotification(
-        id: updatedTask.taskId!,
-        title: 'Task Reminder',
-        body: updatedTask.name,
-        scheduledDate: updatedTask.reminder!,
-        payload: 'task_${updatedTask.taskId}',
-      );
-    } else if (updatedTask.taskId != null) {
-      NotificationService.cancelNotification(updatedTask.taskId!);
-    }
+      if (savedTask.reminder != null && savedTask.taskId != null) {
+        await NotificationService.scheduleNotification(
+          id: savedTask.taskId!,
+          title: 'Task Reminder',
+          body: savedTask.name,
+          scheduledDate: savedTask.reminder!,
+          payload: 'task_${savedTask.taskId}',
+        );
+      } else if (savedTask.taskId != null) {
+        await NotificationService.cancelNotification(savedTask.taskId!);
+      }
 
-    Navigator.of(context).pop(true);
+      Navigator.of(context).pop(true);
+    } catch (e) {
+      print('Error saving task: $e');
+      _showQuirkyDialog('Oops! Something Went Wrong',
+          'The task gremlins are acting up. Please try again later.');
+    }
   }
 
   void _showQuirkyDialog(String title, String content) {
