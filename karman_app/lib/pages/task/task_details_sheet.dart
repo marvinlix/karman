@@ -61,7 +61,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   void _saveChanges() async {
     if (_nameController.text.trim().isEmpty) {
       _showQuirkyDialog('A Task Without a Name?',
-          'Your task is feeling a bit shy and nameless. How about giving it a snazzy title to boost its confidence?');
+          'Please give your task a name!');
       return;
     }
 
