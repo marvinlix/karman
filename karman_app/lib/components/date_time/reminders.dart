@@ -8,11 +8,11 @@ class ReminderButton extends StatelessWidget {
   final bool isEnabled;
 
   const ReminderButton({
-    Key? key,
+    super.key,
     this.selectedDateTime,
     required this.onReminderSet,
     this.isEnabled = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
