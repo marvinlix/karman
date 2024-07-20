@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:karman_app/components/date_time/date_button.dart';
+import 'package:karman_app/components/date_time/due_date_button.dart';
 import 'package:karman_app/components/date_time/reminder_button.dart';
 
 class TaskOptionsSection extends StatelessWidget {
@@ -34,7 +34,7 @@ class TaskOptionsSection extends StatelessWidget {
           title: 'Date',
           isEnabled: isDateEnabled,
           onToggle: onDateToggle,
-          child: DateButton(
+          child: DueDateButton(
             selectedDate: dueDate,
             onDateSelected: onDateSelected,
             isEnabled: isDateEnabled,

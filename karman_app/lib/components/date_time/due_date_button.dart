@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
-class DateButton extends StatelessWidget {
+class DueDateButton extends StatelessWidget {
   final DateTime? selectedDate;
   final Function(DateTime) onDateSelected;
   final bool isEnabled;
 
-  const DateButton({
+  const DueDateButton({
     super.key,
     required this.selectedDate,
     required this.onDateSelected,
