@@ -72,7 +72,7 @@ class DueDateButton extends StatelessWidget {
     showCupertinoDialog(
       context: context,
       builder: (BuildContext context) => CupertinoAlertDialog(
-        title: Text('Time machine not invented yet!'),
+        title: Text('Time Travel Alert!'),
         content: Text('Please select a date in the future.'),
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
