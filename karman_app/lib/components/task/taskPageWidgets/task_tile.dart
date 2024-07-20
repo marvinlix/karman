@@ -28,7 +28,7 @@ class TaskTile extends StatelessWidget {
           children: [
             SlidableAction(
               onPressed: onDelete,
-              backgroundColor: Colors.black,
+              backgroundColor: CupertinoColors.darkBackgroundGray,
               foregroundColor: Colors.redAccent,
               icon: CupertinoIcons.delete,
               label: 'Delete',
@@ -42,7 +42,7 @@ class TaskTile extends StatelessWidget {
               color: Colors.black,
               border: Border(
                 bottom: BorderSide(
-                  color: Colors.grey[800]!,
+                  color: CupertinoColors.darkBackgroundGray,
                   width: 1,
                 ),
               ),
@@ -59,8 +59,8 @@ class TaskTile extends StatelessWidget {
                         child: Checkbox(
                           value: task.isCompleted,
                           onChanged: onChanged,
-                          checkColor: Colors.black,
-                          activeColor: Colors.white,
+                          checkColor: CupertinoColors.black,
+                          activeColor: CupertinoColors.white,
                           shape: const CircleBorder(),
                         ),
                       ),
@@ -79,14 +79,14 @@ class TaskTile extends StatelessWidget {
                             style: TextStyle(
                               color: task.isCompleted
                                   ? Colors.grey[700]
-                                  : Colors.white,
+                                  : CupertinoColors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                           if (_hasAdditionalInfo)
                             Padding(
-                              padding: const EdgeInsets.only(top: 8),
+                              padding: const EdgeInsets.only(top: 2),
                               child: Row(
                                 children: [
                                   if (task.dueDate != null)
