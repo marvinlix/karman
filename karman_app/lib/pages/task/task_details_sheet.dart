@@ -58,21 +58,10 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
 
   final FocusNode _nameFocusNode = FocusNode();
 
-  bool _isDateInPast(DateTime date) {
-    final now = DateTime.now();
-    return date.isBefore(now);
-  }
-
   void _saveChanges() async {
     if (_nameController.text.trim().isEmpty) {
       _showQuirkyDialog('A Task Without a Name?',
           'Your task is feeling a bit shy and nameless. How about giving it a snazzy title to boost its confidence?');
-      return;
-    }
-
-    if (_isReminderEnabled && _reminder != null && _isDateInPast(_reminder!)) {
-      _showQuirkyDialog('Time Travel Not Invented Yet!',
-          'Unless you have a time machine, we can\'t remind you in the past.');
       return;
     }
 

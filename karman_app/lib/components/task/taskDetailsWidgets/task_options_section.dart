@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:karman_app/components/date_time/date_button.dart';
-import 'package:karman_app/components/date_time/reminders.dart';
+import 'package:karman_app/components/date_time/reminder_button.dart';
 
 class TaskOptionsSection extends StatelessWidget {
   final bool isDateEnabled;

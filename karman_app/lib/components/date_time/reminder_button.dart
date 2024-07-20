@@ -38,6 +38,9 @@ class ReminderButton extends StatelessWidget {
 
   void _showReminderPicker(BuildContext context) {
     DateTime tempDateTime = selectedDateTime ?? DateTime.now();
+    if (tempDateTime.isBefore(DateTime.now())) {
+      tempDateTime = DateTime.now().add(Duration(minutes: 1));
+    }
 
     showCupertinoModalPopup(
       context: context,
@@ -57,8 +60,12 @@ class ReminderButton extends StatelessWidget {
                   CupertinoButton(
                     child: Text('Done'),
                     onPressed: () {
-                      onReminderSet(tempDateTime);
-                      Navigator.of(context).pop();
+                      if (tempDateTime.isAfter(DateTime.now())) {
+                        onReminderSet(tempDateTime);
+                        Navigator.of(context).pop();
+                      } else {
+                        _showPastDateAlert(context);
+                      }
                     },
                   ),
                 ],
@@ -67,6 +74,7 @@ class ReminderButton extends StatelessWidget {
                 child: CupertinoDatePicker(
                   mode: CupertinoDatePickerMode.dateAndTime,
                   initialDateTime: tempDateTime,
+                  minimumDate: DateTime.now(),
                   onDateTimeChanged: (DateTime newDateTime) {
                     tempDateTime = newDateTime;
                   },
@@ -76,6 +84,26 @@ class ReminderButton extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _showPastDateAlert(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: Text('Time Travel Not Invented Yet!',
+            style: TextStyle(fontSize: 18)),
+        content: Text(
+            'Unless you have a time machine, we can\'t remind you in the past.'),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            child: Text('Got it!'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
     );
   }
 
