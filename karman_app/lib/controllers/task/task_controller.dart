@@ -7,8 +7,8 @@ class TaskController extends ChangeNotifier {
   final TaskService _taskService = TaskService();
 
   List<Task> _tasks = [];
-  Map<int, Timer> _completionTimers = {};
-  Map<int, bool> _pendingCompletions = {};
+  final Map<int, Timer> _completionTimers = {};
+  final Map<int, bool> _pendingCompletions = {};
 
   List<Task> get tasks => _tasks;
 
