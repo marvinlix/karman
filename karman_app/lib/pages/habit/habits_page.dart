@@ -52,7 +52,7 @@ class _HabitsPageState extends State<HabitsPage> {
             trailing: CupertinoButton(
               onPressed: _showAddHabitDialog,
               child: Icon(
-                CupertinoIcons.plus_circle_fill,
+                CupertinoIcons.plus_circle,
                 color: CupertinoColors.white,
                 size: 32,
               ),

@@ -120,7 +120,7 @@ class _TasksPageState extends State<TasksPage> {
             leading: CupertinoButton(
               onPressed: hasCompletedTasks ? _clearCompletedTasks : null,
               child: Icon(
-                CupertinoIcons.bin_xmark_fill,
+                CupertinoIcons.bin_xmark,
                 color: hasCompletedTasks
                     ? CupertinoColors.white
                     : CupertinoColors.systemGrey,
@@ -134,7 +134,7 @@ class _TasksPageState extends State<TasksPage> {
             trailing: CupertinoButton(
               onPressed: _addTask,
               child: Icon(
-                CupertinoIcons.plus_circle_fill,
+                CupertinoIcons.plus_circle,
                 color: CupertinoColors.white,
                 size: 32,
               ),

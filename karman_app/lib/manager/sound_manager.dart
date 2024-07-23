@@ -69,7 +69,7 @@ class SoundManager {
 
   IconData get currentIcon {
     if (currentSound == null) {
-      return CupertinoIcons.speaker_slash_fill;
+      return CupertinoIcons.speaker_slash;
     }
     return sounds.firstWhere((sound) => sound['file'] == currentSound)['icon'];
   }
