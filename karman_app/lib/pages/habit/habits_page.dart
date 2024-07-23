@@ -63,19 +63,22 @@ class _HabitsPageState extends State<HabitsPage> {
                 ? Center(
                     child: Text(
                       'No habits yet. Add one to get started!',
-                      style: TextStyle(color: CupertinoColors.systemGrey),
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: CupertinoColors.systemGrey,
+                      ),
                     ),
                   )
                 : Padding(
-                  padding: EdgeInsets.only(top: 16),
-                  child: ListView.builder(
+                    padding: EdgeInsets.only(top: 16),
+                    child: ListView.builder(
                       itemCount: habitController.habits.length,
                       itemBuilder: (context, index) {
                         final habit = habitController.habits[index];
                         return HabitTile(habit: habit);
                       },
                     ),
-                ),
+                  ),
           ),
         );
       },
