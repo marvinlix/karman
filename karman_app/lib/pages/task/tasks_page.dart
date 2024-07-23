@@ -24,9 +24,15 @@ class _TasksPageState extends State<TasksPage> {
     });
   }
 
-  void _sortTasks(List<Task> tasks) {
+  void _sortTasks(List<Task> tasks, TaskController taskController) {
     _sortedTasks = List.from(tasks);
     _sortedTasks.sort((a, b) {
+      bool aIsPending = taskController.isTaskPendingCompletion(a.taskId!);
+      bool bIsPending = taskController.isTaskPendingCompletion(b.taskId!);
+
+      if (aIsPending != bIsPending) {
+        return aIsPending ? -1 : 1;
+      }
       if (a.isCompleted != b.isCompleted) {
         return a.isCompleted ? 1 : -1;
       }
@@ -35,11 +41,7 @@ class _TasksPageState extends State<TasksPage> {
   }
 
   void _toggleTaskCompletion(Task task) {
-    final updatedTask = task.copyWith(isCompleted: !task.isCompleted);
-    context.read<TaskController>().updateTask(updatedTask);
-    setState(() {
-      _sortTasks(context.read<TaskController>().tasks);
-    });
+    context.read<TaskController>().toggleTaskCompletion(task);
   }
 
   void _deleteTask(BuildContext context, int id) {
@@ -61,7 +63,8 @@ class _TasksPageState extends State<TasksPage> {
       },
     ).then((_) {
       setState(() {
-        _sortTasks(context.read<TaskController>().tasks);
+        _sortTasks(context.read<TaskController>().tasks,
+            context.read<TaskController>());
       });
     });
   }
@@ -101,9 +104,12 @@ class _TasksPageState extends State<TasksPage> {
   Widget build(BuildContext context) {
     return Consumer<TaskController>(
       builder: (context, taskController, child) {
-        _sortTasks(taskController.tasks);
-        final incompleteTasks =
-            _sortedTasks.where((task) => !task.isCompleted).length;
+        _sortTasks(taskController.tasks, taskController);
+        final incompleteTasks = _sortedTasks
+            .where((task) =>
+                !task.isCompleted &&
+                !taskController.isTaskPendingCompletion(task.taskId!))
+            .length;
         final hasCompletedTasks = _sortedTasks.any((task) => task.isCompleted);
 
         return CupertinoPageScaffold(

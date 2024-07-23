@@ -1,11 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:karman_app/models/task/task.dart';
 import '../../services/task/task_service.dart';
+import 'dart:async';
 
 class TaskController extends ChangeNotifier {
   final TaskService _taskService = TaskService();
 
   List<Task> _tasks = [];
+  Map<int, Timer> _completionTimers = {};
+  Map<int, bool> _pendingCompletions = {};
 
   List<Task> get tasks => _tasks;
 
@@ -36,9 +39,40 @@ class TaskController extends ChangeNotifier {
     return task;
   }
 
+  void toggleTaskCompletion(Task task) {
+    final taskId = task.taskId!;
+    if (_pendingCompletions[taskId] == true) {
+      // Task is being unchecked within the 3-second window
+      _completionTimers[taskId]?.cancel();
+      _completionTimers.remove(taskId);
+      _pendingCompletions[taskId] = false;
+    } else if (!task.isCompleted) {
+      // Task is being checked
+      _pendingCompletions[taskId] = true;
+      _completionTimers[taskId] = Timer(Duration(seconds: 3), () {
+        final updatedTask = task.copyWith(isCompleted: true);
+        updateTask(updatedTask);
+        _completionTimers.remove(taskId);
+        _pendingCompletions.remove(taskId);
+      });
+    } else {
+      // Task is being unchecked (was already completed)
+      final updatedTask = task.copyWith(isCompleted: false);
+      updateTask(updatedTask);
+    }
+    notifyListeners();
+  }
+
+  bool isTaskPendingCompletion(int taskId) {
+    return _pendingCompletions[taskId] == true;
+  }
+
   Future<void> deleteTask(int id) async {
     await _taskService.deleteTask(id);
     _tasks.removeWhere((task) => task.taskId == id);
+    _completionTimers[id]?.cancel();
+    _completionTimers.remove(id);
+    _pendingCompletions.remove(id);
     notifyListeners();
   }
 
@@ -54,5 +88,13 @@ class TaskController extends ChangeNotifier {
 
   List<Task> getIncompleteTasks() {
     return _tasks.where((task) => !task.isCompleted).toList();
+  }
+
+  @override
+  void dispose() {
+    for (var timer in _completionTimers.values) {
+      timer.cancel();
+    }
+    super.dispose();
   }
 }
