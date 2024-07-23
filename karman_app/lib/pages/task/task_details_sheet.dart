@@ -60,8 +60,19 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
 
   void _saveChanges() async {
     if (_nameController.text.trim().isEmpty) {
-      _showQuirkyDialog('A Task Without a Name?',
-          'Please give your task a name!');
+      _showQuirkyDialog(
+          'A Task Without a Name?', 'Please give your task a name!');
+      return;
+    }
+
+    final now = DateTime.now();
+    bool isPastDueDate =
+        _isDateEnabled && _dueDate != null && _dueDate!.isBefore(now);
+    bool isPastReminder =
+        _isReminderEnabled && _reminder != null && _reminder!.isBefore(now);
+
+    if (isPastDueDate || isPastReminder) {
+      _showPastDateReminderDialog(isPastDueDate, isPastReminder);
       return;
     }
 
@@ -113,6 +124,38 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
             child: Text('Got it!'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showPastDateReminderDialog(bool isPastDueDate, bool isPastReminder) {
+    String title = 'Time Travel Alert!';
+    String content = '';
+
+    if (isPastDueDate && isPastReminder) {
+      content =
+          'The due date and reminder are set in the past. Please update them or turn them off to save the changes.';
+    } else if (isPastDueDate) {
+      content =
+          'The due date is set in the past. Please update it or turn it off to save the changes.';
+    } else if (isPastReminder) {
+      content =
+          'The reminder is set in the past. Please update it or turn it off to save the changes.';
+    }
+
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: Text(title, style: TextStyle(fontSize: 18)),
+        content: Text(content),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            child: Text('OK'),
             onPressed: () {
               Navigator.of(context).pop();
             },
