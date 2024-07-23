@@ -17,6 +17,17 @@ class TaskTile extends StatelessWidget {
     required this.onTap,
   });
 
+  bool get isOverdue {
+    if (task.dueDate == null || task.isCompleted) return false;
+    return task.dueDate!.isBefore(DateTime.now());
+  }
+
+  Color getTaskColor() {
+    if (task.isCompleted) return Colors.grey[700]!;
+    if (isOverdue) return Colors.red;
+    return CupertinoColors.white;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -77,9 +88,7 @@ class TaskTile extends StatelessWidget {
                           Text(
                             task.name,
                             style: TextStyle(
-                              color: task.isCompleted
-                                  ? Colors.grey[700]
-                                  : CupertinoColors.white,
+                              color: getTaskColor(),
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                             ),
@@ -116,7 +125,7 @@ class TaskTile extends StatelessWidget {
   Widget _buildIcon(IconData icon) {
     return Padding(
       padding: const EdgeInsets.only(right: 16),
-      child: Icon(icon, color: Colors.white, size: 20),
+      child: Icon(icon, color: getTaskColor(), size: 20),
     );
   }
 
