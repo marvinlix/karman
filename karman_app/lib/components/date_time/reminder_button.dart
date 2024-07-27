@@ -37,9 +37,13 @@ class ReminderButton extends StatelessWidget {
   }
 
   void _showReminderPicker(BuildContext context) {
-    DateTime tempDateTime = selectedDateTime ?? DateTime.now();
-    if (tempDateTime.isBefore(DateTime.now())) {
-      tempDateTime = DateTime.now().add(Duration(minutes: 1));
+    DateTime now = DateTime.now();
+    DateTime minimumDate = now.add(Duration(minutes: 1));
+    DateTime initialDateTime = selectedDateTime ?? minimumDate;
+
+    // Ensure initialDateTime is not before minimumDate
+    if (initialDateTime.isBefore(minimumDate)) {
+      initialDateTime = minimumDate;
     }
 
     showCupertinoModalPopup(
@@ -60,8 +64,8 @@ class ReminderButton extends StatelessWidget {
                   CupertinoButton(
                     child: Text('Done'),
                     onPressed: () {
-                      if (tempDateTime.isAfter(DateTime.now())) {
-                        onReminderSet(tempDateTime);
+                      if (initialDateTime.isAfter(now)) {
+                        onReminderSet(initialDateTime);
                         Navigator.of(context).pop();
                       } else {
                         _showPastDateAlert(context);
@@ -73,10 +77,10 @@ class ReminderButton extends StatelessWidget {
               Expanded(
                 child: CupertinoDatePicker(
                   mode: CupertinoDatePickerMode.dateAndTime,
-                  initialDateTime: tempDateTime,
-                  minimumDate: DateTime.now(),
+                  initialDateTime: initialDateTime,
+                  minimumDate: minimumDate,
                   onDateTimeChanged: (DateTime newDateTime) {
-                    tempDateTime = newDateTime;
+                    initialDateTime = newDateTime;
                   },
                 ),
               ),
