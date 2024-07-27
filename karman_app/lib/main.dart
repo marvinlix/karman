@@ -14,7 +14,7 @@ void main() async {
   tz.initializeTimeZones();
 
   final databaseService = DatabaseService();
-  await databaseService.database; // This initializes the database
+  await databaseService.database; 
 
   // Initialize controllers
   final taskController = TaskController();
