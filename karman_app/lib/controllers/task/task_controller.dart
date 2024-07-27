@@ -54,13 +54,14 @@ class TaskController extends ChangeNotifier {
         updateTask(updatedTask);
         _completionTimers.remove(taskId);
         _pendingCompletions.remove(taskId);
+        notifyListeners();
       });
     } else {
       // Task is being unchecked (was already completed)
       final updatedTask = task.copyWith(isCompleted: false);
       updateTask(updatedTask);
     }
-    notifyListeners();
+    notifyListeners(); 
   }
 
   bool isTaskPendingCompletion(int taskId) {

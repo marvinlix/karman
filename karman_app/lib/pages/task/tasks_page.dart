@@ -27,16 +27,14 @@ class _TasksPageState extends State<TasksPage> {
   void _sortTasks(List<Task> tasks, TaskController taskController) {
     _sortedTasks = List.from(tasks);
     _sortedTasks.sort((a, b) {
-      bool aIsPending = taskController.isTaskPendingCompletion(a.taskId!);
-      bool bIsPending = taskController.isTaskPendingCompletion(b.taskId!);
-
-      if (aIsPending != bIsPending) {
-        return aIsPending ? -1 : 1;
-      }
       if (a.isCompleted != b.isCompleted) {
         return a.isCompleted ? 1 : -1;
       }
-      return b.priority.compareTo(a.priority);
+      if (a.priority != b.priority) {
+        return b.priority.compareTo(a.priority);
+      }
+      // Maintain original order within the same priority
+      return tasks.indexOf(a).compareTo(tasks.indexOf(b));
     });
   }
 
