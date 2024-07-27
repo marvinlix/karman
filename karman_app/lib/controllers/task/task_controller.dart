@@ -42,12 +42,10 @@ class TaskController extends ChangeNotifier {
   void toggleTaskCompletion(Task task) {
     final taskId = task.taskId!;
     if (_pendingCompletions[taskId] == true) {
-      // Task is being unchecked within the 3-second window
       _completionTimers[taskId]?.cancel();
       _completionTimers.remove(taskId);
       _pendingCompletions[taskId] = false;
     } else if (!task.isCompleted) {
-      // Task is being checked
       _pendingCompletions[taskId] = true;
       _completionTimers[taskId] = Timer(Duration(seconds: 3), () {
         final updatedTask = task.copyWith(isCompleted: true);
@@ -57,11 +55,10 @@ class TaskController extends ChangeNotifier {
         notifyListeners();
       });
     } else {
-      // Task is being unchecked (was already completed)
       final updatedTask = task.copyWith(isCompleted: false);
       updateTask(updatedTask);
     }
-    notifyListeners(); 
+    notifyListeners();
   }
 
   bool isTaskPendingCompletion(int taskId) {
@@ -89,6 +86,15 @@ class TaskController extends ChangeNotifier {
 
   List<Task> getIncompleteTasks() {
     return _tasks.where((task) => !task.isCompleted).toList();
+  }
+
+  Future<Task?> getTaskById(int taskId) async {
+    try {
+      return await _taskService.getTaskById(taskId);
+    } catch (e) {
+      print('Error fetching task: $e');
+      return null;
+    }
   }
 
   @override
