@@ -168,89 +168,74 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.of(context).pop(),
-      child: DraggableScrollableSheet(
-        initialChildSize: 0.5,
-        minChildSize: 0.2,
-        maxChildSize: 0.9,
-        builder: (BuildContext context, ScrollController scrollController) {
-          return GestureDetector(
-            onTap: () {},
-            child: Container(
-              decoration: BoxDecoration(
-                color: CupertinoColors.darkBackgroundGray,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(20),
-                  topRight: Radius.circular(20),
-                ),
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 40,
+            left: 20,
+            right: 20,
+            top: 20,
+          ),
+          decoration: BoxDecoration(
+            color: CupertinoColors.darkBackgroundGray,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TaskNameInput(
+                controller: _nameController,
+                focusNode: _nameFocusNode,
+                onSave: _saveChanges,
               ),
-              child: Column(
-                children: [
-                  TaskNameInput(
-                    controller: _nameController,
-                    focusNode: _nameFocusNode,
-                    onSave: _saveChanges,
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      controller: scrollController,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TaskNote(
-                              controller: _noteController,
-                              hintText: 'Note...',
-                            ),
-                            SizedBox(height: 30),
-                            TaskOptionsSection(
-                              isDateEnabled: _isDateEnabled,
-                              isReminderEnabled: _isReminderEnabled,
-                              dueDate: _dueDate,
-                              reminder: _reminder,
-                              onDateToggle: (value) {
-                                setState(() {
-                                  _isDateEnabled = value;
-                                  if (!value) _dueDate = null;
-                                });
-                              },
-                              onReminderToggle: (value) {
-                                setState(() {
-                                  _isReminderEnabled = value;
-                                  if (!value) _reminder = null;
-                                });
-                              },
-                              onDateSelected: (date) {
-                                setState(() {
-                                  _dueDate = date;
-                                });
-                              },
-                              onReminderSet: (DateTime newDateTime) {
-                                setState(() {
-                                  _reminder = newDateTime;
-                                });
-                              },
-                            ),
-                            SizedBox(height: 30),
-                            PrioritySelector(
-                              selectedPriority: _priority,
-                              onPriorityChanged: (priority) {
-                                setState(() {
-                                  _priority = priority;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              SizedBox(height: 20),
+              TaskNote(
+                controller: _noteController,
+                hintText: 'Note...',
               ),
-            ),
-          );
-        },
+              SizedBox(height: 30),
+              TaskOptionsSection(
+                isDateEnabled: _isDateEnabled,
+                isReminderEnabled: _isReminderEnabled,
+                dueDate: _dueDate,
+                reminder: _reminder,
+                onDateToggle: (value) {
+                  setState(() {
+                    _isDateEnabled = value;
+                    if (!value) _dueDate = null;
+                  });
+                },
+                onReminderToggle: (value) {
+                  setState(() {
+                    _isReminderEnabled = value;
+                    if (!value) _reminder = null;
+                  });
+                },
+                onDateSelected: (date) {
+                  setState(() {
+                    _dueDate = date;
+                  });
+                },
+                onReminderSet: (DateTime newDateTime) {
+                  setState(() {
+                    _reminder = newDateTime;
+                  });
+                },
+              ),
+              SizedBox(height: 30),
+              PrioritySelector(
+                selectedPriority: _priority,
+                onPriorityChanged: (priority) {
+                  setState(() {
+                    _priority = priority;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
