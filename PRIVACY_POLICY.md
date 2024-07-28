@@ -1,4 +1,4 @@
-# Privacy Policy for Karman App
+# Privacy Policy for karman
 
 Last updated: July 29, 2024
 
