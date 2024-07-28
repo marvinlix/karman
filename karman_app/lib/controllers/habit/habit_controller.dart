@@ -88,7 +88,6 @@ class HabitController extends ChangeNotifier {
         habit.reminderTime!.inMinutes % 60,
       );
 
-      // If the scheduled time for today has already passed, schedule for tomorrow
       if (scheduledTime.isBefore(now)) {
         scheduledTime = scheduledTime.add(Duration(days: 1));
       }

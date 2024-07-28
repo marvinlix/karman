@@ -60,11 +60,9 @@ class HabitService {
         );
 
         if (today.isAfter(lastCompletionDay)) {
-          // It's a new day, reset isCompletedToday
           habit.isCompletedToday = false;
 
           if (today.difference(lastCompletionDay).inDays > 1) {
-            // More than one day has passed, reset streak
             habit.resetStreak();
           }
 
@@ -79,7 +77,6 @@ class HabitService {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
-    // Check if the habit has already been completed today
     final todayLogs = await _habitDatabase.getHabitLogsForDate(
       db,
       habit.habitId!,
@@ -87,11 +84,9 @@ class HabitService {
     );
 
     if (todayLogs.isNotEmpty && todayLogs.first['completedForToday'] == 1) {
-      // Habit already completed today, no need to update
       return;
     }
 
-    // Create new log for today
     final todayLog = HabitLog(
       habitId: habit.habitId!,
       completedForToday: true,
@@ -100,7 +95,6 @@ class HabitService {
     );
     await createHabitLog(todayLog);
 
-    // Update streak
     habit.updateStreak(today);
 
     await updateHabit(habit);

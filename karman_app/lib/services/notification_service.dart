@@ -35,20 +35,31 @@ class NotificationService {
   static Future<void> onDidReceiveNotificationResponse(
       NotificationResponse notificationResponse) async {
     final String? payload = notificationResponse.payload;
-    if (payload != null && payload.startsWith('task_')) {
-      navigateToTasksPage();
+    if (payload != null) {
+      if (payload.startsWith('task_')) {
+        navigateToTasksPage();
+      } else if (payload.startsWith('habit_')) {
+        navigateToHabitsPage();
+      }
     }
   }
 
   static void navigateToTasksPage() {
+    _navigateToPage(1);
+  }
+
+  static void navigateToHabitsPage() {
+    _navigateToPage(0);
+  }
+
+  static void _navigateToPage(int tabIndex) {
     final context = navigatorKey.currentContext;
     if (context != null) {
       Navigator.of(context).popUntil((route) => route.isFirst);
-      // Delay to ensure the widget tree is built
       Future.delayed(Duration(milliseconds: 100), () {
         final appShellState = AppShell.globalKey.currentState;
         if (appShellState != null) {
-          appShellState.switchToTasksTab();
+          appShellState.switchToTab(tabIndex);
         }
       });
     }

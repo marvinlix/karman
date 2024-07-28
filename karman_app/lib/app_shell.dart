@@ -14,11 +14,12 @@ class AppShell extends StatefulWidget {
 }
 
 class AppShellState extends State<AppShell> {
-  final CupertinoTabController _controller = CupertinoTabController(initialIndex: 1);
+  final CupertinoTabController _controller =
+      CupertinoTabController(initialIndex: 1);
 
-  void switchToTasksTab() {
+  void switchToTab(int index) {
     setState(() {
-      _controller.index = 1;
+      _controller.index = index;
     });
   }
 
