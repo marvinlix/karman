@@ -70,12 +70,6 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   final FocusNode _nameFocusNode = FocusNode();
 
   void _saveChanges() async {
-    if (_nameController.text.trim().isEmpty) {
-      _showQuirkyDialog(
-          'A Task Without a Name?', 'Please give your task a name!');
-      return;
-    }
-
     final now = DateTime.now();
     bool isPastDueDate =
         _isDateEnabled && _dueDate != null && _dueDate!.isBefore(now);
