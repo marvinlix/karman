@@ -5,12 +5,14 @@ class TaskNameInput extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final VoidCallback onSave;
+  final bool isTaskNameEmpty;
 
   const TaskNameInput({
     super.key,
     required this.controller,
     required this.focusNode,
     required this.onSave,
+    required this.isTaskNameEmpty,
   });
 
   @override
@@ -35,11 +37,13 @@ class TaskNameInput extends StatelessWidget {
         SizedBox(width: 20),
         CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: onSave,
+          onPressed: isTaskNameEmpty ? null : onSave,
           child: Text(
             'Save',
             style: TextStyle(
-              color: CupertinoColors.white,
+              color: isTaskNameEmpty
+                  ? CupertinoColors.systemGrey
+                  : CupertinoColors.white,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
