@@ -2,6 +2,7 @@ import 'package:karman_app/database/database_service.dart';
 import 'package:karman_app/database/habit_db.dart';
 import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/models/habits/habit_log.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HabitService {
   final DatabaseService _databaseService = DatabaseService();
@@ -15,13 +16,29 @@ class HabitService {
   Future<List<Habit>> getHabits() async {
     final db = await _databaseService.database;
     final habitsData = await _habitDatabase.getHabits(db);
-    return habitsData.map((habitData) => Habit.fromMap(habitData)).toList();
+    final habits = habitsData.map((habitData) => Habit.fromMap(habitData)).toList();
+    
+    final prefs = await SharedPreferences.getInstance();
+    for (var habit in habits) {
+      final isCompleted = prefs.getBool('habit_${habit.habitId}_completed') ?? false;
+      habit.isCompletedToday = isCompleted;
+    }
+    
+    return habits;
   }
 
   Future<Habit?> getHabit(int habitId) async {
     final db = await _databaseService.database;
     final habitData = await _habitDatabase.getHabit(db, habitId);
-    return habitData != null ? Habit.fromMap(habitData) : null;
+    if (habitData != null) {
+      final habit = Habit.fromMap(habitData);
+      
+      final prefs = await SharedPreferences.getInstance();
+      habit.isCompletedToday = prefs.getBool('habit_${habit.habitId}_completed') ?? false;
+      
+      return habit;
+    }
+    return null;
   }
 
   Future<int> updateHabit(Habit habit) async {
@@ -32,6 +49,10 @@ class HabitService {
   Future<int> deleteHabit(int id) async {
     final db = await _databaseService.database;
     await _habitDatabase.deleteHabitLogs(db, id);
+    
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('habit_${id}_completed');
+    
     return await _habitDatabase.deleteHabit(db, id);
   }
 
@@ -46,46 +67,9 @@ class HabitService {
     return logsData.map((logData) => HabitLog.fromMap(logData)).toList();
   }
 
-  Future<void> resetStreaksIfNeeded() async {
-    final habits = await getHabits();
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
-    for (var habit in habits) {
-      if (habit.lastCompletionDate != null) {
-        final lastCompletionDay = DateTime(
-          habit.lastCompletionDate!.year,
-          habit.lastCompletionDate!.month,
-          habit.lastCompletionDate!.day,
-        );
-
-        if (today.isAfter(lastCompletionDay)) {
-          habit.isCompletedToday = false;
-
-          if (today.difference(lastCompletionDay).inDays > 1) {
-            habit.resetStreak();
-          }
-
-          await updateHabit(habit);
-        }
-      }
-    }
-  }
-
   Future<void> completeHabitForToday(Habit habit, String? log) async {
-    final db = await _databaseService.database;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-
-    final todayLogs = await _habitDatabase.getHabitLogsForDate(
-      db,
-      habit.habitId!,
-      today.toIso8601String(),
-    );
-
-    if (todayLogs.isNotEmpty && todayLogs.first['completedForToday'] == 1) {
-      return;
-    }
 
     final todayLog = HabitLog(
       habitId: habit.habitId!,
@@ -96,14 +80,27 @@ class HabitService {
     await createHabitLog(todayLog);
 
     habit.updateStreak(today);
+    habit.isCompletedToday = true;
 
     await updateHabit(habit);
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('habit_${habit.habitId}_completed', true);
   }
 
   Future<bool> isHabitCompletedToday(int habitId) async {
-    final db = await _databaseService.database;
-    final today = DateTime.now().toIso8601String().split('T')[0];
-    final logs = await _habitDatabase.getHabitLogsForDate(db, habitId, today);
-    return logs.isNotEmpty && logs.first['completedForToday'] == 1;
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('habit_${habitId}_completed') ?? false;
+  }
+
+  Future<void> resetCompletionStatusForNewDay() async {
+    final prefs = await SharedPreferences.getInstance();
+    final habits = await getHabits();
+    
+    for (var habit in habits) {
+      await prefs.setBool('habit_${habit.habitId}_completed', false);
+      habit.isCompletedToday = false;
+      await updateHabit(habit);
+    }
   }
 }
