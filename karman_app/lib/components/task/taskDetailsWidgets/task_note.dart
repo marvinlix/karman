@@ -7,10 +7,10 @@ class TaskNote extends StatefulWidget {
   final String hintText;
 
   const TaskNote({
-    Key? key,
+    super.key,
     required this.controller,
     this.hintText = 'Add a note...',
-  }) : super(key: key);
+  });
 
   @override
   _TaskNoteState createState() => _TaskNoteState();
@@ -63,7 +63,7 @@ class _TaskNoteState extends State<TaskNote> {
             keyboardType: TextInputType.multiline,
             decoration: InputDecoration(
               hintText: widget.hintText,
-              hintStyle: TextStyle(color: Colors.grey),
+              hintStyle: TextStyle(color: CupertinoColors.systemGrey),
               border: InputBorder.none,
               contentPadding: EdgeInsets.all(12),
             ),

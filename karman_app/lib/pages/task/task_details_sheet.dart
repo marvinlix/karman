@@ -179,7 +179,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
           ),
           decoration: BoxDecoration(
             color: CupertinoColors.darkBackgroundGray,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,

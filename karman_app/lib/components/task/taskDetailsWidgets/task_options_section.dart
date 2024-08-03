@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:karman_app/components/date_time/due_date_button.dart';
 import 'package:karman_app/components/date_time/reminder_button.dart';
 
@@ -65,13 +64,15 @@ class TaskOptionsSection extends StatelessWidget {
   }) {
     return Row(
       children: [
-        Icon(icon, color: Colors.white),
+        Icon(icon, color: CupertinoColors.white),
         SizedBox(width: 10),
         Expanded(child: child),
         CupertinoSwitch(
           value: isEnabled,
           onChanged: onToggle,
-          activeColor: Colors.white,
+          thumbColor: CupertinoColors.black,
+          activeColor: CupertinoColors.white,
+          trackColor: CupertinoColors.tertiaryLabel,
         ),
       ],
     );
