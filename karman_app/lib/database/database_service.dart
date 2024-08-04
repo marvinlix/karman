@@ -1,7 +1,8 @@
-import 'package:karman_app/database/habit_db.dart';
-import 'package:karman_app/database/task_db.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:karman_app/database/habit_db.dart';
+import 'package:karman_app/database/task_db.dart';
+import 'package:karman_app/database/focus_db.dart';
 
 class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
@@ -13,7 +14,7 @@ class DatabaseService {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initialize();
+    _database = await _initializeDatabase();
     return _database!;
   }
 
@@ -23,19 +24,31 @@ class DatabaseService {
     return join(databasesPath, databaseName);
   }
 
-  Future<Database> _initialize() async {
+  Future<Database> _initializeDatabase() async {
     final path = await fullPath;
     var database = await openDatabase(
       path,
-      version: 1,
-      onCreate: createDatabase,
+      version: 2, 
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
       singleInstance: true,
     );
     return database;
   }
 
-  Future<void> createDatabase(Database database, int version) async {
-    await TaskDatabase().createTable(database);
-    await HabitDatabase().createTables(database);
+  Future<void> _onCreate(Database db, int version) async {
+    await TaskDatabase().createTable(db);
+    await HabitDatabase().createTables(db);
+    await FocusDatabase().createTable(db);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await FocusDatabase().createTable(db);
+    }
+  }
+
+  Future<void> ensureInitialized() async {
+    await database;
   }
 }

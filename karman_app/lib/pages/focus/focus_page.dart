@@ -3,6 +3,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:karman_app/components/focus/circular_slider.dart';
 import 'package:karman_app/components/focus/rolling_menu.dart';
 import 'package:karman_app/manager/sound_manager.dart';
+import 'package:karman_app/database/database_service.dart';
+import 'package:karman_app/database/focus_db.dart';
+import 'package:karman_app/services/achievement/achievement_service.dart';
 
 class FocusPage extends StatefulWidget {
   const FocusPage({super.key});
@@ -19,6 +22,8 @@ class _FocusPageState extends State<FocusPage>
   int _remainingSeconds = 300;
   int _totalSeconds = 300;
   final SoundManager _soundManager = SoundManager();
+  final FocusDatabase _focusDatabase = FocusDatabase();
+  final AchievementService _achievementService = AchievementService();
 
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -80,7 +85,6 @@ class _FocusPageState extends State<FocusPage>
     _isTimerRunning = false;
     _soundManager.stopBackgroundSound();
 
-    // Close the menu if it's open
     if (_isMenuOpen) {
       _toggleMenu();
     }
@@ -89,12 +93,63 @@ class _FocusPageState extends State<FocusPage>
       Future.delayed(Duration(seconds: 1), () {
         _soundManager.playChime();
       });
-    }
 
+      _recordFocusSession();
+    } else {
+      // Timer was cancelled, so we reset without recording
+      setState(() {
+        _remainingSeconds = _timerValue * 60;
+        _totalSeconds = _remainingSeconds;
+      });
+    }
+  }
+
+  void _recordFocusSession() async {
+    final database = await DatabaseService().database;
+    final duration = _timerValue * 60; // Record full session duration
+    final date = DateTime.now().toIso8601String().split('T')[0];
+    await _focusDatabase.addFocusSession(database, duration, date);
+
+    Map<String, bool> unlockedAchievements =
+        await _achievementService.checkAchievements();
+    _showNewAchievements(unlockedAchievements);
+
+    // Reset timer after recording
     setState(() {
       _remainingSeconds = _timerValue * 60;
       _totalSeconds = _remainingSeconds;
     });
+  }
+
+  void _showNewAchievements(Map<String, bool> unlockedAchievements) {
+    List<String> newAchievements = unlockedAchievements.entries
+        .where((entry) => entry.value)
+        .map((entry) => entry.key)
+        .toList();
+
+    if (newAchievements.isNotEmpty) {
+      showCupertinoDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CupertinoAlertDialog(
+            title: Text('New Achievements Unlocked!'),
+            content: Column(
+              children: newAchievements
+                  .map((achievement) => Text(achievement))
+                  .toList(),
+            ),
+            actions: [
+              CupertinoDialogAction(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   void _toggleMenu() {
@@ -158,7 +213,7 @@ class _FocusPageState extends State<FocusPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  SizedBox(height: 44), // Height of CupertinoNavigationBar
+                  SizedBox(height: 44),
                   SizeTransition(
                     sizeFactor: _animation,
                     axisAlignment: -1,
