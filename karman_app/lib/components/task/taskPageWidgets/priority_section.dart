@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/components/task/taskPageWidgets/task_tile.dart';
 
@@ -110,8 +109,8 @@ class _PrioritySectionState extends State<PrioritySection> {
                       ? CupertinoIcons.flag_circle
                       : CupertinoIcons.flag_circle_fill,
                   color: widget.priority == 3
-                      ? Colors.red
-                      : (widget.priority == 2 ? Colors.yellow : Colors.green),
+                      ? CupertinoColors.systemRed
+                      : (widget.priority == 2 ? CupertinoColors.systemYellow: CupertinoColors.systemGreen),
                 ),
                 SizedBox(width: 10),
                 Text(

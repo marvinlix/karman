@@ -13,8 +13,9 @@ void main() async {
   await NotificationService.init(navigatorKey);
   tz.initializeTimeZones();
 
+  // Initialize the database
   final databaseService = DatabaseService();
-  await databaseService.database; 
+  await databaseService.ensureInitialized();
 
   // Initialize controllers
   final taskController = TaskController();

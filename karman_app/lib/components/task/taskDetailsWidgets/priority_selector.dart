@@ -16,9 +16,9 @@ class PrioritySelector extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildPriorityOption(1, Colors.green),
-        _buildPriorityOption(2, Colors.yellow),
-        _buildPriorityOption(3, Colors.red),
+        _buildPriorityOption(1, CupertinoColors.activeGreen),
+        _buildPriorityOption(2, CupertinoColors.systemYellow),
+        _buildPriorityOption(3, CupertinoColors.systemRed),
       ],
     );
   }
@@ -36,15 +36,15 @@ class PrioritySelector extends StatelessWidget {
               shape: BoxShape.circle,
               color: isSelected ? color : Colors.transparent,
               border: Border.all(
-                color: isSelected ? color : Colors.white,
-                width: 2,
+                color: isSelected ? color : CupertinoColors.darkBackgroundGray,
+                width: 1,
               ),
             ),
             child: Center(
               child: Icon(
-                CupertinoIcons.flag_fill,
+                CupertinoIcons.flag_circle_fill,
                 color: isSelected ? Colors.black : color,
-                size: 20,
+                size: 32,
               ),
             ),
           ),

@@ -31,8 +31,8 @@ class CircularSlider extends StatelessWidget {
             startAngle: 120,
             angleRange: 300,
             customWidths: CustomSliderWidths(
-              trackWidth: 20,
-              progressBarWidth: 20,
+              trackWidth: 30,
+              progressBarWidth: 30,
             ),
             customColors: CustomSliderColors(
               trackColor: CupertinoColors.darkBackgroundGray,
@@ -43,7 +43,7 @@ class CircularSlider extends StatelessWidget {
             ),
             infoProperties: InfoProperties(
               mainLabelStyle: TextStyle(
-                fontSize: 60,
+                fontSize: 70,
                 fontWeight: FontWeight.bold,
                 color: CupertinoColors.white,
               ),
@@ -70,7 +70,7 @@ class CircularSlider extends StatelessWidget {
                   ? CupertinoIcons.stop_circle
                   : CupertinoIcons.play_circle,
               color: CupertinoColors.white,
-              size: 48,
+              size: 54,
             ),
           ),
         ),

@@ -30,6 +30,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   late DateTime? _reminder;
   bool _isDateEnabled = false;
   bool _isReminderEnabled = false;
+  bool _isTaskNameEmpty = true;
 
   @override
   void initState() {
@@ -41,6 +42,9 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
     _reminder = widget.task?.reminder;
     _isDateEnabled = widget.task?.dueDate != null;
     _isReminderEnabled = widget.task?.reminder != null;
+    _isTaskNameEmpty = _nameController.text.trim().isEmpty;
+
+    _nameController.addListener(_updateTaskNameStatus);
 
     if (widget.isNewTask) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -51,20 +55,21 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
 
   @override
   void dispose() {
+    _nameController.removeListener(_updateTaskNameStatus);
     _nameController.dispose();
     _noteController.dispose();
     super.dispose();
   }
 
+  void _updateTaskNameStatus() {
+    setState(() {
+      _isTaskNameEmpty = _nameController.text.trim().isEmpty;
+    });
+  }
+
   final FocusNode _nameFocusNode = FocusNode();
 
   void _saveChanges() async {
-    if (_nameController.text.trim().isEmpty) {
-      _showQuirkyDialog(
-          'A Task Without a Name?', 'Please give your task a name!');
-      return;
-    }
-
     final now = DateTime.now();
     bool isPastDueDate =
         _isDateEnabled && _dueDate != null && _dueDate!.isBefore(now);
@@ -179,7 +184,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
           ),
           decoration: BoxDecoration(
             color: CupertinoColors.darkBackgroundGray,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -189,6 +194,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                 controller: _nameController,
                 focusNode: _nameFocusNode,
                 onSave: _saveChanges,
+                isTaskNameEmpty: _isTaskNameEmpty,
               ),
               SizedBox(height: 20),
               TaskNote(

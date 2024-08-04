@@ -3,6 +3,7 @@ import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/models/habits/habit_log.dart';
 import 'package:karman_app/services/habit/habit_service.dart';
 import 'package:karman_app/services/notification_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HabitController extends ChangeNotifier {
   final HabitService _habitService = HabitService();
@@ -17,8 +18,6 @@ class HabitController extends ChangeNotifier {
     _habits = await _habitService.getHabits();
     for (var habit in _habits) {
       await loadHabitLogs(habit.habitId!);
-      habit.isCompletedToday =
-          await _habitService.isHabitCompletedToday(habit.habitId!);
     }
     notifyListeners();
   }
@@ -68,7 +67,31 @@ class HabitController extends ChangeNotifier {
   }
 
   Future<void> checkAndResetStreaks() async {
-    await _habitService.resetStreaksIfNeeded();
+    final now = DateTime.now();
+    final lastResetDate = await _getLastResetDate();
+    if (lastResetDate == null || !_isSameDay(now, lastResetDate)) {
+      await _habitService.resetCompletionStatusForNewDay();
+      await _setLastResetDate(now);
+    }
+  }
+
+  Future<DateTime?> _getLastResetDate() async {
+    final prefs = await SharedPreferences.getInstance();
+    final lastResetTimestamp = prefs.getInt('last_reset_timestamp');
+    return lastResetTimestamp != null
+        ? DateTime.fromMillisecondsSinceEpoch(lastResetTimestamp)
+        : null;
+  }
+
+  Future<void> _setLastResetDate(DateTime date) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('last_reset_timestamp', date.millisecondsSinceEpoch);
+  }
+
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 
   Future<void> scheduleReminders() async {

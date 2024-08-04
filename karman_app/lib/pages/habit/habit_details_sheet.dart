@@ -22,13 +22,18 @@ class HabitDetailsSheet extends StatefulWidget {
 
 class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
   late TextEditingController _nameController;
+  late FocusNode _nameFocusNode;
   TimeOfDay? _reminderTime;
   bool _isReminderEnabled = false;
+  bool _isHabitNameEmpty = true;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.habit.habitName);
+    _nameFocusNode = FocusNode();
+    _isHabitNameEmpty = _nameController.text.isEmpty;
+    _nameController.addListener(_updateHabitNameState);
     if (widget.habit.reminderTime != null) {
       final minutes = widget.habit.reminderTime!.inMinutes;
       _reminderTime = TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60);
@@ -38,16 +43,19 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
 
   @override
   void dispose() {
+    _nameController.removeListener(_updateHabitNameState);
     _nameController.dispose();
+    _nameFocusNode.dispose();
     super.dispose();
   }
 
+  void _updateHabitNameState() {
+    setState(() {
+      _isHabitNameEmpty = _nameController.text.isEmpty;
+    });
+  }
+
   void _saveChanges() {
-    if (_nameController.text.trim().isEmpty) {
-      _showQuirkyDialog('A Habit Without a Name?',
-          'Your habit is feeling a bit shy and nameless. How about giving it a snazzy title to boost its confidence?');
-      return;
-    }
 
     final updatedHabit = widget.habit.copyWith(
       habitName: _nameController.text.trim(),
@@ -64,7 +72,6 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
       habitController.updateHabit(updatedHabit);
     }
 
-    // Schedule or cancel reminder only if the habit has been saved (has an ID)
     if (updatedHabit.habitId != null) {
       if (_isReminderEnabled && _reminderTime != null) {
         _scheduleReminder(updatedHabit);
@@ -99,23 +106,6 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
     );
   }
 
-  void _showQuirkyDialog(String title, String content) {
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) => CupertinoAlertDialog(
-        title: Text(title, style: TextStyle(fontSize: 18)),
-        content: Text(content),
-        actions: <CupertinoDialogAction>[
-          CupertinoDialogAction(
-            child: Text('Got it!'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,7 +121,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
           ),
           decoration: BoxDecoration(
             color: CupertinoColors.darkBackgroundGray,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -160,24 +150,33 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
         Expanded(
           child: CupertinoTextField(
             controller: _nameController,
+            focusNode: _nameFocusNode,
             style: TextStyle(
-              color: Colors.white,
+              color: _isHabitNameEmpty
+                  ? CupertinoColors.systemGrey
+                  : CupertinoColors.white,
               fontSize: 24,
             ),
             placeholder: 'Habit Name',
             placeholderStyle: TextStyle(
-              color: Colors.grey,
+              color: CupertinoColors.systemGrey,
               fontSize: 24,
             ),
           ),
         ),
+        SizedBox(width: 20),
         CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: _saveChanges,
-          child: Icon(
-            CupertinoIcons.check_mark_circled,
-            color: Colors.white,
-            size: 30,
+          onPressed: _isHabitNameEmpty ? null : _saveChanges,
+          child: Text(
+            'Save',
+            style: TextStyle(
+              color: _isHabitNameEmpty
+                  ? CupertinoColors.systemGrey
+                  : CupertinoColors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -187,7 +186,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
   Widget _buildReminderToggle() {
     return Row(
       children: [
-        Icon(CupertinoIcons.bell, color: Colors.white),
+        Icon(CupertinoIcons.bell, color: CupertinoColors.white),
         SizedBox(width: 10),
         Expanded(
           child: GestureDetector(
@@ -195,7 +194,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
             child: Text(
               _reminderTime != null ? _formatTime(_reminderTime!) : 'Reminder',
               style: TextStyle(
-                color: _isReminderEnabled ? Colors.white : Colors.grey,
+                color: _isReminderEnabled ? CupertinoColors.white : CupertinoColors.systemGrey,
                 fontSize: 18,
               ),
             ),
@@ -209,7 +208,9 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
               if (!value) _reminderTime = null;
             });
           },
-          activeColor: Colors.white,
+          activeColor: CupertinoColors.white,
+          thumbColor: CupertinoColors.black,
+          trackColor: CupertinoColors.systemGrey,
         ),
       ],
     );
@@ -255,11 +256,11 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
   Widget _buildBestStreakInfo() {
     return Row(
       children: [
-        Icon(CupertinoIcons.flame, color: Colors.white),
+        Icon(CupertinoIcons.flame, color: CupertinoColors.white),
         SizedBox(width: 10),
         Text(
           'Best: ${widget.habit.bestStreak}',
-          style: TextStyle(color: Colors.white, fontSize: 18),
+          style: TextStyle(color: CupertinoColors.white, fontSize: 18),
         ),
       ],
     );
@@ -276,14 +277,14 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
       },
       child: const Row(
         children: [
-          Icon(CupertinoIcons.doc, color: Colors.white),
+          Icon(CupertinoIcons.doc, color: CupertinoColors.white),
           SizedBox(width: 10),
           Text(
             'View Logs',
-            style: TextStyle(color: Colors.white, fontSize: 18),
+            style: TextStyle(color: CupertinoColors.white, fontSize: 18),
           ),
           Spacer(),
-          Icon(CupertinoIcons.chevron_right, color: Colors.white),
+          Icon(CupertinoIcons.chevron_right, color: CupertinoColors.white),
         ],
       ),
     );

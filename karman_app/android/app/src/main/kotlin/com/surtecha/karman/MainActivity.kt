@@ -1,4 +1,4 @@
-package com.example.karman_app
+package com.surtecha.karman
 
 import io.flutter.embedding.android.FlutterActivity
 
