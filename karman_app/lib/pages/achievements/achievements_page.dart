@@ -67,9 +67,8 @@ class _AchievementsPageState extends State<AchievementsPage> {
           Icon(
             isUnlocked ? CupertinoIcons.rosette : CupertinoIcons.lock,
             size: 40,
-            color: isUnlocked
-                ? CupertinoColors.activeGreen
-                : CupertinoColors.systemGrey,
+            color:
+                isUnlocked ? CupertinoColors.white : CupertinoColors.systemGrey,
           ),
           SizedBox(width: 16),
           Expanded(
@@ -78,13 +77,22 @@ class _AchievementsPageState extends State<AchievementsPage> {
               children: [
                 Text(
                   achievement.name,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isUnlocked
+                          ? CupertinoColors.white
+                          : CupertinoColors.systemGrey),
                 ),
                 SizedBox(height: 4),
                 Text(
                   achievement.description,
                   style: TextStyle(
-                      fontSize: 14, color: CupertinoColors.systemGrey),
+                    fontSize: 14,
+                    color: isUnlocked
+                        ? CupertinoColors.white
+                        : CupertinoColors.systemGrey,
+                  ),
                 ),
               ],
             ),
