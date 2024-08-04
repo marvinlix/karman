@@ -118,7 +118,7 @@ class _TasksPageState extends State<TasksPage> {
             leading: CupertinoButton(
               onPressed: hasCompletedTasks ? _clearCompletedTasks : null,
               child: Icon(
-                CupertinoIcons.bin_xmark,
+                CupertinoIcons.clear_circled,
                 color: hasCompletedTasks
                     ? CupertinoColors.white
                     : CupertinoColors.systemGrey,
