@@ -44,13 +44,17 @@ class _AchievementsPageState extends State<AchievementsPage> {
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        final achievement =
-                            AchievementConstants.achievements[index];
-                        final isUnlocked =
-                            unlockedAchievements[achievement.name] ?? false;
-                        return _buildAchievementTile(achievement, isUnlocked);
+                        if (index < AchievementConstants.achievements.length) {
+                          final achievement =
+                              AchievementConstants.achievements[index];
+                          final isUnlocked =
+                              unlockedAchievements[achievement.name] ?? false;
+                          return _buildAchievementTile(achievement, isUnlocked);
+                        } else {
+                          return _buildFooter();
+                        }
                       },
-                      childCount: AchievementConstants.achievements.length,
+                      childCount: AchievementConstants.achievements.length + 1,
                     ),
                   ),
                 ],
@@ -98,6 +102,22 @@ class _AchievementsPageState extends State<AchievementsPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFooter() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      child: Center(
+        child: Text(
+          "More badges coming soon...",
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: CupertinoColors.white,
+          ),
+        ),
       ),
     );
   }
