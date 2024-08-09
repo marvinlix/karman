@@ -99,7 +99,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
 
     NotificationService.scheduleNotification(
       id: habit.habitId!,
-      title: 'Habit Reminder',
+      title: 'Let\'s do it!',
       body: habit.habitName,
       scheduledDate: scheduledDate,
       payload: 'habit_${habit.habitId}',
