@@ -51,10 +51,6 @@ class _AchievementsPageState extends State<AchievementsPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: Text('Achievements'),
-        backgroundColor: CupertinoColors.black,
-      ),
       child: SafeArea(
         child: _isInitialLoad
             ? Center(child: CupertinoActivityIndicator())
