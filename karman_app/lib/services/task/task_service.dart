@@ -1,6 +1,7 @@
 import 'package:karman_app/database/database_service.dart';
 import 'package:karman_app/database/task_db.dart';
 import 'package:karman_app/models/task/task.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TaskService {
   final DatabaseService _databaseService = DatabaseService();
@@ -38,5 +39,45 @@ class TaskService {
     final db = await _databaseService.database;
     final taskData = await _taskDatabase.getTaskById(db, id);
     return taskData != null ? Task.fromMap(taskData) : null;
+  }
+
+  Future<void> addInitialTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final bool isFirstRun = prefs.getBool('first_run') ?? true;
+
+    if (isFirstRun) {
+      final initialTasks = [
+        Task(
+          name: 'Mark task as complete',
+          priority: 3,
+        ),
+        Task(
+          name: 'Create a new task (tap ⊕)',
+          priority: 3,
+        ),
+        Task(
+          name: 'Tap a task to view details',
+          priority: 2,
+        ),
+        Task(
+          name: 'Set reminder or due date',
+          priority: 2,
+        ),
+        Task(
+          name: 'Delete task (swipe left)',
+          priority: 1,
+        ),
+        Task(
+          name: 'Clear completed tasks (tap ⊗)',
+          priority: 1,
+        ),
+      ];
+
+      for (var task in initialTasks) {
+        await createTask(task);
+      }
+
+      await prefs.setBool('first_run', false);
+    }
   }
 }
