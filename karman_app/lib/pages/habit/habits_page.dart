@@ -48,7 +48,16 @@ class _HabitsPageState extends State<HabitsPage> {
         return CupertinoPageScaffold(
           navigationBar: CupertinoNavigationBar(
             backgroundColor: CupertinoColors.black,
-            middle: Text('$incompleteHabits habits left'),
+            middle: Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: Text(
+                '$incompleteHabits habits left',
+                style: TextStyle(
+                  color: CupertinoColors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             trailing: CupertinoButton(
               onPressed: _showAddHabitDialog,
               child: Icon(
