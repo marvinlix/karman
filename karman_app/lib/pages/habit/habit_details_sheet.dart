@@ -56,7 +56,6 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
   }
 
   void _saveChanges() {
-
     final updatedHabit = widget.habit.copyWith(
       habitName: _nameController.text.trim(),
       reminderTime: _isReminderEnabled && _reminderTime != null
@@ -105,7 +104,6 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
       payload: 'habit_${habit.habitId}',
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -194,7 +192,9 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
             child: Text(
               _reminderTime != null ? _formatTime(_reminderTime!) : 'Reminder',
               style: TextStyle(
-                color: _isReminderEnabled ? CupertinoColors.white : CupertinoColors.systemGrey,
+                color: _isReminderEnabled
+                    ? CupertinoColors.white
+                    : CupertinoColors.systemGrey,
                 fontSize: 18,
               ),
             ),
@@ -224,6 +224,8 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
   }
 
   void _showTimePicker() {
+    final initialTime = _reminderTime ?? TimeOfDay.now();
+
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext context) => Container(
@@ -236,10 +238,13 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
         child: SafeArea(
           top: false,
           child: CupertinoDatePicker(
-            initialDateTime: DateTime.now().add(Duration(
-              hours: _reminderTime?.hour ?? 0,
-              minutes: _reminderTime?.minute ?? 0,
-            )),
+            initialDateTime: DateTime(
+              DateTime.now().year,
+              DateTime.now().month,
+              DateTime.now().day,
+              initialTime.hour,
+              initialTime.minute,
+            ),
             mode: CupertinoDatePickerMode.time,
             use24hFormat: false,
             onDateTimeChanged: (DateTime newDateTime) {
