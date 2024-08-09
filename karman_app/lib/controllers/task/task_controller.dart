@@ -13,6 +13,7 @@ class TaskController extends ChangeNotifier {
   List<Task> get tasks => _tasks;
 
   Future<void> loadTasks() async {
+    await _taskService.addInitialTasks(); 
     _tasks = await _taskService.getTasks();
     notifyListeners();
   }

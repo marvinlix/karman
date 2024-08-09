@@ -58,9 +58,9 @@ class AchievementService {
     int threeMonthTotalMinutes,
   ) async {
     switch (achievement.name) {
-      case "Minute Master":
-        return todayTotalMinutes >= 30;
       case "Half-Hour Hero":
+        return todayTotalMinutes >= 30;
+      case "Hour Hero":
         return todayTotalMinutes >= 60;
       case "Productivity Pro":
         return todayTotalMinutes >= 90;

@@ -12,7 +12,7 @@ class NotificationService {
   static Future<void> init(GlobalKey<NavigatorState> key) async {
     navigatorKey = key;
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+        AndroidInitializationSettings('@drawable/ic_launcher_foreground');
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings();
     const InitializationSettings initializationSettings =

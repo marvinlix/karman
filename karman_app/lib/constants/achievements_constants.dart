@@ -2,9 +2,9 @@
 
 class AchievementConstants {
   static const List<Achievement> achievements = [
-    Achievement("Minute Master",
-        "Complete 30 minutes of focused activity in a single day."),
     Achievement("Half-Hour Hero",
+        "Complete 30 minutes of focused activity in a single day."),
+    Achievement("Hour Hero",
         "Complete 60 minutes of focused activity in a single day."),
     Achievement("Productivity Pro",
         "Complete 90 minutes of focused activity in a single day."),

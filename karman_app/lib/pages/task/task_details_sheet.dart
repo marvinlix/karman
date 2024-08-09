@@ -103,7 +103,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
       if (savedTask.reminder != null && savedTask.taskId != null) {
         await NotificationService.scheduleNotification(
           id: savedTask.taskId!,
-          title: 'Task Reminder',
+          title: 'You\'ve got a task to do!',
           body: savedTask.name,
           scheduledDate: savedTask.reminder!,
           payload: 'task_${savedTask.taskId}',
