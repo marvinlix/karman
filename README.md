@@ -20,7 +20,7 @@
   </a>
 </p>
 
-## 🌟 Features
+## Features
 
 <table align="center">
   <tr>
@@ -32,20 +32,22 @@
   </tr>
 </table>
 
-### Task Management
+### ✅ Task Management
+
 Organize and prioritize your tasks effortlessly with a clean, user-friendly interface.
 <p align="center">
   <img src="preview/tasks.gif" alt="Task Management" width="25%">
 </p>
 
+### 🔄 Habit Tracking
 
-### Habit Tracking
 Track your daily habits and maintain your streaks to build a better you.
 <p align="center">
   <img src="preview/habits.gif" alt="Habit Tracking" width="25%">
 </p>
 
-### Focus Timer
+### ⏳ Focus Timer
+
 Maximize productivity with a built-in focus timer designed to keep you on track.
 <p align="center">
   <img src="preview/focus.gif" alt="Focus Timer" width="25%">
@@ -92,7 +94,7 @@ We value your feedback! Join our [Discord server](https://discord.gg/wDkZDfpVwp)
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 We love contributions! Check out our [Contributing Guidelines](CONTRIBUTING.md) and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to get started.
 
@@ -106,7 +108,7 @@ Please ensure your pull request is well-documented and adheres to our coding sta
 
 ---
 
-## 🛣️ Roadmap
+## Roadmap
 
 - [ ] Add more ambient sounds to focus timer
 - [ ] Update badges for habits
@@ -114,23 +116,23 @@ Please ensure your pull request is well-documented and adheres to our coding sta
 
 ---
 
-## 💸 Sponsorship
+## Sponsorship
 
-*karman* is a completely **free** and **open-source** project, dedicated to providing the best possible experience for the users. I do not monetize the app in any way, ensuring that productivity remains accessible to everyone. However, publishing the app on the App Store requires an annual fee of $100. 
+karman is a completely free and open-source project, dedicated to providing the best possible experience for our users. We do not monetize the app in any way, ensuring that productivity remains accessible to everyone. However, publishing the app on the Google Play Store requires an annual fee of $100. 
 
-To make *karman* available to a wider audience and keep the project alive, I rely on your generous support. Your sponsorship will help cover these costs, ensuring that karman remains free and open for everyone. Every contribution, no matter how small, makes a **difference**.
+To make karman available to a wider audience and keep the project alive, we rely on your generous support. Your sponsorship will help cover these costs, ensuring that karman remains free and open for everyone. Every contribution, no matter how small, makes a difference.
 
 If you’d like to support karman, please consider [becoming a sponsor](https://github.com/sponsors/surtecha).
 
 ---
 
-## 📜 License
+## License
 
 karman is licensed under the GNU General Public License v3.0 (GPL-3.0). See the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 💖 Acknowledgements
+## Acknowledgements
 
 Special thanks to the open-source community for their continuous support and contributions.
 
@@ -139,6 +141,3 @@ Special thanks to the open-source community for their continuous support and con
 <p align="center">
   Maintained with passion by <a href="https://github.com/surtecha">surtecha</a>.
 </p>
-
-
-
