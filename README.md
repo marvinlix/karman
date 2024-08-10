@@ -62,20 +62,20 @@ Maximize productivity with a built-in focus timer designed to keep you on track.
 
 ### Clone the Repository
 
-bash
+```bash
 git clone https://github.com/surtecha/karman.git
 cd karman
-
+```
 ### Install Dependencies
 
-bash
+```bash
 flutter pub get
-
+```
 ### Run the App
 
-bash
+```bash
 flutter run
-
+```
 ---
 
 ## 🛠️ Development Status
