@@ -32,7 +32,7 @@ I have the right and responsibility to remove, edit, or reject comments, commits
 
 ## Reporting
 
-Instances of unacceptable behavior may be reported by contacting me at [suryatejachalla.dev@gmail.com]. All reports will be reviewed and investigated promptly and fairly. Confidentiality will be maintained with regard to the reporter of an incident.
+Instances of unacceptable behavior may be reported by contacting me at [surtecha@gmail.com]. All reports will be reviewed and investigated promptly and fairly. Confidentiality will be maintained with regard to the reporter of an incident.
 
 ## Attribution
 
