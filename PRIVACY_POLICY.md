@@ -1,6 +1,6 @@
 # Privacy Policy for karman
 
-Last updated: July 29, 2024
+Last updated: August 11, 2024
 
 ## Introduction
 
@@ -28,6 +28,6 @@ We may update our Privacy Policy from time to time. Thus, you are advised to rev
 
 ## Contact Us
 
-If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact the developer at suryatejachalla.dev@gmail.com.
+If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact the developer at surtecha@gmail.com.
 
 This privacy policy page was created to explain what information our App collects and how it is used. If you have additional questions or require more information about our Privacy Policy, please feel free to contact us through our GitHub repository at https://github.com/surtecha/karman.
