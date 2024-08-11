@@ -10,13 +10,13 @@
 
 <p align="center">
   <a href="https://github.com/surtecha/karman/releases">
-    <img src="https://img.shields.io/github/v/release/surtecha/karman?include_prereleases&style=flat-square" alt="Latest Release">
+    <img src="https://img.shields.io/github/v/release/surtecha/karman?include_prereleases&style=flat" alt="Latest Release">
   </a>
   <a href="https://github.com/surtecha/karman/issues">
-    <img src="https://img.shields.io/github/issues/surtecha/karman?style=flat-square" alt="Issues">
+    <img src="https://img.shields.io/github/issues/surtecha/karman?style=flat" alt="Issues">
   </a>
   <a href="https://github.com/surtecha/karman/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/surtecha/karman?style=flat-square" alt="License">
+    <img src="https://img.shields.io/github/license/surtecha/karman?style=flat" alt="License">
   </a>
 </p>
 
