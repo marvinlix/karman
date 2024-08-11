@@ -118,7 +118,7 @@ Please ensure your pull request is well-documented and adheres to our coding sta
 
 ## Sponsorship
 
-karman is a completely free and open-source project, dedicated to providing the best possible experience for our users. We do not monetize the app in any way, ensuring that productivity remains accessible to everyone. However, publishing the app on the Google Play Store requires an annual fee of $100. 
+karman is a completely free and open-source project, dedicated to providing the best possible experience for our users. We do not monetize the app in any way, ensuring that productivity remains accessible to everyone. However, publishing the app on the App Store requires an annual fee of $100. 
 
 To make karman available to a wider audience and keep the project alive, we rely on your generous support. Your sponsorship will help cover these costs, ensuring that karman remains free and open for everyone. Every contribution, no matter how small, makes a difference.
 
