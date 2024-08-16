@@ -6,6 +6,7 @@ import 'package:karman_app/manager/sound_manager.dart';
 import 'package:karman_app/database/database_service.dart';
 import 'package:karman_app/database/focus_db.dart';
 import 'package:karman_app/services/achievement/achievement_service.dart';
+import 'package:karman_app/services/focus/timer_service.dart';
 
 class FocusPage extends StatefulWidget {
   const FocusPage({super.key});
@@ -24,6 +25,7 @@ class _FocusPageState extends State<FocusPage>
   final SoundManager _soundManager = SoundManager();
   final FocusDatabase _focusDatabase = FocusDatabase();
   final AchievementService _achievementService = AchievementService();
+  final TimerService _timerService = TimerService();
 
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -37,6 +39,21 @@ class _FocusPageState extends State<FocusPage>
       vsync: this,
     );
     _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+    _loadTimerState();
+  }
+
+  Future<void> _loadTimerState() async {
+    final timerState = await _timerService.getTimerState();
+    setState(() {
+      _timerValue = timerState['timerValue'];
+      _isTimerRunning = timerState['isTimerRunning'];
+      _remainingSeconds = timerState['remainingSeconds'];
+      _totalSeconds = timerState['totalSeconds'];
+    });
+    if (_isTimerRunning) {
+      _startTimer();
+      _soundManager.playSelectedSound();
+    }
   }
 
   @override
@@ -53,6 +70,7 @@ class _FocusPageState extends State<FocusPage>
       _remainingSeconds = value * 60;
       _totalSeconds = _remainingSeconds;
     });
+    _saveTimerState();
   }
 
   void _toggleTimer() {
@@ -65,6 +83,7 @@ class _FocusPageState extends State<FocusPage>
         _stopTimer(playChime: false);
       }
     });
+    _saveTimerState();
   }
 
   void _startTimer() {
@@ -73,6 +92,7 @@ class _FocusPageState extends State<FocusPage>
       setState(() {
         if (_remainingSeconds > 0) {
           _remainingSeconds--;
+          _saveTimerState();
         } else {
           _stopTimer(playChime: true);
         }
@@ -102,6 +122,16 @@ class _FocusPageState extends State<FocusPage>
         _totalSeconds = _remainingSeconds;
       });
     }
+    _saveTimerState();
+  }
+
+  Future<void> _saveTimerState() async {
+    await _timerService.saveTimerState(
+      timerValue: _timerValue,
+      isTimerRunning: _isTimerRunning,
+      remainingSeconds: _remainingSeconds,
+      totalSeconds: _totalSeconds,
+    );
   }
 
   void _recordFocusSession() async {
@@ -119,6 +149,7 @@ class _FocusPageState extends State<FocusPage>
       _remainingSeconds = _timerValue * 60;
       _totalSeconds = _remainingSeconds;
     });
+    _saveTimerState();
   }
 
   void _showNewAchievements(Map<String, bool> unlockedAchievements) {
