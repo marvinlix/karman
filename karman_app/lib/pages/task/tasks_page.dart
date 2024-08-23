@@ -128,7 +128,11 @@ class _TasksPageState extends State<TasksPage> {
             middle: Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: Text(
-                '$incompleteTasks tasks left',
+                incompleteTasks == 0
+                    ? 'No tasks left'
+                    : (incompleteTasks == 1
+                        ? '1 task left'
+                        : '$incompleteTasks tasks left'),
                 style: TextStyle(
                   color: CupertinoColors.white,
                   fontWeight: FontWeight.bold,
