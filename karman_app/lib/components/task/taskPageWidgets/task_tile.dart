@@ -89,7 +89,7 @@ class TaskTile extends StatelessWidget {
                                       ? Colors.grey[700]
                                       : CupertinoColors.white,
                                   fontSize: 18,
-                                  fontWeight: FontWeight.w300,
+                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                               if (_hasAdditionalInfo)
