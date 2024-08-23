@@ -4,8 +4,9 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/controllers/task/task_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
-class TaskTile extends StatelessWidget {
+class TaskTile extends StatefulWidget {
   final Task task;
   final Function(bool?)? onChanged;
   final Function(BuildContext)? onDelete;
@@ -20,31 +21,54 @@ class TaskTile extends StatelessWidget {
   });
 
   @override
+  _TaskTileState createState() => _TaskTileState();
+}
+
+class _TaskTileState extends State<TaskTile> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scheduleUpdates();
+    });
+  }
+
+  void _scheduleUpdates() {
+    final taskController = Provider.of<TaskController>(context, listen: false);
+    if (widget.task.dueDate != null) {
+      taskController.scheduleUpdate(widget.task.taskId!, widget.task.dueDate!);
+    }
+    if (widget.task.reminder != null) {
+      taskController.scheduleUpdate(widget.task.taskId!, widget.task.reminder!);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<TaskController>(
       builder: (context, taskController, child) {
         bool isPendingCompletion =
-            taskController.isTaskPendingCompletion(task.taskId!);
-        bool isChecked = task.isCompleted || isPendingCompletion;
+            taskController.isTaskPendingCompletion(widget.task.taskId!);
+        bool isChecked = widget.task.isCompleted || isPendingCompletion;
 
         return Material(
           color: Colors.transparent,
           child: Slidable(
-            key: ValueKey(task.taskId),
+            key: ValueKey(widget.task.taskId),
             endActionPane: ActionPane(
               motion: const DrawerMotion(),
               children: [
                 SlidableAction(
-                  onPressed: onDelete,
+                  onPressed: widget.onDelete,
                   backgroundColor: CupertinoColors.darkBackgroundGray,
-                  foregroundColor: Colors.redAccent,
+                  foregroundColor: CupertinoColors.systemRed,
                   icon: CupertinoIcons.delete,
                   label: 'Delete',
                 ),
               ],
             ),
             child: GestureDetector(
-              onTap: onTap,
+              onTap: widget.onTap,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.black,
@@ -66,7 +90,7 @@ class TaskTile extends StatelessWidget {
                             scale: 1.3,
                             child: Checkbox(
                               value: isChecked,
-                              onChanged: onChanged,
+                              onChanged: widget.onChanged,
                               checkColor: CupertinoColors.black,
                               activeColor: CupertinoColors.white,
                               shape: const CircleBorder(),
@@ -83,7 +107,7 @@ class TaskTile extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                task.name,
+                                widget.task.name,
                                 style: TextStyle(
                                   color: isChecked
                                       ? Colors.grey[700]
@@ -92,21 +116,33 @@ class TaskTile extends StatelessWidget {
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
-                              if (_hasAdditionalInfo)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 2),
-                                  child: Row(
-                                    children: [
-                                      if (task.dueDate != null)
-                                        _buildIcon(CupertinoIcons.calendar),
-                                      if (task.reminder != null)
-                                        _buildIcon(CupertinoIcons.clock),
-                                      if (task.note != null &&
-                                          task.note!.isNotEmpty)
-                                        _buildIcon(CupertinoIcons.doc_text),
-                                    ],
-                                  ),
-                                ),
+                              SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  if (widget.task.dueDate != null)
+                                    _buildInfoWithIcon(
+                                      CupertinoIcons.calendar,
+                                      _formatDate(widget.task.dueDate!),
+                                      isOverdue:
+                                          _isOverdue(widget.task.dueDate!),
+                                    ),
+                                  widget.task.dueDate != null ? SizedBox(width: 20) : SizedBox(width: 0),
+                                  if (widget.task.reminder != null)
+                                    _buildInfoWithIcon(
+                                      CupertinoIcons.bell_fill,
+                                      _formatDateTime(widget.task.reminder!),
+                                      isOverdue:
+                                          _isOverdue(widget.task.reminder!),
+                                    ),
+                                  widget.task.reminder != null ? SizedBox(width: 20) : SizedBox(width: 0),
+                                  if(widget.task.note != null && widget.task.note!.isNotEmpty)
+                                    Icon(
+                                      CupertinoIcons.doc_text_fill,
+                                      size: 16,
+                                      color: widget.task.isCompleted ? Colors.grey[700] : CupertinoColors.systemGrey5,
+                                    ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -123,15 +159,38 @@ class TaskTile extends StatelessWidget {
     );
   }
 
-  Widget _buildIcon(IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 16),
-      child: Icon(icon, color: Colors.white, size: 20),
+  Widget _buildInfoWithIcon(IconData icon, String text,
+      {bool isOverdue = false}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: isOverdue ? CupertinoColors.systemRed : (widget.task.isCompleted ? Colors.grey[700] : CupertinoColors.systemGrey5),
+        ),
+        SizedBox(width: 4),
+        Text(
+          text,
+          style: TextStyle(
+            color: isOverdue ? CupertinoColors.systemRed : (widget.task.isCompleted ? Colors.grey[700] : CupertinoColors.systemGrey5),
+            fontSize: 13,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ],
     );
   }
 
-  bool get _hasAdditionalInfo =>
-      task.dueDate != null ||
-      task.reminder != null ||
-      (task.note != null && task.note!.isNotEmpty);
+  String _formatDate(DateTime date) {
+    return DateFormat('MMM d').format(date);
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return DateFormat('MMM d, h:mm a').format(dateTime);
+  }
+
+  bool _isOverdue(DateTime date) {
+    return date.isBefore(DateTime.now()) && !widget.task.isCompleted;
+  }
 }
