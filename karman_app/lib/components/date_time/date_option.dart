@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 
@@ -12,14 +11,14 @@ class DateOptionWidget extends StatefulWidget {
   final String placeholder;
 
   const DateOptionWidget({
-    Key? key,
+    super.key,
     required this.isEnabled,
     required this.date,
     required this.onToggle,
     required this.onDateSelected,
     required this.title,
     required this.placeholder,
-  }) : super(key: key);
+  });
 
   @override
   _DateOptionWidgetState createState() => _DateOptionWidgetState();

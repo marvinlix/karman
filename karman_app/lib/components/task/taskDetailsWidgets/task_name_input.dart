@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 class TaskNameInput extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
-  final VoidCallback onSave;
+  final VoidCallback? onSave;
   final bool isTaskNameEmpty;
+  final bool hasChanges;
 
   const TaskNameInput({
     super.key,
@@ -13,6 +14,7 @@ class TaskNameInput extends StatelessWidget {
     required this.focusNode,
     required this.onSave,
     required this.isTaskNameEmpty,
+    required this.hasChanges,
   });
 
   @override
@@ -37,13 +39,13 @@ class TaskNameInput extends StatelessWidget {
         SizedBox(width: 20),
         CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: isTaskNameEmpty ? null : onSave,
+          onPressed: onSave,
           child: Text(
             'Save',
             style: TextStyle(
-              color: isTaskNameEmpty
-                  ? CupertinoColors.systemGrey
-                  : CupertinoColors.white,
+              color: (hasChanges && !isTaskNameEmpty)
+                  ? CupertinoColors.white
+                  : CupertinoColors.systemGrey,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
