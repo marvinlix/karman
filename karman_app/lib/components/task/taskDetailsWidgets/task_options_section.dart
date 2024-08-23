@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:karman_app/components/date_time/due_date_button.dart';
-import 'package:karman_app/components/date_time/reminder_button.dart';
+import 'package:karman_app/components/date_time/date_option.dart';
+import 'package:karman_app/components/date_time/reminder_option.dart';
 
 class TaskOptionsSection extends StatelessWidget {
   final bool isDateEnabled;
@@ -28,51 +28,22 @@ class TaskOptionsSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _buildToggleRow(
-          icon: CupertinoIcons.calendar,
-          title: 'Date',
+        DateOptionWidget(
           isEnabled: isDateEnabled,
+          date: dueDate,
           onToggle: onDateToggle,
-          child: DueDateButton(
-            selectedDate: dueDate,
-            onDateSelected: onDateSelected,
-            isEnabled: isDateEnabled,
-          ),
+          onDateSelected: onDateSelected,
+          title: 'Date',
+          placeholder: 'Due Date',
         ),
         SizedBox(height: 20),
-        _buildToggleRow(
-          icon: CupertinoIcons.bell,
-          title: 'Reminder',
+        ReminderOptionWidget(
           isEnabled: isReminderEnabled,
+          dateTime: reminder,
           onToggle: onReminderToggle,
-          child: ReminderButton(
-            selectedDateTime: reminder,
-            onReminderSet: onReminderSet,
-            isEnabled: isReminderEnabled,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildToggleRow({
-    required IconData icon,
-    required String title,
-    required bool isEnabled,
-    required Function(bool) onToggle,
-    required Widget child,
-  }) {
-    return Row(
-      children: [
-        Icon(icon, color: CupertinoColors.white),
-        SizedBox(width: 10),
-        Expanded(child: child),
-        CupertinoSwitch(
-          value: isEnabled,
-          onChanged: onToggle,
-          thumbColor: CupertinoColors.black,
-          activeColor: CupertinoColors.white,
-          trackColor: CupertinoColors.tertiaryLabel,
+          onDateTimeSelected: onReminderSet,
+          title: 'Reminder',
+          placeholder: 'Reminder',
         ),
       ],
     );
