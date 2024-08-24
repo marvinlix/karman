@@ -60,13 +60,23 @@ class _HabitsPageState extends State<HabitsPage> {
     );
   }
 
+  List<Habit> _sortHabits(List<Habit> habits) {
+    habits.sort((a, b) {
+      if (a.isCompletedToday == b.isCompletedToday) {
+        return 0;
+      }
+      return a.isCompletedToday ? 1 : -1;
+    });
+    return habits;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<HabitController>(
       builder: (context, habitController, child) {
-        final incompleteHabits = habitController.habits
-            .where((habit) => !habit.isCompletedToday)
-            .length;
+        final sortedHabits = _sortHabits(habitController.habits);
+        final incompleteHabits =
+            sortedHabits.where((habit) => !habit.isCompletedToday).length;
 
         return CupertinoPageScaffold(
           navigationBar: CupertinoNavigationBar(
@@ -74,7 +84,7 @@ class _HabitsPageState extends State<HabitsPage> {
             middle: Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: Text(
-                habitController.habits.isEmpty
+                sortedHabits.isEmpty
                     ? 'No habits left'
                     : '$incompleteHabits habit${incompleteHabits == 1 ? '' : 's'} left',
                 style: TextStyle(
@@ -95,7 +105,7 @@ class _HabitsPageState extends State<HabitsPage> {
           child: SafeArea(
             child: _isLoading
                 ? Center(child: CupertinoActivityIndicator())
-                : habitController.habits.isEmpty
+                : sortedHabits.isEmpty
                     ? _buildEmptyState()
                     : CustomScrollView(
                         slivers: [
@@ -107,8 +117,8 @@ class _HabitsPageState extends State<HabitsPage> {
                             sliver: SliverList(
                               delegate: SliverChildBuilderDelegate(
                                 (context, index) {
-                                  if (index < habitController.habits.length) {
-                                    final habit = habitController.habits[index];
+                                  if (index < sortedHabits.length) {
+                                    final habit = sortedHabits[index];
                                     return AnimatedSwitcher(
                                       duration: Duration(milliseconds: 300),
                                       child: HabitTile(
@@ -119,7 +129,7 @@ class _HabitsPageState extends State<HabitsPage> {
                                   }
                                   return SizedBox(height: 40);
                                 },
-                                childCount: habitController.habits.length + 1,
+                                childCount: sortedHabits.length + 1,
                               ),
                             ),
                           ),
