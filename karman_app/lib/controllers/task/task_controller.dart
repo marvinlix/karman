@@ -52,7 +52,7 @@ class TaskController extends ChangeNotifier {
       _pendingCompletions[taskId] = false;
     } else if (!task.isCompleted) {
       _pendingCompletions[taskId] = true;
-      _completionTimers[taskId] = Timer(Duration(seconds: 3), () {
+      _completionTimers[taskId] = Timer(Duration(seconds: 1), () {
         final updatedTask = task.copyWith(isCompleted: true);
         updateTask(updatedTask);
         _completionTimers.remove(taskId);
