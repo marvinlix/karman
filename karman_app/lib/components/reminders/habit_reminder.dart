@@ -1,29 +1,25 @@
 import 'package:flutter/cupertino.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter/material.dart';
 
-class ReminderOptionWidget extends StatefulWidget {
+class HabitReminder extends StatefulWidget {
   final bool isEnabled;
-  final DateTime? dateTime;
+  final TimeOfDay? time;
   final Function(bool) onToggle;
-  final Function(DateTime) onDateTimeSelected;
-  final String title;
-  final String placeholder;
+  final Function(TimeOfDay) onTimeSelected;
 
-  const ReminderOptionWidget({
-    super.key,
+  const HabitReminder({
+    Key? key,
     required this.isEnabled,
-    required this.dateTime,
+    required this.time,
     required this.onToggle,
-    required this.onDateTimeSelected,
-    required this.title,
-    required this.placeholder,
-  });
+    required this.onTimeSelected,
+  }) : super(key: key);
 
   @override
-  _ReminderOptionWidgetState createState() => _ReminderOptionWidgetState();
+  _HabitReminderState createState() => _HabitReminderState();
 }
 
-class _ReminderOptionWidgetState extends State<ReminderOptionWidget>
+class _HabitReminderState extends State<HabitReminder>
     with SingleTickerProviderStateMixin {
   bool isPickerVisible = false;
   late AnimationController _animationController;
@@ -64,6 +60,14 @@ class _ReminderOptionWidgetState extends State<ReminderOptionWidget>
     }
   }
 
+  String _formatTime(TimeOfDay time) {
+    final hour =
+        time.hour == 0 ? 12 : (time.hour > 12 ? time.hour - 12 : time.hour);
+    final minute = time.minute.toString().padLeft(2, '0');
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    return '$hour:$minute $period';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -71,7 +75,7 @@ class _ReminderOptionWidgetState extends State<ReminderOptionWidget>
         _buildToggleRow(),
         SizeTransition(
           sizeFactor: _animation,
-          child: isPickerVisible ? _buildDateTimePicker() : SizedBox.shrink(),
+          child: isPickerVisible ? _buildTimePicker() : SizedBox.shrink(),
         ),
       ],
     );
@@ -90,15 +94,16 @@ class _ReminderOptionWidgetState extends State<ReminderOptionWidget>
               }
             },
             child: Text(
-              widget.dateTime == null
-                  ? widget.placeholder
-                  : DateFormat('MMM d, yyyy HH:mm').format(widget.dateTime!),
+              widget.time == null
+                  ? 'Set daily reminder'
+                  : _formatTime(widget.time!),
               style: TextStyle(
-                  color: widget.isEnabled
-                      ? CupertinoColors.white
-                      : CupertinoColors.systemGrey,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500),
+                color: widget.isEnabled
+                    ? CupertinoColors.white
+                    : CupertinoColors.systemGrey,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),
@@ -113,16 +118,18 @@ class _ReminderOptionWidgetState extends State<ReminderOptionWidget>
     );
   }
 
-  Widget _buildDateTimePicker() {
+  Widget _buildTimePicker() {
     return SizedBox(
       height: 220,
       child: Column(
         children: [
           Expanded(
             child: CupertinoDatePicker(
-              mode: CupertinoDatePickerMode.dateAndTime,
-              initialDateTime: widget.dateTime ?? DateTime.now(),
-              onDateTimeChanged: widget.onDateTimeSelected,
+              mode: CupertinoDatePickerMode.time,
+              initialDateTime: DateTime.now().add(Duration(minutes: 1)),
+              onDateTimeChanged: (DateTime dateTime) {
+                widget.onTimeSelected(TimeOfDay.fromDateTime(dateTime));
+              },
             ),
           ),
           CupertinoButton(

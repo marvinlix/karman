@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:karman_app/components/reminders/habit_reminder.dart';
 import 'package:karman_app/controllers/habit/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/pages/habit/habit_logs_page.dart';
@@ -127,7 +128,21 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
             children: [
               _buildHabitNameField(),
               SizedBox(height: 30),
-              _buildReminderToggle(),
+              HabitReminder(
+                isEnabled: _isReminderEnabled,
+                time: _reminderTime,
+                onToggle: (value) {
+                  setState(() {
+                    _isReminderEnabled = value;
+                    if (!value) _reminderTime = null;
+                  });
+                },
+                onTimeSelected: (TimeOfDay time) {
+                  setState(() {
+                    _reminderTime = time;
+                  });
+                },
+              ),
               if (!widget.isNewHabit) ...[
                 SizedBox(height: 25),
                 _buildBestStreakInfo(),
@@ -178,83 +193,6 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildReminderToggle() {
-    return Row(
-      children: [
-        Icon(CupertinoIcons.bell, color: CupertinoColors.white),
-        SizedBox(width: 10),
-        Expanded(
-          child: GestureDetector(
-            onTap: _isReminderEnabled ? _showTimePicker : null,
-            child: Text(
-              _reminderTime != null ? _formatTime(_reminderTime!) : 'Reminder',
-              style: TextStyle(
-                color: _isReminderEnabled
-                    ? CupertinoColors.white
-                    : CupertinoColors.systemGrey,
-                fontSize: 18,
-              ),
-            ),
-          ),
-        ),
-        CupertinoSwitch(
-          value: _isReminderEnabled,
-          onChanged: (value) {
-            setState(() {
-              _isReminderEnabled = value;
-              if (!value) _reminderTime = null;
-            });
-          },
-          activeColor: CupertinoColors.white,
-          thumbColor: CupertinoColors.black,
-          trackColor: CupertinoColors.systemGrey,
-        ),
-      ],
-    );
-  }
-
-  String _formatTime(TimeOfDay time) {
-    final hour = time.hourOfPeriod;
-    final minute = time.minute.toString().padLeft(2, '0');
-    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
-    return '$hour:$minute $period';
-  }
-
-  void _showTimePicker() {
-    final initialTime = _reminderTime ?? TimeOfDay.now();
-
-    showCupertinoModalPopup<void>(
-      context: context,
-      builder: (BuildContext context) => Container(
-        height: 216,
-        padding: const EdgeInsets.only(top: 6.0),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: SafeArea(
-          top: false,
-          child: CupertinoDatePicker(
-            initialDateTime: DateTime(
-              DateTime.now().year,
-              DateTime.now().month,
-              DateTime.now().day,
-              initialTime.hour,
-              initialTime.minute,
-            ),
-            mode: CupertinoDatePickerMode.time,
-            use24hFormat: false,
-            onDateTimeChanged: (DateTime newDateTime) {
-              setState(() {
-                _reminderTime = TimeOfDay.fromDateTime(newDateTime);
-              });
-            },
-          ),
-        ),
-      ),
     );
   }
 

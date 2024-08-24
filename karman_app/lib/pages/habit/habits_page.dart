@@ -75,8 +75,8 @@ class _HabitsPageState extends State<HabitsPage> {
               padding: const EdgeInsets.only(top: 20.0),
               child: Text(
                 habitController.habits.isEmpty
-                    ? 'Habits'
-                    : '$incompleteHabits habits left',
+                    ? 'No habits left'
+                    : '$incompleteHabits habit${incompleteHabits == 1 ? '' : 's'} left',
                 style: TextStyle(
                   color: CupertinoColors.white,
                   fontWeight: FontWeight.bold,
@@ -102,22 +102,25 @@ class _HabitsPageState extends State<HabitsPage> {
                           CupertinoSliverRefreshControl(
                             onRefresh: _refreshHabits,
                           ),
-                          SliverList(
-                            delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                                if (index < habitController.habits.length) {
-                                  final habit = habitController.habits[index];
-                                  return AnimatedSwitcher(
-                                    duration: Duration(milliseconds: 300),
-                                    child: HabitTile(
-                                      key: ValueKey(habit.habitId),
-                                      habit: habit,
-                                    ),
-                                  );
-                                }
-                                return SizedBox(height: 40);
-                              },
-                              childCount: habitController.habits.length + 1,
+                          SliverPadding(
+                            padding: EdgeInsets.only(top: 20.0),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  if (index < habitController.habits.length) {
+                                    final habit = habitController.habits[index];
+                                    return AnimatedSwitcher(
+                                      duration: Duration(milliseconds: 300),
+                                      child: HabitTile(
+                                        key: ValueKey(habit.habitId),
+                                        habit: habit,
+                                      ),
+                                    );
+                                  }
+                                  return SizedBox(height: 40);
+                                },
+                                childCount: habitController.habits.length + 1,
+                              ),
                             ),
                           ),
                         ],

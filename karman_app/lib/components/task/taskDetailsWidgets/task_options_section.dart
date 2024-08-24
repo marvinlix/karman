@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:karman_app/components/date_time/date_option.dart';
-import 'package:karman_app/components/date_time/reminder_option.dart';
+import 'package:karman_app/components/reminders/date_option.dart';
+import 'package:karman_app/components/reminders/task_reminder.dart';
 
 class TaskOptionsSection extends StatelessWidget {
   final bool isDateEnabled;
@@ -37,7 +37,7 @@ class TaskOptionsSection extends StatelessWidget {
           placeholder: 'Due Date',
         ),
         SizedBox(height: 20),
-        ReminderOptionWidget(
+        TaskReminder(
           isEnabled: isReminderEnabled,
           dateTime: reminder,
           onToggle: onReminderToggle,
