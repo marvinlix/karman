@@ -27,12 +27,12 @@ class TaskNameInput extends StatelessWidget {
             focusNode: focusNode,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 24,
+              fontSize: 20,
             ),
             placeholder: 'Task Name',
             placeholderStyle: TextStyle(
               color: CupertinoColors.systemGrey,
-              fontSize: 18,
+              fontSize: 20,
             ),
           ),
         ),

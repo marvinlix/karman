@@ -181,12 +181,12 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
               color: _isHabitNameEmpty
                   ? CupertinoColors.systemGrey
                   : CupertinoColors.white,
-              fontSize: 24,
+              fontSize: 20,
             ),
             placeholder: 'Habit Name',
             placeholderStyle: TextStyle(
               color: CupertinoColors.systemGrey,
-              fontSize: 24,
+              fontSize: 20,
             ),
           ),
         ),
