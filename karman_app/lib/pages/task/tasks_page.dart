@@ -130,9 +130,7 @@ class _TasksPageState extends State<TasksPage> {
               child: Text(
                 incompleteTasks == 0
                     ? 'No tasks left'
-                    : (incompleteTasks == 1
-                        ? '1 task left'
-                        : '$incompleteTasks tasks left'),
+                    : '$incompleteTasks task${incompleteTasks == 1 ? '' : 's'} left',
                 style: TextStyle(
                   color: CupertinoColors.white,
                   fontWeight: FontWeight.bold,
