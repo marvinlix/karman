@@ -27,6 +27,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
   TimeOfDay? _reminderTime;
   bool _isReminderEnabled = false;
   bool _isHabitNameEmpty = true;
+  bool _hasChanges = false;
 
   @override
   void initState() {
@@ -34,7 +35,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
     _nameController = TextEditingController(text: widget.habit.habitName);
     _nameFocusNode = FocusNode();
     _isHabitNameEmpty = _nameController.text.isEmpty;
-    _nameController.addListener(_updateHabitNameState);
+    _nameController.addListener(_updateState);
     if (widget.habit.reminderTime != null) {
       final minutes = widget.habit.reminderTime!.inMinutes;
       _reminderTime = TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60);
@@ -44,19 +45,29 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
 
   @override
   void dispose() {
-    _nameController.removeListener(_updateHabitNameState);
+    _nameController.removeListener(_updateState);
     _nameController.dispose();
     _nameFocusNode.dispose();
     super.dispose();
   }
 
-  void _updateHabitNameState() {
+  void _updateState() {
     setState(() {
       _isHabitNameEmpty = _nameController.text.isEmpty;
+      _hasChanges = _nameController.text != widget.habit.habitName ||
+          _isReminderEnabled != (widget.habit.reminderTime != null) ||
+          (_isReminderEnabled &&
+              _reminderTime != null &&
+              widget.habit.reminderTime != null &&
+              (_reminderTime!.hour != widget.habit.reminderTime!.inHours ||
+                  _reminderTime!.minute !=
+                      widget.habit.reminderTime!.inMinutes % 60));
     });
   }
 
   void _saveChanges() {
+    if (!_hasChanges) return;
+
     final updatedHabit = widget.habit.copyWith(
       habitName: _nameController.text.trim(),
       reminderTime: _isReminderEnabled && _reminderTime != null
@@ -135,11 +146,13 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
                   setState(() {
                     _isReminderEnabled = value;
                     if (!value) _reminderTime = null;
+                    _updateState();
                   });
                 },
                 onTimeSelected: (TimeOfDay time) {
                   setState(() {
                     _reminderTime = time;
+                    _updateState();
                   });
                 },
               ),
@@ -180,13 +193,13 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
         SizedBox(width: 20),
         CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: _isHabitNameEmpty ? null : _saveChanges,
+          onPressed: _hasChanges && !_isHabitNameEmpty ? _saveChanges : null,
           child: Text(
             'Save',
             style: TextStyle(
-              color: _isHabitNameEmpty
-                  ? CupertinoColors.systemGrey
-                  : CupertinoColors.white,
+              color: _hasChanges && !_isHabitNameEmpty
+                  ? CupertinoColors.white
+                  : CupertinoColors.systemGrey,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -220,7 +233,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
       },
       child: const Row(
         children: [
-          Icon(CupertinoIcons.doc, color: CupertinoColors.white),
+          Icon(CupertinoIcons.doc_text, color: CupertinoColors.white),
           SizedBox(width: 10),
           Text(
             'View Logs',
