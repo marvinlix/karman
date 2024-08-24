@@ -81,7 +81,7 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
           style: TextStyle(color: CupertinoColors.white, fontSize: 16),
         ),
         SizedBox(height: 8),
-        TaskNote(
+        LogNote(
           controller: _logController,
           hintText: 'Enter your log here...',
         ),
@@ -99,10 +99,10 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
       ),
       sliderRotate: false,
       elevation: 0,
-      text: 'Complete your habit →',
+      text: '\t Complete your habit \t →',
       textStyle: TextStyle(
         color: CupertinoColors.white,
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: FontWeight.bold,
       ),
       submittedIcon: Icon(
@@ -116,21 +116,21 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
   }
 }
 
-class TaskNote extends StatefulWidget {
+class LogNote extends StatefulWidget {
   final TextEditingController controller;
   final String hintText;
 
-  const TaskNote({
+  const LogNote({
     super.key,
     required this.controller,
-    this.hintText = 'Add a note...',
+    this.hintText = '',
   });
 
   @override
-  _TaskNoteState createState() => _TaskNoteState();
+  _LogNoteState createState() => _LogNoteState();
 }
 
-class _TaskNoteState extends State<TaskNote> {
+class _LogNoteState extends State<LogNote> {
   int _noteLines = 1;
 
   @override
