@@ -210,23 +210,25 @@ class _FocusPageState extends State<FocusPage>
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         backgroundColor: CupertinoColors.black,
-        trailing: _isTimerRunning ? CupertinoButton(
-          onPressed: _isTimerRunning ? _toggleMenu : null,
-          child: Icon(
-            _soundManager.currentIcon,
-            color: _isTimerRunning
-                ? CupertinoColors.white
-                : CupertinoColors.systemGrey,
-            size: 32,
-          ),
-        ) : null,
+        trailing: _isTimerRunning
+            ? CupertinoButton(
+                onPressed: _isTimerRunning ? _toggleMenu : null,
+                child: Icon(
+                  _soundManager.currentIcon,
+                  color: _isTimerRunning
+                      ? CupertinoColors.white
+                      : CupertinoColors.systemGrey,
+                  size: 32,
+                ),
+              )
+            : null,
       ),
       child: SafeArea(
         child: Stack(
           children: [
-            Center(
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 20),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Center(
                 child: CircularSlider(
                   onValueChanged: _onSliderValueChanged,
                   currentValue: _timerValue,
