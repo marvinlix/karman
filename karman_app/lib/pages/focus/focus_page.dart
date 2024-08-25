@@ -210,7 +210,7 @@ class _FocusPageState extends State<FocusPage>
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         backgroundColor: CupertinoColors.black,
-        trailing: CupertinoButton(
+        trailing: _isTimerRunning ? CupertinoButton(
           onPressed: _isTimerRunning ? _toggleMenu : null,
           child: Icon(
             _soundManager.currentIcon,
@@ -219,7 +219,7 @@ class _FocusPageState extends State<FocusPage>
                 : CupertinoColors.systemGrey,
             size: 32,
           ),
-        ),
+        ) : null,
       ),
       child: SafeArea(
         child: Stack(
