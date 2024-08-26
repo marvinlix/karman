@@ -56,7 +56,7 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
                 'Complete ${widget.habit.habitName}',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 24,
+                  fontSize: 26,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -94,15 +94,15 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
       innerColor: CupertinoColors.darkBackgroundGray,
       outerColor: CupertinoColors.tertiarySystemBackground.darkColor,
       sliderButtonIcon: Icon(
-        CupertinoIcons.leaf_arrow_circlepath,
+        CupertinoIcons.right_chevron,
         color: CupertinoColors.white,
       ),
       sliderRotate: false,
       elevation: 0,
-      text: '\t Complete your habit \t →',
+      text: '\t Complete your habit',
       textStyle: TextStyle(
         color: CupertinoColors.white,
-        fontSize: 18,
+        fontSize: 22,
         fontWeight: FontWeight.bold,
       ),
       submittedIcon: Icon(
