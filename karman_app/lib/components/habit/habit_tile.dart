@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:karman_app/components/generic/delete_dialog.dart';
 import 'package:karman_app/controllers/habit/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/pages/habit/habit_completion_sheet.dart';
@@ -25,7 +26,7 @@ class HabitTile extends StatelessWidget {
           motion: const DrawerMotion(),
           children: [
             SlidableAction(
-              onPressed: (context) => _deleteHabit(context),
+              onPressed: (context) => _showDeleteConfirmation(context),
               backgroundColor: CupertinoColors.darkBackgroundGray,
               foregroundColor: CupertinoColors.systemRed,
               icon: CupertinoIcons.delete,
@@ -166,6 +167,16 @@ class HabitTile extends StatelessWidget {
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) => HabitCompletionSheet(habit: habit),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) => DeleteConfirmationDialog(
+        itemName: 'habit',
+        onDelete: () => _deleteHabit(context),
+      ),
     );
   }
 
