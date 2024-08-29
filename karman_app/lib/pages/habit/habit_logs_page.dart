@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:karman_app/controllers/habit/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
@@ -64,7 +63,7 @@ class HabitLogsPage extends StatelessWidget {
                             Text(
                               DateFormat('MMMM d, y').format(log.date),
                               style: TextStyle(
-                                color: CupertinoColors.systemBlue,
+                                color: CupertinoColors.systemGrey,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
