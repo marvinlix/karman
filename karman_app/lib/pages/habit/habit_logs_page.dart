@@ -15,8 +15,12 @@ class HabitLogsPage extends StatelessWidget {
       backgroundColor: CupertinoColors.black,
       navigationBar: CupertinoNavigationBar(
         backgroundColor: CupertinoColors.black,
+        leading: CupertinoNavigationBarBackButton(
+          color: CupertinoColors.white,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         middle: Text(
-          'Habit Logs',
+          'Logs',
           style: TextStyle(color: CupertinoColors.white),
         ),
       ),
@@ -63,7 +67,7 @@ class HabitLogsPage extends StatelessWidget {
                             Text(
                               DateFormat('MMMM d, y').format(log.date),
                               style: TextStyle(
-                                color: CupertinoColors.systemGrey,
+                                color: CupertinoColors.systemGrey3,
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
