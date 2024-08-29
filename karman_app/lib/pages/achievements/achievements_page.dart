@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:karman_app/constants/achievements_constants.dart';
-import 'package:karman_app/services/achievement/achievement_service.dart';
+import 'package:karman_app/services/achievement_service.dart';
 import 'dart:async';
 
 class AchievementsPage extends StatefulWidget {

@@ -5,8 +5,8 @@ import 'package:karman_app/components/focus/rolling_menu.dart';
 import 'package:karman_app/manager/sound_manager.dart';
 import 'package:karman_app/database/database_service.dart';
 import 'package:karman_app/database/focus_db.dart';
-import 'package:karman_app/services/achievement/achievement_service.dart';
-import 'package:karman_app/services/focus/timer_service.dart';
+import 'package:karman_app/services/achievement_service.dart';
+import 'package:karman_app/services/timer_service.dart';
 
 class FocusPage extends StatefulWidget {
   const FocusPage({super.key});
