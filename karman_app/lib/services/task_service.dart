@@ -57,27 +57,7 @@ class TaskService {
       if (!tasksAdded) {
         final initialTasks = [
           Task(
-            name: 'Mark task as complete',
-            priority: 3,
-          ),
-          Task(
-            name: 'Create a new task (tap ⊕)',
-            priority: 3,
-          ),
-          Task(
-            name: 'Tap a task to view details',
-            priority: 2,
-          ),
-          Task(
-            name: 'Set reminder or due date',
-            priority: 2,
-          ),
-          Task(
-            name: 'Delete task (swipe left)',
-            priority: 1,
-          ),
-          Task(
-            name: 'Clear completed tasks (tap ⊗)',
+            name: 'Welcome to karman!',
             priority: 1,
           ),
         ];
