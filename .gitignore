@@ -6,3 +6,4 @@ karman_app/ios/Podfile.lock
 karman_app/pubspec.lock
 karman_app/ttwenty.jks
 karman_app/.vscode/settings.json
+.DS_Store

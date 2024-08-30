@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:karman_app/app_shell.dart';
 import 'package:karman_app/controllers/habit/habit_controller.dart';
 import 'package:karman_app/controllers/task/task_controller.dart';
+import 'package:karman_app/pages/welcome/welcome_screen.dart';
+import 'package:karman_app/pages/welcome/welcome_service.dart';
 import 'package:karman_app/services/notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -25,29 +27,40 @@ void main() async {
   await taskController.loadTasks();
   await habitController.loadHabits();
 
+  // Check if we should show the welcome screen
+  final shouldShowWelcome = await WelcomeService.shouldShowWelcomeScreen();
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => taskController),
       ChangeNotifierProvider(create: (context) => habitController),
     ],
-    child: KarmanApp(navigatorKey: navigatorKey),
+    child: KarmanApp(
+      navigatorKey: navigatorKey,
+      showWelcome: shouldShowWelcome,
+    ),
   ));
 }
 
 class KarmanApp extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
+  final bool showWelcome;
 
-  const KarmanApp({super.key, required this.navigatorKey});
+  const KarmanApp({
+    super.key,
+    required this.navigatorKey,
+    required this.showWelcome,
+  });
 
   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      theme: CupertinoThemeData(
+      theme: const CupertinoThemeData(
         brightness: Brightness.dark,
       ),
-      home: AppShell(key: AppShell.globalKey),
+      home: showWelcome ? const WelcomeScreen() : AppShell(key: AppShell.globalKey),
     );
   }
 }
