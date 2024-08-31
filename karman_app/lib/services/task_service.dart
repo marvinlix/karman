@@ -1,8 +1,6 @@
 import 'package:karman_app/database/database_service.dart';
 import 'package:karman_app/database/task_db.dart';
 import 'package:karman_app/models/task/task.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
 class TaskService {
   final DatabaseService _databaseService = DatabaseService();
@@ -40,37 +38,5 @@ class TaskService {
     final db = await _databaseService.database;
     final taskData = await _taskDatabase.getTaskById(db, id);
     return taskData != null ? Task.fromMap(taskData) : null;
-  }
-
-  Future<void> addInitialTasks() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? storedVersion = prefs.getString('app_version');
-
-    // Get current app version
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    final String currentVersion = packageInfo.version;
-
-    // Check if it's a fresh install (no stored version) or same version
-    if (storedVersion == null || storedVersion == currentVersion) {
-      final bool tasksAdded = prefs.getBool('initial_tasks_added') ?? false;
-
-      if (!tasksAdded) {
-        final initialTasks = [
-          Task(
-            name: 'Welcome to karman!',
-            priority: 1,
-          ),
-        ];
-
-        for (var task in initialTasks) {
-          await createTask(task);
-        }
-
-        await prefs.setBool('initial_tasks_added', true);
-      }
-    }
-
-    // Always update the stored version
-    await prefs.setString('app_version', currentVersion);
   }
 }

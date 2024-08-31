@@ -33,7 +33,6 @@ dependencies:
   table_calendar: ^3.1.2
   smooth_page_indicator: ^1.2.0+3
   lottie: ^3.1.2
-  tutorial_coach_mark: ^1.2.11
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +52,12 @@ flutter:
     - lib/assets/intro/habits.json
     - lib/assets/intro/focus.json
     - lib/assets/intro/github.json
+    - lib/assets/tutorials/tasks/create_task.png
+    - lib/assets/tutorials/tasks/clear_completed.png
+    - lib/assets/tutorials/tasks/task_details.png
+    - lib/assets/tutorials/tasks/complete_task.png
+    - lib/assets/tutorials/tasks/clear_completed.png
+    - lib/assets/tutorials/tasks/delete_task.png
     - lib/assets/audio/rain.mp3
     - lib/assets/audio/forest.mp3
     - lib/assets/audio/ocean.mp3
