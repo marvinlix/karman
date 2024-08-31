@@ -64,6 +64,9 @@ flutter:
     - lib/assets/tutorials/habits/view_streak.png
     - lib/assets/tutorials/habits/habit_details.png
     - lib/assets/tutorials/habits/delete_habit.png
+    - lib/assets/tutorials/focus/set_time.png
+    - lib/assets/tutorials/focus/start_timer.png
+    - lib/assets/tutorials/focus/relaxing_sounds.png
     - lib/assets/audio/rain.mp3
     - lib/assets/audio/forest.mp3
     - lib/assets/audio/ocean.mp3

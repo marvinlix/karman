@@ -7,6 +7,8 @@ import 'package:karman_app/database/database_service.dart';
 import 'package:karman_app/database/focus_db.dart';
 import 'package:karman_app/services/achievement_service.dart';
 import 'package:karman_app/services/timer_service.dart';
+import 'package:karman_app/pages/tutorial/focus_tutorial.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FocusPage extends StatefulWidget {
   const FocusPage({super.key});
@@ -15,8 +17,7 @@ class FocusPage extends StatefulWidget {
   _FocusPageState createState() => _FocusPageState();
 }
 
-class _FocusPageState extends State<FocusPage>
-    with SingleTickerProviderStateMixin {
+class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
   int _timerValue = 5;
   bool _isTimerRunning = false;
   late Timer _timer;
@@ -31,6 +32,10 @@ class _FocusPageState extends State<FocusPage>
   late Animation<double> _animation;
   bool _isMenuOpen = false;
 
+  bool _showTutorial = false;
+  late AnimationController _tutorialAnimationController;
+  late Animation<double> _tutorialFadeAnimation;
+
   @override
   void initState() {
     super.initState();
@@ -39,7 +44,16 @@ class _FocusPageState extends State<FocusPage>
       vsync: this,
     );
     _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+    _tutorialAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _tutorialFadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(_tutorialAnimationController);
     _loadTimerState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkFirstLaunch();
+    });
   }
 
   Future<void> _loadTimerState() async {
@@ -56,11 +70,33 @@ class _FocusPageState extends State<FocusPage>
     }
   }
 
+  Future<void> _checkFirstLaunch() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isFirstLaunch = prefs.getBool('first_launch_focus') ?? true;
+    if (isFirstLaunch) {
+      await Future.delayed(Duration(milliseconds: 1000));
+      setState(() {
+        _showTutorial = true;
+      });
+      _tutorialAnimationController.forward();
+    }
+  }
+
+  void _onTutorialComplete() async {
+    await _tutorialAnimationController.reverse();
+    setState(() {
+      _showTutorial = false;
+    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('first_launch_focus', false);
+  }
+
   @override
   void dispose() {
     _timer.cancel();
     _soundManager.dispose();
     _animationController.dispose();
+    _tutorialAnimationController.dispose();
     super.dispose();
   }
 
@@ -116,7 +152,6 @@ class _FocusPageState extends State<FocusPage>
 
       _recordFocusSession();
     } else {
-      // Timer was cancelled, so we reset without recording
       setState(() {
         _remainingSeconds = _timerValue * 60;
         _totalSeconds = _remainingSeconds;
@@ -136,7 +171,7 @@ class _FocusPageState extends State<FocusPage>
 
   void _recordFocusSession() async {
     final database = await DatabaseService().database;
-    final duration = _timerValue * 60; // Record full session duration
+    final duration = _timerValue * 60;
     final date = DateTime.now().toIso8601String().split('T')[0];
     await _focusDatabase.addFocusSession(database, duration, date);
 
@@ -144,7 +179,6 @@ class _FocusPageState extends State<FocusPage>
         await _achievementService.checkAchievements();
     _showNewAchievements(unlockedAchievements);
 
-    // Reset timer after recording
     setState(() {
       _remainingSeconds = _timerValue * 60;
       _totalSeconds = _remainingSeconds;
@@ -272,6 +306,11 @@ class _FocusPageState extends State<FocusPage>
                 ],
               ),
             ),
+            if (_showTutorial)
+              FadeTransition(
+                opacity: _tutorialFadeAnimation,
+                child: FocusTutorial.build(context, _onTutorialComplete),
+              ),
           ],
         ),
       ),
