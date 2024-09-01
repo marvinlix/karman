@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:karman_app/models/task/task.dart';
-import '../../services/task_service.dart';
+import '../services/task_service.dart';
 import 'dart:async';
 
 class TaskController extends ChangeNotifier {

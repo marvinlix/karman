@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:karman_app/components/habit/habit_tile.dart';
-import 'package:karman_app/controllers/habit/habit_controller.dart';
+import 'package:karman_app/controllers/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/pages/habit/habit_details_sheet.dart';
 import 'package:karman_app/pages/tutorial/habit_tutorial.dart';

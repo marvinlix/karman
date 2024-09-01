@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:karman_app/app_shell.dart';
-import 'package:karman_app/controllers/habit/habit_controller.dart';
-import 'package:karman_app/controllers/task/task_controller.dart';
+import 'package:karman_app/controllers/habit_controller.dart';
+import 'package:karman_app/controllers/task_controller.dart';
 import 'package:karman_app/pages/welcome/welcome_screen.dart';
 import 'package:karman_app/pages/welcome/welcome_service.dart';
 import 'package:karman_app/services/notification_service.dart';

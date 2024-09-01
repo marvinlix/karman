@@ -3,7 +3,7 @@ import 'package:karman_app/components/task/taskDetailsWidgets/task_name_input.da
 import 'package:karman_app/components/task/taskDetailsWidgets/task_options_section.dart';
 import 'package:karman_app/components/task/taskDetailsWidgets/priority_selector.dart';
 import 'package:karman_app/components/task/taskDetailsWidgets/task_note.dart';
-import 'package:karman_app/controllers/task/task_controller.dart';
+import 'package:karman_app/controllers/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/services/notification_service.dart';
 import 'package:provider/provider.dart';

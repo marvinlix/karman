@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:karman_app/controllers/focus/focus_controller.dart';
+import 'package:karman_app/controllers/focus_controller.dart';
 import 'package:karman_app/pages/tutorial/focus_tutorial.dart';
 import 'package:provider/provider.dart';
 import 'package:karman_app/components/focus/circular_slider.dart';

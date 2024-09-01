@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:karman_app/models/task/task.dart';
-import 'package:karman_app/controllers/task/task_controller.dart';
+import 'package:karman_app/controllers/task_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 

@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:karman_app/controllers/task/task_controller.dart';
+import 'package:karman_app/controllers/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/pages/task/task_details_sheet.dart';
 import 'package:karman_app/components/task/taskPageWidgets/task_list.dart';

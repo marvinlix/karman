@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:karman_app/components/generic/delete_dialog.dart';
-import 'package:karman_app/controllers/habit/habit_controller.dart';
+import 'package:karman_app/controllers/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/pages/habit/habit_completion_sheet.dart';
 import 'package:karman_app/pages/habit/habit_details_sheet.dart';
