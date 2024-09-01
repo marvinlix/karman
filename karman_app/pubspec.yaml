@@ -33,6 +33,7 @@ dependencies:
   table_calendar: ^3.1.2
   smooth_page_indicator: ^1.2.0+3
   lottie: ^3.1.2
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +74,7 @@ flutter:
     - lib/assets/audio/night.mp3
     - lib/assets/audio/airplane.mp3
     - lib/assets/audio/subtle_chime.mp3
+    - lib/assets/images/wip/work_in_progress.png
 
 flutter_launcher_icons:
   android: "launcher_icon"

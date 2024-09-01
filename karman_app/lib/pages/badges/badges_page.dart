@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:karman_app/pages/badges/focus_badges_page.dart';
+import 'package:karman_app/pages/badges/habit_badges_page.dart';
 
 class BadgesPage extends StatelessWidget {
   const BadgesPage({super.key});
@@ -27,7 +28,18 @@ class BadgesPage extends StatelessWidget {
                 ),
               ),
             ),
-            // Add more badge categories here in the future
+            _buildBadgeCategory(
+              context,
+              'Habit Badges',
+              'Track your habit achievements',
+              CupertinoIcons.checkmark_seal,
+              () => Navigator.push(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => HabitBadgesPage(),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -47,7 +59,7 @@ class BadgesPage extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 40, color: CupertinoColors.activeBlue),
+            Icon(icon, size: 40, color: CupertinoColors.white),
             SizedBox(width: 16),
             Expanded(
               child: Column(
