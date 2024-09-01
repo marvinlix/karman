@@ -1,25 +1,25 @@
-import 'package:flutter/cupertino.dart';
-import 'package:karman_app/constants/achievements_constants.dart';
-import 'package:karman_app/services/achievement_service.dart';
 import 'dart:async';
+import 'package:flutter/cupertino.dart';
+import 'package:karman_app/constants/focus_badge_constants.dart';
+import 'package:karman_app/services/focus_badge_service.dart';
 
-class AchievementsPage extends StatefulWidget {
-  const AchievementsPage({super.key});
+class FocusBadgesPage extends StatefulWidget {
+  const FocusBadgesPage({super.key});
 
   @override
-  _AchievementsPageState createState() => _AchievementsPageState();
+  _FocusBadgesPageState createState() => _FocusBadgesPageState();
 }
 
-class _AchievementsPageState extends State<AchievementsPage> {
-  final AchievementService _achievementService = AchievementService();
-  Map<String, bool> unlockedAchievements = {};
+class _FocusBadgesPageState extends State<FocusBadgesPage> {
+  final FocusBadgeService _focusBadgeService = FocusBadgeService();
+  Map<String, bool> unlockedBadges = {};
   bool _isInitialLoad = true;
   Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
-    _initialLoadAchievements();
+    _initialLoadBadges();
   }
 
   @override
@@ -28,22 +28,20 @@ class _AchievementsPageState extends State<AchievementsPage> {
     super.dispose();
   }
 
-  Future<void> _initialLoadAchievements() async {
-    final newUnlockedAchievements =
-        await _achievementService.checkAchievements();
+  Future<void> _initialLoadBadges() async {
+    final newUnlockedBadges = await _focusBadgeService.checkFocusBadges();
     setState(() {
-      unlockedAchievements = newUnlockedAchievements;
+      unlockedBadges = newUnlockedBadges;
       _isInitialLoad = false;
     });
   }
 
-  Future<void> _refreshAchievements() async {
+  Future<void> _refreshBadges() async {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 300), () async {
-      final newUnlockedAchievements =
-          await _achievementService.checkAchievements();
+      final newUnlockedBadges = await _focusBadgeService.checkFocusBadges();
       setState(() {
-        unlockedAchievements = newUnlockedAchievements;
+        unlockedBadges = newUnlockedBadges;
       });
     });
   }
@@ -51,28 +49,31 @@ class _AchievementsPageState extends State<AchievementsPage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
+      navigationBar: CupertinoNavigationBar(
+        backgroundColor: CupertinoColors.black,
+        middle: Text('Focus Badges'),
+      ),
       child: SafeArea(
         child: _isInitialLoad
             ? Center(child: CupertinoActivityIndicator())
             : CustomScrollView(
                 slivers: [
                   CupertinoSliverRefreshControl(
-                    onRefresh: _refreshAchievements,
+                    onRefresh: _refreshBadges,
                   ),
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        if (index < AchievementConstants.achievements.length) {
-                          final achievement =
-                              AchievementConstants.achievements[index];
+                        if (index < FocusBadgeConstants.focusBadges.length) {
+                          final badge = FocusBadgeConstants.focusBadges[index];
                           final isUnlocked =
-                              unlockedAchievements[achievement.name] ?? false;
-                          return _buildAchievementTile(achievement, isUnlocked);
+                              unlockedBadges[badge.name] ?? false;
+                          return _buildBadgeTile(badge, isUnlocked);
                         } else {
                           return _buildFooter();
                         }
                       },
-                      childCount: AchievementConstants.achievements.length + 1,
+                      childCount: FocusBadgeConstants.focusBadges.length + 1,
                     ),
                   ),
                 ],
@@ -81,11 +82,11 @@ class _AchievementsPageState extends State<AchievementsPage> {
     );
   }
 
-  Widget _buildAchievementTile(Achievement achievement, bool isUnlocked) {
+  Widget _buildBadgeTile(FocusBadge badge, bool isUnlocked) {
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 300),
       child: Container(
-        key: ValueKey('${achievement.name}_$isUnlocked'),
+        key: ValueKey('${badge.name}_$isUnlocked'),
         padding: EdgeInsets.all(16),
         child: Row(
           children: [
@@ -102,7 +103,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    achievement.name,
+                    badge.name,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -113,7 +114,7 @@ class _AchievementsPageState extends State<AchievementsPage> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    achievement.description,
+                    badge.description,
                     style: TextStyle(
                       fontSize: 14,
                       color: isUnlocked
@@ -135,11 +136,11 @@ class _AchievementsPageState extends State<AchievementsPage> {
       padding: EdgeInsets.all(16),
       child: Center(
         child: Text(
-          "More badges coming soon...",
+          "More focus badges coming soon...",
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: CupertinoColors.white,
+            color: CupertinoColors.systemGrey,
           ),
         ),
       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:karman_app/pages/achievements/achievements_page.dart';
+import 'package:karman_app/pages/badges/badges_page.dart';
 import 'package:karman_app/pages/habit/habits_page.dart';
 import 'package:karman_app/pages/task/tasks_page.dart';
 import 'package:karman_app/pages/focus/focus_page.dart';
@@ -60,7 +60,7 @@ class AppShellState extends State<AppShell> {
           case 2:
             return CupertinoTabView(builder: (context) => FocusPage());
           case 3:
-            return CupertinoTabView(builder: (context) => AchievementsPage());
+            return CupertinoTabView(builder: (context) => BadgesPage());
           default:
             return CupertinoTabView(builder: (context) => TasksPage());
         }

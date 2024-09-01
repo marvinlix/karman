@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:karman_app/manager/sound_manager.dart';
 import 'package:karman_app/services/timer_service.dart';
 import 'package:karman_app/services/focus_service.dart';
-import 'package:karman_app/services/achievement_service.dart';
+import 'package:karman_app/services/focus_badge_service.dart';
 
 class FocusController extends ChangeNotifier {
   final SoundManager _soundManager = SoundManager();
   final TimerService _timerService = TimerService();
   final FocusService _focusService = FocusService();
-  final AchievementService _achievementService = AchievementService();
+  final FocusBadgeService _achievementService = FocusBadgeService();
 
   int _timerValue = 5;
   bool _isTimerRunning = false;
@@ -110,7 +110,7 @@ class FocusController extends ChangeNotifier {
     await _focusService.addFocusSession(duration);
 
     Map<String, bool> unlockedAchievements =
-        await _achievementService.checkAchievements();
+        await _achievementService.checkFocusBadges();
 
     _remainingSeconds = _timerValue * 60;
     _totalSeconds = _remainingSeconds;

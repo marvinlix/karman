@@ -1,11 +1,11 @@
-import 'package:karman_app/constants/achievements_constants.dart';
+import 'package:karman_app/constants/focus_badge_constants.dart';
 import 'package:karman_app/database/database_service.dart';
 import 'package:karman_app/database/focus_db.dart';
 
-class AchievementService {
+class FocusBadgeService {
   final FocusDatabase _focusDatabase = FocusDatabase();
 
-  Future<Map<String, bool>> checkAchievements() async {
+  Future<Map<String, bool>> checkFocusBadges() async {
     final database = await DatabaseService().database;
     final today = DateTime.now();
     final oneWeekAgo = today.subtract(Duration(days: 7));
@@ -33,11 +33,11 @@ class AchievementService {
     int monthTotalMinutes = _calculateTotalMinutes(monthSessions);
     int threeMonthTotalMinutes = _calculateTotalMinutes(threeMonthSessions);
 
-    Map<String, bool> unlockedAchievements = {};
+    Map<String, bool> achievedBadges = {};
 
-    for (var achievement in AchievementConstants.achievements) {
-      unlockedAchievements[achievement.name] = await _checkAchievement(
-        achievement,
+    for (var badge in FocusBadgeConstants.focusBadges) {
+      achievedBadges[badge.name] = await _checkFocusBadge(
+        badge,
         database,
         todayTotalMinutes,
         weekTotalMinutes,
@@ -46,18 +46,18 @@ class AchievementService {
       );
     }
 
-    return unlockedAchievements;
+    return achievedBadges;
   }
 
-  Future<bool> _checkAchievement(
-    Achievement achievement,
+  Future<bool> _checkFocusBadge(
+    FocusBadge badge,
     dynamic database,
     int todayTotalMinutes,
     int weekTotalMinutes,
     int monthTotalMinutes,
     int threeMonthTotalMinutes,
   ) async {
-    switch (achievement.name) {
+    switch (badge.name) {
       case "Half-Hour Hero":
         return todayTotalMinutes >= 30;
       case "Hour Hero":
