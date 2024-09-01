@@ -51,6 +51,10 @@ class _FocusBadgesPageState extends State<FocusBadgesPage> {
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         backgroundColor: CupertinoColors.black,
+        leading: CupertinoNavigationBarBackButton(
+          color: CupertinoColors.white,
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         middle: Text('Focus Badges'),
       ),
       child: SafeArea(
@@ -70,10 +74,10 @@ class _FocusBadgesPageState extends State<FocusBadgesPage> {
                               unlockedBadges[badge.name] ?? false;
                           return _buildBadgeTile(badge, isUnlocked);
                         } else {
-                          return _buildFooter();
+                          return SizedBox.shrink(); // No footer
                         }
                       },
-                      childCount: FocusBadgeConstants.focusBadges.length + 1,
+                      childCount: FocusBadgeConstants.focusBadges.length,
                     ),
                   ),
                 ],
@@ -126,22 +130,6 @@ class _FocusBadgesPageState extends State<FocusBadgesPage> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFooter() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      child: Center(
-        child: Text(
-          "More focus badges coming soon...",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: CupertinoColors.systemGrey,
-          ),
         ),
       ),
     );
