@@ -74,7 +74,7 @@ class BadgesPage extends StatelessWidget {
             SizedBox(height: 16),
             _buildNavigationTile(
               context,
-              'Contribute',
+              'Contribute on GitHub',
               CupertinoIcons.cube_box,
               () => Navigator.push(
                 context,
@@ -86,7 +86,7 @@ class BadgesPage extends StatelessWidget {
             SizedBox(height: 16),
             _buildNavigationTile(
               context,
-              'Community',
+              'Join the Community',
               CupertinoIcons.group,
               () => Navigator.push(
                 context,
@@ -98,7 +98,7 @@ class BadgesPage extends StatelessWidget {
             SizedBox(height: 16),
             _buildNavigationTile(
               context,
-              'Support',
+              'Support the Project',
               CupertinoIcons.heart,
               () => Navigator.push(
                 context,

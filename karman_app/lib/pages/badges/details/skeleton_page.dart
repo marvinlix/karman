@@ -7,7 +7,7 @@ class SkeletonPage extends StatelessWidget {
   final String animationAsset;
   final String linkText;
   final String linkUrl;
-  final List<String> bulletPoints;
+  final List<String> paragraphs;
 
   const SkeletonPage({
     super.key,
@@ -15,7 +15,7 @@ class SkeletonPage extends StatelessWidget {
     required this.animationAsset,
     required this.linkText,
     required this.linkUrl,
-    required this.bulletPoints,
+    required this.paragraphs,
   });
 
   @override
@@ -24,6 +24,10 @@ class SkeletonPage extends StatelessWidget {
       backgroundColor: CupertinoColors.black,
       navigationBar: CupertinoNavigationBar(
         backgroundColor: CupertinoColors.black,
+        leading: GestureDetector(
+          onTap: () => Navigator.pop(context),
+          child: Icon(CupertinoIcons.back, color: CupertinoColors.white),
+        ),
         middle: Text(title, style: _textStyle.copyWith(fontSize: 18)),
       ),
       child: SafeArea(
@@ -32,31 +36,34 @@ class SkeletonPage extends StatelessWidget {
             SizedBox(height: 16),
             Lottie.asset(animationAsset, height: 200),
             SizedBox(height: 24),
-            GestureDetector(
-              onTap: () => _launchURL(linkUrl),
-              child: Text(
-                linkText,
-                style: _textStyle.copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: CupertinoColors.systemBlue,
-                ),
-              ),
-            ),
-            SizedBox(height: 24),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 32),
-                child: ListView(
-                  children: bulletPoints
-                      .map((point) => Padding(
-                            padding: EdgeInsets.only(bottom: 8),
+                child: Column(
+                  children: paragraphs
+                      .map((paragraph) => Padding(
+                            padding: EdgeInsets.only(bottom: 16),
                             child: Text(
-                              '• $point',
+                              paragraph,
                               style: _textStyle,
                             ),
                           ))
                       .toList(),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 24),
+              child: CupertinoButton(
+                color: CupertinoColors.white,
+                onPressed: () => _launchURL(linkUrl),
+                child: Text(
+                  linkText,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: CupertinoColors.black,
+                  ),
                 ),
               ),
             ),
@@ -67,7 +74,8 @@ class SkeletonPage extends StatelessWidget {
   }
 
   static final TextStyle _textStyle = TextStyle(
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
     color: CupertinoColors.white,
   );
 

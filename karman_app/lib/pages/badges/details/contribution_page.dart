@@ -5,10 +5,10 @@ final contributionPage = SkeletonPage(
   animationAsset: 'lib/assets/lottie/github.json',
   linkText: 'Contribute on GitHub',
   linkUrl: 'https://github.com/surtecha/karman',
-  bulletPoints: const [
-    'Karman is an open-source project',
-    'No paywalls, ads, or monetization',
-    'Maintain a fresh and minimalist feel',
-    'Community-driven development',
+  paragraphs: const [
+    'Karman thrives as an open-source project dedicated to offering a seamless, ad-free experience.',
+    'Your contributions, whether in code, design, or community feedback, are vital in sustaining this minimalist, user-centered app.',
+    'By joining our development efforts on GitHub, you help us continually innovate and ensure that Karman remains a platform that serves its users first.',
+    'Together, we can shape the future of Karman to reflect the values and needs of our growing community.',
   ],
 );
