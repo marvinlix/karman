@@ -56,7 +56,7 @@ class CircularSlider extends StatelessWidget {
             ),
           ),
           min: 1,
-          max: 120,
+          max: 60,
           initialValue: isTimerRunning ? progress : currentValue.toDouble(),
           onChange: isTimerRunning
               ? null
