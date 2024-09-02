@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class HabitBadgesPage extends StatelessWidget {
   const HabitBadgesPage({super.key});
@@ -22,12 +21,10 @@ class HabitBadgesPage extends StatelessWidget {
             children: [
               Text(
                 'Work in Progress!',
-                style: GoogleFonts.knewave(
-                  textStyle: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: CupertinoColors.white,
-                  ),
+                style: TextStyle(
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                  color: CupertinoColors.white,
                 ),
               ),
               SizedBox(height: 20),
