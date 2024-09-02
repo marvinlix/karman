@@ -16,6 +16,10 @@ class HabitsTutorial {
       imageAsset: 'lib/assets/tutorials/habits/log_routine.png',
     ),
     TutorialPage(
+      instruction: 'Swipe right to complete habit',
+      imageAsset: 'lib/assets/tutorials/habits/swipe_complete.png',
+    ),
+    TutorialPage(
       instruction: 'View current streak at a glance',
       imageAsset: 'lib/assets/tutorials/habits/view_streak.png',
     ),

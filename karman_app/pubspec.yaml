@@ -64,6 +64,7 @@ flutter:
     - lib/assets/tutorials/tasks/delete_task.png
     - lib/assets/tutorials/habits/create_habit.png
     - lib/assets/tutorials/habits/complete_habit.png
+    - lib/assets/tutorials/habits/swipe_complete.png
     - lib/assets/tutorials/habits/log_routine.png
     - lib/assets/tutorials/habits/view_streak.png
     - lib/assets/tutorials/habits/habit_details.png
