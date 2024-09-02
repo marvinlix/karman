@@ -1,4 +1,4 @@
-import 'package:karman_app/pages/badges/details/skeleton_page.dart';
+import 'package:karman_app/pages/more/details/skeleton_page.dart';
 
 final contributionPage = SkeletonPage(
   title: 'Contribute',

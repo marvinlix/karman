@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:karman_app/pages/badges/details/community_page.dart';
-import 'package:karman_app/pages/badges/details/contribution_page.dart';
-import 'package:karman_app/pages/badges/details/support_page.dart';
-import 'package:karman_app/pages/badges/focus_badges_page.dart';
-import 'package:karman_app/pages/badges/habit_badges_page.dart';
+import 'package:karman_app/pages/more/details/community_page.dart';
+import 'package:karman_app/pages/more/details/contribution_page.dart';
+import 'package:karman_app/pages/more/details/support_page.dart';
+import 'package:karman_app/pages/more/focus_badges_page.dart';
+import 'package:karman_app/pages/more/habit_badges_page.dart';
 
 class MorePage extends StatelessWidget {
   const MorePage({super.key});

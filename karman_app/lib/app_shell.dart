@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:karman_app/pages/badges/more_page.dart';
+import 'package:karman_app/pages/more/more_page.dart';
 import 'package:karman_app/pages/habit/habits_page.dart';
 import 'package:karman_app/pages/task/tasks_page.dart';
 import 'package:karman_app/pages/focus/focus_page.dart';
