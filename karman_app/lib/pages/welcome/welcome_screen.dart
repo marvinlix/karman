@@ -230,7 +230,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         SizedBox(
           height: constraints.maxHeight * 0.4,
           child: Lottie.asset(
-            'lib/assets/intro/github.json',
+            'lib/assets/lottie/github.json',
             fit: BoxFit.contain,
           ),
         ),
