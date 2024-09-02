@@ -160,6 +160,7 @@ class MorePage extends StatelessWidget {
               title,
               style: TextStyle(
                 fontSize: 16,
+                fontWeight: FontWeight.w600,
                 color: CupertinoColors.white,
               ),
             ),
