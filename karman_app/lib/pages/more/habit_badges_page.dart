@@ -16,21 +16,13 @@ class HabitBadgesPage extends StatelessWidget {
       ),
       child: SafeArea(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Work in Progress!',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: CupertinoColors.white,
-                ),
-              ),
-              SizedBox(height: 20),
-              Image.asset('lib/assets/images/wip/work_in_progress.png'),
-              SizedBox(height: 40),
-            ],
+          child: Text(
+            'Coming Soon!',
+            style: TextStyle(
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+              color: CupertinoColors.white,
+            ),
           ),
         ),
       ),
