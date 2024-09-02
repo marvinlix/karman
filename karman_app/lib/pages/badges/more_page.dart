@@ -5,8 +5,8 @@ import 'package:karman_app/pages/badges/details/support_page.dart';
 import 'package:karman_app/pages/badges/focus_badges_page.dart';
 import 'package:karman_app/pages/badges/habit_badges_page.dart';
 
-class BadgesPage extends StatelessWidget {
-  const BadgesPage({super.key});
+class MorePage extends StatelessWidget {
+  const MorePage({super.key});
 
   @override
   Widget build(BuildContext context) {
