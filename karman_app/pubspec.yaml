@@ -2,7 +2,7 @@ name: karman_app
 description: "Productivity in your pocket"
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 0.2.2-beta.1+4
+version: 1.0.1+7
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -30,6 +30,11 @@ dependencies:
   change_app_package_name: ^1.3.0
   shared_preferences: ^2.3.1
   package_info_plus: ^8.0.1
+  table_calendar: ^3.1.2
+  smooth_page_indicator: ^1.2.0+3
+  lottie: ^3.1.2
+  google_fonts: ^6.2.1
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
@@ -37,19 +42,43 @@ dev_dependencies:
 
   flutter_lints: ^4.0.0
   build_runner: ^2.4.11
-  vibration: ^1.9.0
+  vibration: ^2.0.0
   flutter_launcher_icons: ^0.13.1
 
 flutter:
   uses-material-design: true
 
   assets:
+    - lib/assets/images/icon/icon.png
+    - lib/assets/lottie/tasks.json
+    - lib/assets/lottie/habits.json
+    - lib/assets/lottie/focus.json
+    - lib/assets/lottie/github.json
+    - lib/assets/lottie/discord.json
+    - lib/assets/lottie/support.json
+    - lib/assets/tutorials/tasks/create_task.png
+    - lib/assets/tutorials/tasks/clear_completed.png
+    - lib/assets/tutorials/tasks/task_details.png
+    - lib/assets/tutorials/tasks/complete_task.png
+    - lib/assets/tutorials/tasks/clear_completed.png
+    - lib/assets/tutorials/tasks/delete_task.png
+    - lib/assets/tutorials/habits/create_habit.png
+    - lib/assets/tutorials/habits/complete_habit.png
+    - lib/assets/tutorials/habits/swipe_complete.png
+    - lib/assets/tutorials/habits/log_routine.png
+    - lib/assets/tutorials/habits/view_streak.png
+    - lib/assets/tutorials/habits/habit_details.png
+    - lib/assets/tutorials/habits/delete_habit.png
+    - lib/assets/tutorials/focus/set_time.png
+    - lib/assets/tutorials/focus/start_timer.png
+    - lib/assets/tutorials/focus/relaxing_sounds.png
     - lib/assets/audio/rain.mp3
     - lib/assets/audio/forest.mp3
     - lib/assets/audio/ocean.mp3
     - lib/assets/audio/night.mp3
     - lib/assets/audio/airplane.mp3
     - lib/assets/audio/subtle_chime.mp3
+    - lib/assets/images/wip/work_in_progress.png
 
 flutter_launcher_icons:
   android: "launcher_icon"

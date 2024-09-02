@@ -97,11 +97,13 @@ class NotificationService {
     required DateTime scheduledDate,
     String? payload,
   }) async {
+    tz.TZDateTime notificationTime = _nextInstanceOfTime(scheduledDate);
+
     await _notifications.zonedSchedule(
       id,
       title,
       body,
-      tz.TZDateTime.from(scheduledDate, tz.local),
+      notificationTime,
       const NotificationDetails(
         android: AndroidNotificationDetails(
           'scheduled_notification_channel',
@@ -116,6 +118,28 @@ class NotificationService {
           UILocalNotificationDateInterpretation.absoluteTime,
       payload: payload,
     );
+  }
+
+  static tz.TZDateTime _nextInstanceOfTime(DateTime scheduledDate) {
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime scheduledTZDateTime = tz.TZDateTime.from(scheduledDate, tz.local);
+
+    if (scheduledTZDateTime.isBefore(now)) {
+      scheduledTZDateTime = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day,
+        scheduledDate.hour,
+        scheduledDate.minute,
+      );
+
+      if (scheduledTZDateTime.isBefore(now)) {
+        scheduledTZDateTime = scheduledTZDateTime.add(const Duration(days: 1));
+      }
+    }
+
+    return scheduledTZDateTime;
   }
 
   static Future<void> cancelNotification(int id) async {

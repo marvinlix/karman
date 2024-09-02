@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:karman_app/controllers/habit/habit_controller.dart';
+import 'package:karman_app/components/reminders/habit_reminder.dart';
+import 'package:karman_app/controllers/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/pages/habit/habit_logs_page.dart';
 import 'package:karman_app/services/notification_service.dart';
@@ -26,6 +27,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
   TimeOfDay? _reminderTime;
   bool _isReminderEnabled = false;
   bool _isHabitNameEmpty = true;
+  bool _hasChanges = false;
 
   @override
   void initState() {
@@ -33,7 +35,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
     _nameController = TextEditingController(text: widget.habit.habitName);
     _nameFocusNode = FocusNode();
     _isHabitNameEmpty = _nameController.text.isEmpty;
-    _nameController.addListener(_updateHabitNameState);
+    _nameController.addListener(_updateState);
     if (widget.habit.reminderTime != null) {
       final minutes = widget.habit.reminderTime!.inMinutes;
       _reminderTime = TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60);
@@ -43,19 +45,29 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
 
   @override
   void dispose() {
-    _nameController.removeListener(_updateHabitNameState);
+    _nameController.removeListener(_updateState);
     _nameController.dispose();
     _nameFocusNode.dispose();
     super.dispose();
   }
 
-  void _updateHabitNameState() {
+  void _updateState() {
     setState(() {
       _isHabitNameEmpty = _nameController.text.isEmpty;
+      _hasChanges = _nameController.text != widget.habit.habitName ||
+          _isReminderEnabled != (widget.habit.reminderTime != null) ||
+          (_isReminderEnabled &&
+              _reminderTime != null &&
+              widget.habit.reminderTime != null &&
+              (_reminderTime!.hour != widget.habit.reminderTime!.inHours ||
+                  _reminderTime!.minute !=
+                      widget.habit.reminderTime!.inMinutes % 60));
     });
   }
 
   void _saveChanges() {
+    if (!_hasChanges) return;
+
     final updatedHabit = widget.habit.copyWith(
       habitName: _nameController.text.trim(),
       reminderTime: _isReminderEnabled && _reminderTime != null
@@ -127,7 +139,23 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
             children: [
               _buildHabitNameField(),
               SizedBox(height: 30),
-              _buildReminderToggle(),
+              HabitReminder(
+                isEnabled: _isReminderEnabled,
+                time: _reminderTime,
+                onToggle: (value) {
+                  setState(() {
+                    _isReminderEnabled = value;
+                    if (!value) _reminderTime = null;
+                    _updateState();
+                  });
+                },
+                onTimeSelected: (TimeOfDay time) {
+                  setState(() {
+                    _reminderTime = time;
+                    _updateState();
+                  });
+                },
+              ),
               if (!widget.isNewHabit) ...[
                 SizedBox(height: 25),
                 _buildBestStreakInfo(),
@@ -153,108 +181,31 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
               color: _isHabitNameEmpty
                   ? CupertinoColors.systemGrey
                   : CupertinoColors.white,
-              fontSize: 24,
+              fontSize: 20,
             ),
             placeholder: 'Habit Name',
             placeholderStyle: TextStyle(
               color: CupertinoColors.systemGrey,
-              fontSize: 24,
+              fontSize: 20,
             ),
           ),
         ),
         SizedBox(width: 20),
         CupertinoButton(
           padding: EdgeInsets.zero,
-          onPressed: _isHabitNameEmpty ? null : _saveChanges,
+          onPressed: _hasChanges && !_isHabitNameEmpty ? _saveChanges : null,
           child: Text(
             'Save',
             style: TextStyle(
-              color: _isHabitNameEmpty
-                  ? CupertinoColors.systemGrey
-                  : CupertinoColors.white,
+              color: _hasChanges && !_isHabitNameEmpty
+                  ? CupertinoColors.white
+                  : CupertinoColors.systemGrey,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildReminderToggle() {
-    return Row(
-      children: [
-        Icon(CupertinoIcons.bell, color: CupertinoColors.white),
-        SizedBox(width: 10),
-        Expanded(
-          child: GestureDetector(
-            onTap: _isReminderEnabled ? _showTimePicker : null,
-            child: Text(
-              _reminderTime != null ? _formatTime(_reminderTime!) : 'Reminder',
-              style: TextStyle(
-                color: _isReminderEnabled
-                    ? CupertinoColors.white
-                    : CupertinoColors.systemGrey,
-                fontSize: 18,
-              ),
-            ),
-          ),
-        ),
-        CupertinoSwitch(
-          value: _isReminderEnabled,
-          onChanged: (value) {
-            setState(() {
-              _isReminderEnabled = value;
-              if (!value) _reminderTime = null;
-            });
-          },
-          activeColor: CupertinoColors.white,
-          thumbColor: CupertinoColors.black,
-          trackColor: CupertinoColors.systemGrey,
-        ),
-      ],
-    );
-  }
-
-  String _formatTime(TimeOfDay time) {
-    final hour = time.hourOfPeriod;
-    final minute = time.minute.toString().padLeft(2, '0');
-    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
-    return '$hour:$minute $period';
-  }
-
-  void _showTimePicker() {
-    final initialTime = _reminderTime ?? TimeOfDay.now();
-
-    showCupertinoModalPopup<void>(
-      context: context,
-      builder: (BuildContext context) => Container(
-        height: 216,
-        padding: const EdgeInsets.only(top: 6.0),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        color: CupertinoColors.systemBackground.resolveFrom(context),
-        child: SafeArea(
-          top: false,
-          child: CupertinoDatePicker(
-            initialDateTime: DateTime(
-              DateTime.now().year,
-              DateTime.now().month,
-              DateTime.now().day,
-              initialTime.hour,
-              initialTime.minute,
-            ),
-            mode: CupertinoDatePickerMode.time,
-            use24hFormat: false,
-            onDateTimeChanged: (DateTime newDateTime) {
-              setState(() {
-                _reminderTime = TimeOfDay.fromDateTime(newDateTime);
-              });
-            },
-          ),
-        ),
-      ),
     );
   }
 
@@ -282,7 +233,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
       },
       child: const Row(
         children: [
-          Icon(CupertinoIcons.doc, color: CupertinoColors.white),
+          Icon(CupertinoIcons.doc_text, color: CupertinoColors.white),
           SizedBox(width: 10),
           Text(
             'View Logs',

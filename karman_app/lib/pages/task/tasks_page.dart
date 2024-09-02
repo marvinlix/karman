@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
-import 'package:karman_app/controllers/task/task_controller.dart';
+import 'package:karman_app/controllers/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/pages/task/task_details_sheet.dart';
 import 'package:karman_app/components/task/taskPageWidgets/task_list.dart';
+import 'package:karman_app/pages/tutorial/task_tutorial.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TasksPage extends StatefulWidget {
   const TasksPage({super.key});
@@ -12,16 +14,53 @@ class TasksPage extends StatefulWidget {
   _TasksPageState createState() => _TasksPageState();
 }
 
-class _TasksPageState extends State<TasksPage> {
+class _TasksPageState extends State<TasksPage> with TickerProviderStateMixin {
   List<Task> _sortedTasks = [];
   final Map<int, bool> _expandedSections = {1: true, 2: true, 3: true, 0: true};
+  bool _showTutorial = false;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+    );
+    _fadeAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TaskController>().loadTasks();
+      _checkFirstLaunch();
     });
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _checkFirstLaunch() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isFirstLaunch = prefs.getBool('first_launch') ?? true;
+    if (isFirstLaunch) {
+      await Future.delayed(Duration(milliseconds: 1000));
+      setState(() {
+        _showTutorial = true;
+      });
+      _animationController.forward();
+    }
+  }
+
+  void _onTutorialComplete() async {
+    await _animationController.reverse();
+    setState(() {
+      _showTutorial = false;
+    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('first_launch', false);
   }
 
   void _sortTasks(List<Task> tasks, TaskController taskController) {
@@ -33,7 +72,6 @@ class _TasksPageState extends State<TasksPage> {
       if (a.priority != b.priority) {
         return b.priority.compareTo(a.priority);
       }
-      // Maintain original order within the same priority
       return tasks.indexOf(a).compareTo(tasks.indexOf(b));
     });
   }
@@ -110,53 +148,64 @@ class _TasksPageState extends State<TasksPage> {
             .length;
         final hasCompletedTasks = _sortedTasks.any((task) => task.isCompleted);
 
-        return CupertinoPageScaffold(
-          backgroundColor: CupertinoColors.black,
-          navigationBar: CupertinoNavigationBar(
-            backgroundColor: CupertinoColors.black,
-            border: null,
-            leading: CupertinoButton(
-              onPressed: hasCompletedTasks ? _clearCompletedTasks : null,
-              child: Icon(
-                CupertinoIcons.clear_circled,
-                color: hasCompletedTasks
-                    ? CupertinoColors.white
-                    : CupertinoColors.systemGrey,
-                size: 32,
+        return Stack(
+          children: [
+            CupertinoPageScaffold(
+              backgroundColor: CupertinoColors.black,
+              navigationBar: CupertinoNavigationBar(
+                backgroundColor: CupertinoColors.black,
+                border: null,
+                leading: CupertinoButton(
+                  onPressed: hasCompletedTasks ? _clearCompletedTasks : null,
+                  child: Icon(
+                    CupertinoIcons.clear_circled,
+                    color: hasCompletedTasks
+                        ? CupertinoColors.white
+                        : CupertinoColors.systemGrey,
+                    size: 32,
+                  ),
+                ),
+                middle: Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Text(
+                    incompleteTasks == 0
+                        ? 'No tasks left'
+                        : '$incompleteTasks task${incompleteTasks == 1 ? '' : 's'} left',
+                    style: TextStyle(
+                      color: CupertinoColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                trailing: CupertinoButton(
+                  onPressed: _addTask,
+                  child: Icon(
+                    CupertinoIcons.plus_circle,
+                    color: CupertinoColors.white,
+                    size: 32,
+                  ),
+                ),
               ),
-            ),
-            middle: Padding(
-              padding: const EdgeInsets.only(top: 20.0),
-              child: Text(
-                '$incompleteTasks tasks left',
-                style: TextStyle(
-                  color: CupertinoColors.white,
-                  fontWeight: FontWeight.bold,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16),
+                child: SafeArea(
+                  child: TaskList(
+                    tasks: _sortedTasks,
+                    expandedSections: _expandedSections,
+                    onToggleSection: _toggleSection,
+                    onTaskToggle: _toggleTaskCompletion,
+                    onTaskDelete: _deleteTask,
+                    onTaskTap: _openTaskDetails,
+                  ),
                 ),
               ),
             ),
-            trailing: CupertinoButton(
-              onPressed: _addTask,
-              child: Icon(
-                CupertinoIcons.plus_circle,
-                color: CupertinoColors.white,
-                size: 32,
+            if (_showTutorial)
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: TasksTutorial.build(context, _onTutorialComplete),
               ),
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: SafeArea(
-              child: TaskList(
-                tasks: _sortedTasks,
-                expandedSections: _expandedSections,
-                onToggleSection: _toggleSection,
-                onTaskToggle: _toggleTaskCompletion,
-                onTaskDelete: _deleteTask,
-                onTaskTap: _openTaskDetails,
-              ),
-            ),
-          ),
+          ],
         );
       },
     );

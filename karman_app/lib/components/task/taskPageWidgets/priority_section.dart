@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/components/task/taskPageWidgets/task_tile.dart';
 
-class PrioritySection extends StatefulWidget {
+class PrioritySection extends StatelessWidget {
   final int priority;
   final List<Task> tasks;
   final bool isExpanded;
@@ -23,68 +23,12 @@ class PrioritySection extends StatefulWidget {
   });
 
   @override
-  _PrioritySectionState createState() => _PrioritySectionState();
-}
-
-class _PrioritySectionState extends State<PrioritySection> {
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
-  late List<Task> _tasks;
-
-  @override
-  void initState() {
-    super.initState();
-    _tasks = widget.tasks
-        .where((task) => task.priority == widget.priority && !task.isCompleted)
-        .toList();
-  }
-
-  @override
-  void didUpdateWidget(PrioritySection oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _updateList();
-  }
-
-  void _updateList() {
-    final newTasks = widget.tasks
-        .where((task) => task.priority == widget.priority && !task.isCompleted)
-        .toList();
-
-    for (var i = 0; i < newTasks.length; i++) {
-      if (i >= _tasks.length) {
-        _tasks.add(newTasks[i]);
-        _listKey.currentState?.insertItem(i);
-      } else if (_tasks[i] != newTasks[i]) {
-        _tasks[i] = newTasks[i];
-        _listKey.currentState?.setState(() {});
-      }
-    }
-
-    while (_tasks.length > newTasks.length) {
-      final task = _tasks.removeLast();
-      _listKey.currentState?.removeItem(
-        _tasks.length,
-        (context, animation) => _buildItem(context, task, animation),
-      );
-    }
-  }
-
-  Widget _buildItem(
-      BuildContext context, Task task, Animation<double> animation) {
-    return SizeTransition(
-      sizeFactor: animation,
-      child: TaskTile(
-        key: ValueKey(task.taskId),
-        task: task,
-        onChanged: (value) => widget.onTaskToggle(task),
-        onDelete: (context) => widget.onTaskDelete(context, task.taskId!),
-        onTap: () => widget.onTaskTap(task),
-      ),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_tasks.isEmpty) {
+    final priorityTasks = tasks
+        .where((task) => task.priority == priority && !task.isCompleted)
+        .toList();
+
+    if (priorityTasks.isEmpty) {
       return SizedBox.shrink();
     }
 
@@ -92,7 +36,7 @@ class _PrioritySectionState extends State<PrioritySection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: () => widget.onToggle(widget.priority),
+          onTap: () => onToggle(priority),
           child: Container(
             padding: EdgeInsets.only(
               top: 23,
@@ -105,25 +49,25 @@ class _PrioritySectionState extends State<PrioritySection> {
               children: [
                 Icon(
                   size: 32,
-                  widget.isExpanded
+                  isExpanded
                       ? CupertinoIcons.flag_circle
                       : CupertinoIcons.flag_circle_fill,
-                  color: widget.priority == 3
+                  color: priority == 3
                       ? CupertinoColors.systemRed
-                      : (widget.priority == 2 ? CupertinoColors.systemYellow: CupertinoColors.systemGreen),
+                      : (priority == 2
+                          ? CupertinoColors.systemYellow
+                          : CupertinoColors.systemGreen),
                 ),
                 SizedBox(width: 10),
                 Text(
-                  widget.priority == 3
-                      ? 'High'
-                      : (widget.priority == 2 ? 'Medium' : 'Low'),
+                  priority == 3 ? 'High' : (priority == 2 ? 'Medium' : 'Low'),
                   style: TextStyle(
                       color: CupertinoColors.white,
                       fontWeight: FontWeight.bold),
                 ),
                 Spacer(),
                 Icon(
-                  widget.isExpanded
+                  isExpanded
                       ? CupertinoIcons.chevron_up
                       : CupertinoIcons.chevron_down,
                   color: CupertinoColors.white,
@@ -132,15 +76,31 @@ class _PrioritySectionState extends State<PrioritySection> {
             ),
           ),
         ),
-        if (widget.isExpanded)
-          AnimatedList(
-            key: _listKey,
+        if (isExpanded)
+          CustomScrollView(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            initialItemCount: _tasks.length,
-            itemBuilder: (context, index, animation) {
-              return _buildItem(context, _tasks[index], animation);
-            },
+            slivers: [
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final task = priorityTasks[index];
+                    return AnimatedSwitcher(
+                      duration: Duration(milliseconds: 400),
+                      child: TaskTile(
+                        key: ValueKey(task.taskId),
+                        task: task,
+                        onChanged: (value) => onTaskToggle(task),
+                        onDelete: (context) =>
+                            onTaskDelete(context, task.taskId!),
+                        onTap: () => onTaskTap(task),
+                      ),
+                    );
+                  },
+                  childCount: priorityTasks.length,
+                ),
+              ),
+            ],
           ),
         SizedBox(height: 16),
       ],
