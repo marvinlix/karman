@@ -34,6 +34,7 @@ dependencies:
   smooth_page_indicator: ^1.2.0+3
   lottie: ^3.1.2
   google_fonts: ^6.2.1
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
@@ -49,10 +50,12 @@ flutter:
 
   assets:
     - lib/assets/images/icon/icon.png
-    - lib/assets/intro/tasks.json
-    - lib/assets/intro/habits.json
-    - lib/assets/intro/focus.json
-    - lib/assets/intro/github.json
+    - lib/assets/lottie/tasks.json
+    - lib/assets/lottie/habits.json
+    - lib/assets/lottie/focus.json
+    - lib/assets/lottie/github.json
+    - lib/assets/lottie/discord.json
+    - lib/assets/lottie/support.json
     - lib/assets/tutorials/tasks/create_task.png
     - lib/assets/tutorials/tasks/clear_completed.png
     - lib/assets/tutorials/tasks/task_details.png

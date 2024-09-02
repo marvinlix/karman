@@ -13,17 +13,17 @@ class WelcomePageContent {
 List<WelcomePageContent> welcomePages = [
   WelcomePageContent(
     title: "Organize Your Day",
-    lottieAsset: "lib/assets/intro/tasks.json",
+    lottieAsset: "lib/assets/lottie/tasks.json",
     description: "Organize, prioritize, and accomplish your tasks with ease.",
   ),
   WelcomePageContent(
     title: "Build Good Habits",
-    lottieAsset: "lib/assets/intro/habits.json",
+    lottieAsset: "lib/assets/lottie/habits.json",
     description: "Develop and maintain positive habits for personal growth.",
   ),
   WelcomePageContent(
     title: "Stay Focused",
-    lottieAsset: "lib/assets/intro/focus.json",
+    lottieAsset: "lib/assets/lottie/focus.json",
     description: "Enhance your productivity with our focus timer.",
   ),
 ];
