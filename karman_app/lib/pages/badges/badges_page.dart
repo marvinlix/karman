@@ -19,6 +19,16 @@ class BadgesPage extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.all(16),
           children: [
+            // Achievements Section
+            Text(
+              'Achievements',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: CupertinoColors.white,
+              ),
+            ),
+            SizedBox(height: 16),
             Row(
               children: [
                 Expanded(
@@ -50,7 +60,18 @@ class BadgesPage extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 32),
+            SizedBox(height: 40),
+
+            // Make Karman Better Section
+            Text(
+              'Make Karman Better',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: CupertinoColors.white,
+              ),
+            ),
+            SizedBox(height: 16),
             _buildNavigationTile(
               context,
               'Contribute',
@@ -92,7 +113,8 @@ class BadgesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildActionTile(BuildContext context, String title, IconData icon, VoidCallback onTap) {
+  Widget _buildActionTile(
+      BuildContext context, String title, IconData icon, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -120,7 +142,8 @@ class BadgesPage extends StatelessWidget {
     );
   }
 
-  Widget _buildNavigationTile(BuildContext context, String title, IconData icon, VoidCallback onTap) {
+  Widget _buildNavigationTile(
+      BuildContext context, String title, IconData icon, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
