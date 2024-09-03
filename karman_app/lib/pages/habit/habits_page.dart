@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:karman_app/components/habit/habit_tile.dart';
-import 'package:karman_app/controllers/habit/habit_controller.dart';
+import 'package:karman_app/controllers/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/pages/habit/habit_details_sheet.dart';
+import 'package:karman_app/pages/tutorial/habit_tutorial.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:async';
+import 'package:karman_app/components/badges/achievement_overlay.dart';
 
 class HabitsPage extends StatefulWidget {
   const HabitsPage({super.key});
@@ -12,16 +16,82 @@ class HabitsPage extends StatefulWidget {
   _HabitsPageState createState() => _HabitsPageState();
 }
 
-class _HabitsPageState extends State<HabitsPage> {
+class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
+  bool _isLoading = true;
+  Timer? _debounce;
+  bool _showTutorial = false;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  StreamSubscription? _achievementSubscription;
+
   @override
   void initState() {
     super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+    );
+    _fadeAnimation =
+        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+    _loadHabits();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkFirstLaunch();
+      _scheduleStreakReminders();
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _animationController.dispose();
+    _achievementSubscription?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadHabits() async {
+    final habitController =
+        Provider.of<HabitController>(context, listen: false);
+    await habitController.loadHabits();
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _checkFirstLaunch() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isFirstLaunch = prefs.getBool('first_launch_habits') ?? true;
+    if (isFirstLaunch) {
+      await Future.delayed(Duration(milliseconds: 1000));
+      setState(() {
+        _showTutorial = true;
+      });
+      _animationController.forward();
+    }
+  }
+
+  void _onTutorialComplete() async {
+    await _animationController.reverse();
+    setState(() {
+      _showTutorial = false;
+    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('first_launch_habits', false);
+  }
+
+  Future<void> _refreshHabits() async {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () async {
       final habitController =
           Provider.of<HabitController>(context, listen: false);
-      habitController.loadHabits();
-      habitController.scheduleReminders();
+      await habitController.loadHabits();
+      await _scheduleStreakReminders();
     });
+  }
+
+  Future<void> _scheduleStreakReminders() async {
+    final habitController =
+        Provider.of<HabitController>(context, listen: false);
+    await habitController.scheduleStreakReminders();
   }
 
   void _showAddHabitDialog() {
@@ -37,51 +107,126 @@ class _HabitsPageState extends State<HabitsPage> {
     );
   }
 
+  List<Habit> _sortHabits(List<Habit> habits) {
+    habits.sort((a, b) {
+      if (a.isCompletedToday == b.isCompletedToday) {
+        return 0;
+      }
+      return a.isCompletedToday ? 1 : -1;
+    });
+    return habits;
+  }
+
+  void _listenForAchievements(HabitController controller) {
+    _achievementSubscription?.cancel();
+    _achievementSubscription =
+        controller.achievementStream.listen((achievedBadges) {
+      for (String badgeName in achievedBadges) {
+        _showAchievementOverlay(badgeName);
+      }
+    });
+  }
+
+  void _showAchievementOverlay(String badgeName) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => AchievementOverlay(
+        badgeName: badgeName,
+        onDismiss: () => Navigator.of(context).pop(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<HabitController>(
       builder: (context, habitController, child) {
-        final incompleteHabits = habitController.habits
-            .where((habit) => !habit.isCompletedToday)
-            .length;
+        _listenForAchievements(habitController);
+        final sortedHabits = _sortHabits(habitController.habits);
+        final incompleteHabits =
+            sortedHabits.where((habit) => !habit.isCompletedToday).length;
 
-        return CupertinoPageScaffold(
-          navigationBar: CupertinoNavigationBar(
-            backgroundColor: CupertinoColors.black,
-            middle: Text('$incompleteHabits habits left'),
-            trailing: CupertinoButton(
-              onPressed: _showAddHabitDialog,
-              child: Icon(
-                CupertinoIcons.plus_circle,
-                color: CupertinoColors.white,
-                size: 32,
-              ),
-            ),
-          ),
-          child: SafeArea(
-            child: habitController.habits.isEmpty
-                ? Center(
-                    child: Text(
-                      'No habits yet. Add one to get started!',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: CupertinoColors.systemGrey,
-                      ),
-                    ),
-                  )
-                : Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: ListView.builder(
-                      itemCount: habitController.habits.length,
-                      itemBuilder: (context, index) {
-                        final habit = habitController.habits[index];
-                        return HabitTile(habit: habit);
-                      },
+        return Stack(
+          children: [
+            CupertinoPageScaffold(
+              navigationBar: CupertinoNavigationBar(
+                backgroundColor: CupertinoColors.black,
+                middle: Padding(
+                  padding: const EdgeInsets.only(top: 20.0),
+                  child: Text(
+                    sortedHabits.isEmpty
+                        ? 'No habits left'
+                        : '$incompleteHabits habit${incompleteHabits == 1 ? '' : 's'} left',
+                    style: TextStyle(
+                      color: CupertinoColors.white,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-          ),
+                ),
+                trailing: CupertinoButton(
+                  onPressed: _showAddHabitDialog,
+                  child: Icon(
+                    CupertinoIcons.plus_circle,
+                    color: CupertinoColors.white,
+                    size: 32,
+                  ),
+                ),
+              ),
+              child: SafeArea(
+                child: _isLoading
+                    ? Center(child: CupertinoActivityIndicator())
+                    : sortedHabits.isEmpty
+                        ? _buildEmptyState()
+                        : CustomScrollView(
+                            slivers: [
+                              CupertinoSliverRefreshControl(
+                                onRefresh: _refreshHabits,
+                              ),
+                              SliverPadding(
+                                padding: EdgeInsets.only(top: 20.0),
+                                sliver: SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) {
+                                      if (index < sortedHabits.length) {
+                                        final habit = sortedHabits[index];
+                                        return AnimatedSwitcher(
+                                          duration: Duration(milliseconds: 300),
+                                          child: HabitTile(
+                                            key: ValueKey(habit.habitId),
+                                            habit: habit,
+                                          ),
+                                        );
+                                      }
+                                      return SizedBox(height: 40);
+                                    },
+                                    childCount: sortedHabits.length + 1,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+              ),
+            ),
+            if (_showTutorial)
+              FadeTransition(
+                opacity: _fadeAnimation,
+                child: HabitsTutorial.build(context, _onTutorialComplete),
+              ),
+          ],
         );
       },
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Text(
+        'No habits yet. Add one to get started!',
+        style: TextStyle(
+          fontSize: 18,
+          color: CupertinoColors.systemGrey,
+        ),
+      ),
     );
   }
 }

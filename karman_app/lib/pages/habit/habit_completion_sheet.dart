@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:karman_app/models/habits/habit.dart';
-import 'package:karman_app/controllers/habit/habit_controller.dart';
+import 'package:karman_app/controllers/habit_controller.dart';
 import 'package:provider/provider.dart';
 import 'package:slide_to_act/slide_to_act.dart';
 
@@ -17,12 +16,26 @@ class HabitCompletionSheet extends StatefulWidget {
   _HabitCompletionSheetState createState() => _HabitCompletionSheetState();
 }
 
-class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
+class _HabitCompletionSheetState extends State<HabitCompletionSheet>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _logController = TextEditingController();
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat();
+    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+  }
 
   @override
   void dispose() {
     _logController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -53,10 +66,10 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Complete ${widget.habit.habitName}',
+                widget.habit.habitName,
                 style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
+                  color: CupertinoColors.white,
+                  fontSize: 26,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -81,9 +94,23 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
           style: TextStyle(color: CupertinoColors.white, fontSize: 16),
         ),
         SizedBox(height: 8),
-        TaskNote(
-          controller: _logController,
-          hintText: 'Enter your log here...',
+        Container(
+          decoration: BoxDecoration(
+            color: CupertinoColors.tertiarySystemBackground.darkColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: CupertinoTextField(
+            controller: _logController,
+            style: TextStyle(color: CupertinoColors.white),
+            maxLines: null,
+            keyboardType: TextInputType.multiline,
+            placeholder: 'Enter your log here...',
+            placeholderStyle: TextStyle(color: CupertinoColors.systemGrey),
+            decoration: BoxDecoration(
+              border: Border.all(color: CupertinoColors.transparent),
+            ),
+            padding: EdgeInsets.all(12),
+          ),
         ),
       ],
     );
@@ -93,16 +120,13 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
     return SlideAction(
       innerColor: CupertinoColors.darkBackgroundGray,
       outerColor: CupertinoColors.tertiarySystemBackground.darkColor,
-      sliderButtonIcon: Icon(
-        CupertinoIcons.leaf_arrow_circlepath,
-        color: CupertinoColors.white,
-      ),
+      sliderButtonIcon: GlowingArrow(animation: _animation),
       sliderRotate: false,
       elevation: 0,
-      text: 'Complete your habit →',
+      text: '\t\t\t\t\t\t Swipe to complete',
       textStyle: TextStyle(
         color: CupertinoColors.white,
-        fontSize: 20,
+        fontSize: 22,
         fontWeight: FontWeight.bold,
       ),
       submittedIcon: Icon(
@@ -116,63 +140,42 @@ class _HabitCompletionSheetState extends State<HabitCompletionSheet> {
   }
 }
 
-class TaskNote extends StatefulWidget {
-  final TextEditingController controller;
-  final String hintText;
+class GlowingArrow extends StatelessWidget {
+  final Animation<double> animation;
 
-  const TaskNote({
+  const GlowingArrow({
     super.key,
-    required this.controller,
-    this.hintText = 'Add a note...',
+    required this.animation,
   });
 
   @override
-  _TaskNoteState createState() => _TaskNoteState();
-}
-
-class _TaskNoteState extends State<TaskNote> {
-  int _noteLines = 1;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(_updateNoteLines);
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_updateNoteLines);
-    super.dispose();
-  }
-
-  void _updateNoteLines() {
-    final newLines = '\n'.allMatches(widget.controller.text).length + 1;
-    if (newLines != _noteLines) {
-      setState(() {
-        _noteLines = newLines;
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: CupertinoColors.tertiarySystemBackground.darkColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: CupertinoTextField(
-        controller: widget.controller,
-        style: TextStyle(color: Colors.white),
-        maxLines: null,
-        keyboardType: TextInputType.multiline,
-        placeholder: widget.hintText,
-        placeholderStyle: TextStyle(color: Colors.grey),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.transparent),
-        ),
-        padding: EdgeInsets.all(12),
-      ),
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (context, child) {
+        return ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return LinearGradient(
+              colors: [
+                CupertinoColors.white.withOpacity(0.2),
+                CupertinoColors.white,
+                CupertinoColors.white.withOpacity(0.2),
+              ],
+              stops: [
+                0.0,
+                animation.value,
+                animation.value + 0.1,
+              ],
+              tileMode: TileMode.mirror,
+            ).createShader(bounds);
+          },
+          child: Icon(
+            CupertinoIcons.chevron_right_2,
+            color: CupertinoColors.white,
+            size: 32,
+          ),
+        );
+      },
     );
   }
 }

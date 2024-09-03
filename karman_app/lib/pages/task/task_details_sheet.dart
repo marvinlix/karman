@@ -3,7 +3,7 @@ import 'package:karman_app/components/task/taskDetailsWidgets/task_name_input.da
 import 'package:karman_app/components/task/taskDetailsWidgets/task_options_section.dart';
 import 'package:karman_app/components/task/taskDetailsWidgets/priority_selector.dart';
 import 'package:karman_app/components/task/taskDetailsWidgets/task_note.dart';
-import 'package:karman_app/controllers/task/task_controller.dart';
+import 'package:karman_app/controllers/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/services/notification_service.dart';
 import 'package:provider/provider.dart';
@@ -31,6 +31,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   bool _isDateEnabled = false;
   bool _isReminderEnabled = false;
   bool _isTaskNameEmpty = true;
+  bool _hasChanges = false;
 
   @override
   void initState() {
@@ -44,21 +45,43 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
     _isReminderEnabled = widget.task?.reminder != null;
     _isTaskNameEmpty = _nameController.text.trim().isEmpty;
 
-    _nameController.addListener(_updateTaskNameStatus);
+    _nameController.addListener(_checkForChanges);
+    _noteController.addListener(_checkForChanges);
 
     if (widget.isNewTask) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         FocusScope.of(context).requestFocus(_nameFocusNode);
       });
+      _hasChanges = true;
     }
   }
 
   @override
   void dispose() {
-    _nameController.removeListener(_updateTaskNameStatus);
+    _nameController.removeListener(_checkForChanges);
+    _noteController.removeListener(_checkForChanges);
     _nameController.dispose();
     _noteController.dispose();
     super.dispose();
+  }
+
+  void _checkForChanges() {
+    bool newHasChanges = widget.isNewTask ||
+        _nameController.text != (widget.task?.name ?? '') ||
+        _noteController.text != (widget.task?.note ?? '') ||
+        _dueDate != widget.task?.dueDate ||
+        _priority != (widget.task?.priority ?? 1) ||
+        _reminder != widget.task?.reminder ||
+        _isDateEnabled != (widget.task?.dueDate != null) ||
+        _isReminderEnabled != (widget.task?.reminder != null);
+
+    if (newHasChanges != _hasChanges) {
+      setState(() {
+        _hasChanges = newHasChanges;
+      });
+    }
+
+    _updateTaskNameStatus();
   }
 
   void _updateTaskNameStatus() {
@@ -103,7 +126,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
       if (savedTask.reminder != null && savedTask.taskId != null) {
         await NotificationService.scheduleNotification(
           id: savedTask.taskId!,
-          title: 'Task Reminder',
+          title: 'You\'ve got a task to do!',
           body: savedTask.name,
           scheduledDate: savedTask.reminder!,
           payload: 'task_${savedTask.taskId}',
@@ -193,8 +216,9 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
               TaskNameInput(
                 controller: _nameController,
                 focusNode: _nameFocusNode,
-                onSave: _saveChanges,
+                onSave: _hasChanges && !_isTaskNameEmpty ? _saveChanges : null,
                 isTaskNameEmpty: _isTaskNameEmpty,
+                hasChanges: _hasChanges,
               ),
               SizedBox(height: 20),
               TaskNote(
@@ -211,22 +235,26 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                   setState(() {
                     _isDateEnabled = value;
                     if (!value) _dueDate = null;
+                    _checkForChanges();
                   });
                 },
                 onReminderToggle: (value) {
                   setState(() {
                     _isReminderEnabled = value;
                     if (!value) _reminder = null;
+                    _checkForChanges();
                   });
                 },
                 onDateSelected: (date) {
                   setState(() {
                     _dueDate = date;
+                    _checkForChanges();
                   });
                 },
                 onReminderSet: (DateTime newDateTime) {
                   setState(() {
                     _reminder = newDateTime;
+                    _checkForChanges();
                   });
                 },
               ),
@@ -236,6 +264,7 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                 onPriorityChanged: (priority) {
                   setState(() {
                     _priority = priority;
+                    _checkForChanges();
                   });
                 },
               ),

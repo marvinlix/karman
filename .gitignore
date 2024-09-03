@@ -5,4 +5,5 @@ karman_app/ios/Runner.xcodeproj/project.pbxproj
 karman_app/ios/Podfile.lock
 karman_app/pubspec.lock
 karman_app/ttwenty.jks
+.DS_Store
 karman_app/.vscode/settings.json

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 class CircularSlider extends StatelessWidget {
@@ -26,26 +27,27 @@ class CircularSlider extends StatelessWidget {
       children: [
         SleekCircularSlider(
           appearance: CircularSliderAppearance(
-            animDurationMultiplier: 0.8,
-            size: 350,
+            size: 400,
             startAngle: 120,
             angleRange: 300,
             customWidths: CustomSliderWidths(
-              trackWidth: 30,
-              progressBarWidth: 30,
+              trackWidth: 40,
+              progressBarWidth: 40,
+              shadowWidth: 0,
+              handlerSize: 10,
             ),
             customColors: CustomSliderColors(
-              trackColor: CupertinoColors.darkBackgroundGray,
+              trackColor: Colors.grey[900]!,
               dynamicGradient: true,
               progressBarColor: CupertinoColors.white,
-              shadowColor: CupertinoColors.systemGrey,
               dotColor: CupertinoColors.black,
             ),
             infoProperties: InfoProperties(
               mainLabelStyle: TextStyle(
-                fontSize: 70,
+                fontSize: 65,
                 fontWeight: FontWeight.bold,
                 color: CupertinoColors.white,
+                letterSpacing: 1.5,
               ),
               modifier: (double value) {
                 return timeDisplay;
@@ -53,8 +55,10 @@ class CircularSlider extends StatelessWidget {
             ),
           ),
           min: 1,
-          max: 120,
-          initialValue: isTimerRunning ? progress : currentValue.toDouble(),
+          max: 60,
+          initialValue: isTimerRunning
+              ? (progress * 59 + 1)
+              : currentValue.toDouble().clamp(1, 60),
           onChange: isTimerRunning
               ? null
               : (double value) {
@@ -70,7 +74,7 @@ class CircularSlider extends StatelessWidget {
                   ? CupertinoIcons.stop_circle
                   : CupertinoIcons.play_circle,
               color: CupertinoColors.white,
-              size: 54,
+              size: 64,
             ),
           ),
         ),

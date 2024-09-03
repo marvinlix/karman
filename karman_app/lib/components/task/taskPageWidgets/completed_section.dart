@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/components/task/taskPageWidgets/task_tile.dart';
 
-class CompletedSection extends StatefulWidget {
+class CompletedSection extends StatelessWidget {
   final List<Task> tasks;
   final bool isExpanded;
   final VoidCallback onToggle;
@@ -21,65 +21,10 @@ class CompletedSection extends StatefulWidget {
   });
 
   @override
-  _CompletedSectionState createState() => _CompletedSectionState();
-}
-
-class _CompletedSectionState extends State<CompletedSection> {
-  final GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
-  late List<Task> _completedTasks;
-
-  @override
-  void initState() {
-    super.initState();
-    _completedTasks = widget.tasks.where((task) => task.isCompleted).toList();
-  }
-
-  @override
-  void didUpdateWidget(CompletedSection oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _updateList();
-  }
-
-  void _updateList() {
-    final newCompletedTasks =
-        widget.tasks.where((task) => task.isCompleted).toList();
-
-    for (var i = 0; i < newCompletedTasks.length; i++) {
-      if (i >= _completedTasks.length) {
-        _completedTasks.add(newCompletedTasks[i]);
-        _listKey.currentState?.insertItem(i);
-      } else if (_completedTasks[i] != newCompletedTasks[i]) {
-        _completedTasks[i] = newCompletedTasks[i];
-        _listKey.currentState?.setState(() {});
-      }
-    }
-
-    while (_completedTasks.length > newCompletedTasks.length) {
-      final task = _completedTasks.removeLast();
-      _listKey.currentState?.removeItem(
-        _completedTasks.length,
-        (context, animation) => _buildItem(context, task, animation),
-      );
-    }
-  }
-
-  Widget _buildItem(
-      BuildContext context, Task task, Animation<double> animation) {
-    return SizeTransition(
-      sizeFactor: animation,
-      child: TaskTile(
-        key: ValueKey(task.taskId),
-        task: task,
-        onChanged: (value) => widget.onTaskToggle(task),
-        onDelete: (context) => widget.onTaskDelete(context, task.taskId!),
-        onTap: () => widget.onTaskTap(task),
-      ),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_completedTasks.isEmpty) {
+    final completedTasks = tasks.where((task) => task.isCompleted).toList();
+
+    if (completedTasks.isEmpty) {
       return SizedBox.shrink();
     }
 
@@ -87,7 +32,7 @@ class _CompletedSectionState extends State<CompletedSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: widget.onToggle,
+          onTap: onToggle,
           child: Container(
             padding: EdgeInsets.only(
               top: 23,
@@ -100,7 +45,7 @@ class _CompletedSectionState extends State<CompletedSection> {
               children: [
                 Icon(
                   size: 32,
-                  widget.isExpanded
+                  isExpanded
                       ? CupertinoIcons.checkmark_circle
                       : CupertinoIcons.checkmark_circle_fill,
                   color: CupertinoColors.systemGrey,
@@ -114,7 +59,7 @@ class _CompletedSectionState extends State<CompletedSection> {
                 ),
                 Spacer(),
                 Icon(
-                  widget.isExpanded
+                  isExpanded
                       ? CupertinoIcons.chevron_up
                       : CupertinoIcons.chevron_down,
                   color: CupertinoColors.white,
@@ -123,15 +68,31 @@ class _CompletedSectionState extends State<CompletedSection> {
             ),
           ),
         ),
-        if (widget.isExpanded)
-          AnimatedList(
-            key: _listKey,
+        if (isExpanded)
+          CustomScrollView(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            initialItemCount: _completedTasks.length,
-            itemBuilder: (context, index, animation) {
-              return _buildItem(context, _completedTasks[index], animation);
-            },
+            slivers: [
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final task = completedTasks[index];
+                    return AnimatedSwitcher(
+                      duration: Duration(milliseconds: 300),
+                      child: TaskTile(
+                        key: ValueKey(task.taskId),
+                        task: task,
+                        onChanged: (value) => onTaskToggle(task),
+                        onDelete: (context) =>
+                            onTaskDelete(context, task.taskId!),
+                        onTap: () => onTaskTap(task),
+                      ),
+                    );
+                  },
+                  childCount: completedTasks.length,
+                ),
+              ),
+            ],
           ),
       ],
     );

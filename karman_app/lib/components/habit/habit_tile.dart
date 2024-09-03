@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:karman_app/controllers/habit/habit_controller.dart';
+import 'package:karman_app/components/generic/delete_dialog.dart';
+import 'package:karman_app/controllers/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/pages/habit/habit_completion_sheet.dart';
 import 'package:karman_app/pages/habit/habit_details_sheet.dart';
@@ -25,9 +26,9 @@ class HabitTile extends StatelessWidget {
           motion: const DrawerMotion(),
           children: [
             SlidableAction(
-              onPressed: (context) => _deleteHabit(context),
+              onPressed: (context) => _showDeleteConfirmation(context),
               backgroundColor: CupertinoColors.darkBackgroundGray,
-              foregroundColor: Colors.redAccent,
+              foregroundColor: CupertinoColors.systemRed,
               icon: CupertinoIcons.delete,
               label: 'Delete',
             ),
@@ -49,47 +50,75 @@ class HabitTile extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(
-                    width: 60,
-                    child: Center(
-                      child: _buildCompletionIcon(context),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16, horizontal: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            habit.habitName,
-                            style: TextStyle(
-                              color: habit.isCompletedToday
-                                  ? Colors.grey[700]
-                                  : CupertinoColors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2),
-                            child: Row(
-                              children: [
-                                _buildStreakIcon(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 16),
+                  _buildCompletionArea(context),
+                  _buildDetailsArea(context),
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompletionArea(BuildContext context) {
+    return GestureDetector(
+      onTap: habit.isCompletedToday
+          ? () => _showHabitDetailsSheet(context)
+          : () => _showHabitCompletionSheet(context),
+      child: Container(
+        width: MediaQuery.of(context).size.width * 0.2,
+        color: Colors.transparent,
+        child: Center(
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.black,
+            ),
+            child: Icon(
+              habit.isCompletedToday
+                  ? CupertinoIcons.checkmark_circle_fill
+                  : CupertinoIcons.circle,
+              color: habit.isCompletedToday
+                  ? CupertinoColors.systemGrey
+                  : CupertinoColors.white,
+              size: 36,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailsArea(BuildContext context) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              habit.habitName,
+              style: TextStyle(
+                color: habit.isCompletedToday
+                    ? Colors.grey[700]
+                    : CupertinoColors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: Row(
+                children: [
+                  _buildStreakIcon(),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -127,26 +156,6 @@ class HabitTile extends StatelessWidget {
     }
   }
 
-  Widget _buildCompletionIcon(BuildContext context) {
-    return GestureDetector(
-      onTap: habit.isCompletedToday
-          ? null
-          : () => _showHabitCompletionSheet(context),
-      child: Transform.scale(
-        scale: 1.3,
-        child: Icon(
-          habit.isCompletedToday
-              ? CupertinoIcons.checkmark_circle_fill
-              : CupertinoIcons.circle,
-          color: habit.isCompletedToday
-              ? CupertinoColors.systemGrey
-              : CupertinoColors.white,
-          size: 28,
-        ),
-      ),
-    );
-  }
-
   void _showHabitDetailsSheet(BuildContext context) {
     showCupertinoModalPopup(
       context: context,
@@ -158,6 +167,16 @@ class HabitTile extends StatelessWidget {
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) => HabitCompletionSheet(habit: habit),
+    );
+  }
+
+  void _showDeleteConfirmation(BuildContext context) {
+    showCupertinoDialog(
+      context: context,
+      builder: (BuildContext context) => DeleteConfirmationDialog(
+        itemName: 'habit',
+        onDelete: () => _deleteHabit(context),
+      ),
     );
   }
 

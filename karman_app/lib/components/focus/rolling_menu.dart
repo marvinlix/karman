@@ -20,34 +20,36 @@ class RollingMenu extends StatelessWidget {
         color: null,
         borderRadius: BorderRadius.circular(30),
       ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: items.map((item) {
-            final isSelected = item['file'] == currentSound;
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 18),
-              child: GestureDetector(
-                onTap: () => onItemSelected(item),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? item['color']
-                        : CupertinoColors.darkBackgroundGray,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    item['icon'],
-                    color: CupertinoColors.white,
-                    size: 32,
+      child: Center(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: items.map((item) {
+              final isSelected = item['file'] == currentSound;
+              return Padding(
+                padding: EdgeInsets.symmetric(horizontal: 18),
+                child: GestureDetector(
+                  onTap: () => onItemSelected(item),
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? item['color']
+                          : CupertinoColors.darkBackgroundGray,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      item['icon'],
+                      color: CupertinoColors.white,
+                      size: 32,
+                    ),
                   ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );

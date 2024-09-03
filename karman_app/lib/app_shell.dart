@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:karman_app/pages/achievements/achievements_page.dart';
+import 'package:karman_app/pages/more/more_page.dart';
 import 'package:karman_app/pages/habit/habits_page.dart';
 import 'package:karman_app/pages/task/tasks_page.dart';
 import 'package:karman_app/pages/focus/focus_page.dart';
@@ -34,20 +33,20 @@ class AppShellState extends State<AppShell> {
         activeColor: CupertinoColors.white,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.leaf_arrow_circlepath),
+            icon: Icon(CupertinoIcons.repeat),
             label: 'Habit',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.check_mark_circled),
+            icon: Icon(CupertinoIcons.list_bullet),
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.self_improvement_outlined),
+            icon: Icon(CupertinoIcons.timer),
             label: 'Focus',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.rosette),
-            label: 'Badges',
+            icon: Icon(CupertinoIcons.square_grid_2x2),
+            label: 'More',
           ),
         ],
       ),
@@ -60,7 +59,7 @@ class AppShellState extends State<AppShell> {
           case 2:
             return CupertinoTabView(builder: (context) => FocusPage());
           case 3:
-            return CupertinoTabView(builder: (context) => AchievementsPage());
+            return CupertinoTabView(builder: (context) => MorePage());
           default:
             return CupertinoTabView(builder: (context) => TasksPage());
         }
