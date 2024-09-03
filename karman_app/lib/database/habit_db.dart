@@ -121,4 +121,32 @@ class HabitDatabase {
       {'isCompletedToday': 0},
     );
   }
+
+  Future<void> createBadgesTable(Database database) async {
+    await database.execute('''
+    CREATE TABLE IF NOT EXISTS habit_badges (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      badge_name TEXT NOT NULL,
+      achieved_date TEXT NOT NULL
+    )
+  ''');
+  }
+
+  Future<void> addAchievedBadge(Database db, String badgeName) async {
+    final date = DateTime.now().toIso8601String();
+    await db.insert('habit_badges', {
+      'badge_name': badgeName,
+      'achieved_date': date,
+    });
+  }
+
+  Future<bool> isBadgeAchieved(Database db, String badgeName) async {
+    final result = await db.query(
+      'habit_badges',
+      where: 'badge_name = ?',
+      whereArgs: [badgeName],
+      limit: 1,
+    );
+    return result.isNotEmpty;
+  }
 }

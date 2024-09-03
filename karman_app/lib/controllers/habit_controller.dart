@@ -4,14 +4,22 @@ import 'package:karman_app/models/habits/habit_log.dart';
 import 'package:karman_app/services/habit_service.dart';
 import 'package:karman_app/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:karman_app/services/habit_badge_service.dart';
+import 'dart:async';
 
 class HabitController extends ChangeNotifier {
   final HabitService _habitService = HabitService();
+  final HabitBadgeService _habitBadgeService = HabitBadgeService();
   List<Habit> _habits = [];
   final Map<int, List<HabitLog>> _habitLogs = {};
 
+  final StreamController<List<String>> _achievementStreamController =
+      StreamController<List<String>>.broadcast();
+
   List<Habit> get habits => _habits;
   Map<int, List<HabitLog>> get habitLogs => _habitLogs;
+  Stream<List<String>> get achievementStream =>
+      _achievementStreamController.stream;
 
   Future<void> loadHabits() async {
     await checkAndResetStreaks();
@@ -32,6 +40,14 @@ class HabitController extends ChangeNotifier {
     final newHabit = habit.copyWith(habitId: id);
     _habits.add(newHabit);
     _scheduleReminder(newHabit);
+
+    // Check for newly achieved badges
+    List<String> newlyAchievedBadges =
+        await _habitBadgeService.checkNewlyAchievedBadges(_habits);
+    if (newlyAchievedBadges.isNotEmpty) {
+      _achievementStreamController.add(newlyAchievedBadges);
+    }
+
     notifyListeners();
   }
 
@@ -63,6 +79,14 @@ class HabitController extends ChangeNotifier {
       }
     }
     await loadHabitLogs(habit.habitId!);
+
+    // Check for newly achieved badges
+    List<String> newlyAchievedBadges =
+        await _habitBadgeService.checkNewlyAchievedBadges(_habits);
+    if (newlyAchievedBadges.isNotEmpty) {
+      _achievementStreamController.add(newlyAchievedBadges);
+    }
+
     notifyListeners();
   }
 
@@ -123,5 +147,11 @@ class HabitController extends ChangeNotifier {
         payload: 'habit_${habit.habitId}',
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _achievementStreamController.close();
+    super.dispose();
   }
 }

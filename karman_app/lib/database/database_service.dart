@@ -8,6 +8,9 @@ class DatabaseService {
   static final DatabaseService _instance = DatabaseService._internal();
   static Database? _database;
 
+  static const _databaseName = "karman_app.db";
+  static const _databaseVersion = 4;
+
   factory DatabaseService() => _instance;
 
   DatabaseService._internal();
@@ -19,16 +22,15 @@ class DatabaseService {
   }
 
   Future<String> get fullPath async {
-    const databaseName = 'karman.db';
     final databasesPath = await getDatabasesPath();
-    return join(databasesPath, databaseName);
+    return join(databasesPath, _databaseName);
   }
 
   Future<Database> _initializeDatabase() async {
     final path = await fullPath;
     var database = await openDatabase(
       path,
-      version: 3, 
+      version: _databaseVersion,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       singleInstance: true,
@@ -40,6 +42,7 @@ class DatabaseService {
     await TaskDatabase().createTable(db);
     await HabitDatabase().createTables(db);
     await FocusDatabase().createTable(db);
+    await HabitDatabase().createBadgesTable(db);
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -55,9 +58,25 @@ class DatabaseService {
         )
       ''');
     }
+    if (oldVersion < 4) {
+      await HabitDatabase().createBadgesTable(db);
+    }
   }
 
   Future<void> ensureInitialized() async {
     await database;
+  }
+
+  Future<void> deleteDatabase() async {
+    final path = await fullPath;
+    await databaseFactory.deleteDatabase(path);
+    _database = null;
+  }
+
+  Future<void> closeDatabase() async {
+    if (_database != null) {
+      await _database!.close();
+      _database = null;
+    }
   }
 }
