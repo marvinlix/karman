@@ -46,17 +46,17 @@
 <table align="center" border="0">
   <tr>
     <td align="center">
-      <img src="preview/tasks.gif" alt="Tasks Screen" width="250"><br>
+      <img src="preview/tasks.png" alt="Tasks Screen" width="250"><br>
       <em>Task Management</em>
     </td>
     <td width="50"></td>
     <td align="center">
-      <img src="preview/habits.gif" alt="Habits Screen" width="250"><br>
+      <img src="preview/habits.png" alt="Habits Screen" width="250"><br>
       <em>Habit Tracking</em>
     </td>
     <td width="50"></td>
     <td align="center">
-      <img src="preview/focus.gif" alt="Focus Screen" width="250"><br>
+      <img src="preview/focus.png" alt="Focus Screen" width="250"><br>
       <em>Focus Timer</em>
     </td>
   </tr>
