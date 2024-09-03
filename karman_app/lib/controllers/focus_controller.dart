@@ -1,28 +1,34 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:karman_app/manager/sound_manager.dart';
+import 'package:karman_app/services/badges/focus_badge_service.dart';
 import 'package:karman_app/services/timer_service.dart';
 import 'package:karman_app/services/focus_service.dart';
-import 'package:karman_app/services/focus_badge_service.dart';
 
 class FocusController extends ChangeNotifier {
   final SoundManager _soundManager = SoundManager();
   final TimerService _timerService = TimerService();
   final FocusService _focusService = FocusService();
   final FocusBadgeService _achievementService = FocusBadgeService();
+  final StreamController<List<String>> _achievementStreamController =
+      StreamController<List<String>>.broadcast();
 
-  int _timerValue = 5;
+  static const int _minTimerValue = 1;
+
+  int _timerValue = _minTimerValue;
   bool _isTimerRunning = false;
   late DateTime _endTime;
   Timer? _timer;
-  int _remainingSeconds = 300;
-  int _totalSeconds = 300;
+  int _remainingSeconds = 60;
+  int _totalSeconds = 60;
 
   int get timerValue => _timerValue;
   bool get isTimerRunning => _isTimerRunning;
   int get remainingSeconds => _remainingSeconds;
   int get totalSeconds => _totalSeconds;
   SoundManager get soundManager => _soundManager;
+  Stream<List<String>> get achievementStream =>
+      _achievementStreamController.stream;
 
   FocusController() {
     _loadTimerState();
@@ -89,11 +95,16 @@ class FocusController extends ChangeNotifier {
       });
       _recordFocusSession();
     } else {
-      _remainingSeconds = _timerValue * 60;
-      _totalSeconds = _remainingSeconds;
+      _resetTimer();
     }
     _saveTimerState();
     notifyListeners();
+  }
+
+  void _resetTimer() {
+    _timerValue = _minTimerValue;
+    _remainingSeconds = _timerValue * 60;
+    _totalSeconds = _remainingSeconds;
   }
 
   Future<void> _saveTimerState() async {
@@ -106,20 +117,23 @@ class FocusController extends ChangeNotifier {
   }
 
   void _recordFocusSession() async {
-    final duration = _timerValue * 60;
+    final duration = _totalSeconds - _remainingSeconds;
+    print(
+        "Recording focus session with duration: $duration seconds"); // Debug print
     await _focusService.addFocusSession(duration);
 
-    Map<String, bool> unlockedAchievements =
-        await _achievementService.checkFocusBadges();
+    List<String> newlyAchievedBadges =
+        await _achievementService.checkNewlyAchievedBadges();
 
-    _remainingSeconds = _timerValue * 60;
-    _totalSeconds = _remainingSeconds;
+    print("Newly achieved badges: $newlyAchievedBadges"); // Debug print
+
+    _resetTimer();
     _saveTimerState();
     notifyListeners();
 
-    if (unlockedAchievements.values.any((value) => value)) {
-      // TODO: Notify the UI to show achievements
-      // Use a callback or a stream for this
+    if (newlyAchievedBadges.isNotEmpty) {
+      print("Notifying about new achievements"); // Debug print
+      _achievementStreamController.add(newlyAchievedBadges);
     }
   }
 
@@ -131,13 +145,14 @@ class FocusController extends ChangeNotifier {
 
   double get progress {
     if (_totalSeconds == 0) return 0;
-    return (_totalSeconds - _remainingSeconds) / _totalSeconds * 115 + 5;
+    return 1 - (_remainingSeconds / _totalSeconds);
   }
 
   @override
   void dispose() {
     _timer?.cancel();
     _soundManager.dispose();
+    _achievementStreamController.close();
     super.dispose();
   }
 }

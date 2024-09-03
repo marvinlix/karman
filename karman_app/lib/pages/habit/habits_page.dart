@@ -7,6 +7,7 @@ import 'package:karman_app/pages/tutorial/habit_tutorial.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
+import 'package:karman_app/components/badges/achievement_overlay.dart';
 
 class HabitsPage extends StatefulWidget {
   const HabitsPage({super.key});
@@ -21,6 +22,7 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
   bool _showTutorial = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+  StreamSubscription? _achievementSubscription;
 
   @override
   void initState() {
@@ -34,6 +36,7 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
     _loadHabits();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkFirstLaunch();
+      _scheduleStreakReminders();
     });
   }
 
@@ -41,6 +44,7 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
   void dispose() {
     _debounce?.cancel();
     _animationController.dispose();
+    _achievementSubscription?.cancel();
     super.dispose();
   }
 
@@ -80,7 +84,14 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
       final habitController =
           Provider.of<HabitController>(context, listen: false);
       await habitController.loadHabits();
+      await _scheduleStreakReminders();
     });
+  }
+
+  Future<void> _scheduleStreakReminders() async {
+    final habitController =
+        Provider.of<HabitController>(context, listen: false);
+    await habitController.scheduleStreakReminders();
   }
 
   void _showAddHabitDialog() {
@@ -106,10 +117,31 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
     return habits;
   }
 
+  void _listenForAchievements(HabitController controller) {
+    _achievementSubscription?.cancel();
+    _achievementSubscription =
+        controller.achievementStream.listen((achievedBadges) {
+      for (String badgeName in achievedBadges) {
+        _showAchievementOverlay(badgeName);
+      }
+    });
+  }
+
+  void _showAchievementOverlay(String badgeName) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => AchievementOverlay(
+        badgeName: badgeName,
+        onDismiss: () => Navigator.of(context).pop(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<HabitController>(
       builder: (context, habitController, child) {
+        _listenForAchievements(habitController);
         final sortedHabits = _sortHabits(habitController.habits);
         final incompleteHabits =
             sortedHabits.where((habit) => !habit.isCompletedToday).length;

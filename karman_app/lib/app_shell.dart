@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:karman_app/pages/more/more_page.dart';
 import 'package:karman_app/pages/habit/habits_page.dart';
 import 'package:karman_app/pages/task/tasks_page.dart';
@@ -34,15 +33,15 @@ class AppShellState extends State<AppShell> {
         activeColor: CupertinoColors.white,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.leaf_arrow_circlepath),
+            icon: Icon(CupertinoIcons.repeat),
             label: 'Habit',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.check_mark_circled),
+            icon: Icon(CupertinoIcons.list_bullet),
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.self_improvement_rounded),
+            icon: Icon(CupertinoIcons.timer),
             label: 'Focus',
           ),
           BottomNavigationBarItem(

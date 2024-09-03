@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:karman_app/pages/more/details/community_page.dart';
 import 'package:karman_app/pages/more/details/contribution_page.dart';
 import 'package:karman_app/pages/more/details/support_page.dart';
-import 'package:karman_app/pages/more/focus_badges_page.dart';
-import 'package:karman_app/pages/more/habit_badges_page.dart';
+import 'package:karman_app/pages/more/badges/focus_badges_page.dart';
+import 'package:karman_app/pages/more/badges/habit_badges_page.dart';
 
 class MorePage extends StatelessWidget {
   const MorePage({super.key});
@@ -35,7 +35,7 @@ class MorePage extends StatelessWidget {
                   child: _buildActionTile(
                     context,
                     'Focus Badges',
-                    CupertinoIcons.timer,
+                    CupertinoIcons.rosette,
                     () => Navigator.push(
                       context,
                       CupertinoPageRoute(
@@ -49,7 +49,7 @@ class MorePage extends StatelessWidget {
                   child: _buildActionTile(
                     context,
                     'Habit Badges',
-                    CupertinoIcons.checkmark_seal,
+                    CupertinoIcons.star_circle,
                     () => Navigator.push(
                       context,
                       CupertinoPageRoute(

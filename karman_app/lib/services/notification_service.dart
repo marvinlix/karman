@@ -122,7 +122,8 @@ class NotificationService {
 
   static tz.TZDateTime _nextInstanceOfTime(DateTime scheduledDate) {
     final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
-    tz.TZDateTime scheduledTZDateTime = tz.TZDateTime.from(scheduledDate, tz.local);
+    tz.TZDateTime scheduledTZDateTime =
+        tz.TZDateTime.from(scheduledDate, tz.local);
 
     if (scheduledTZDateTime.isBefore(now)) {
       scheduledTZDateTime = tz.TZDateTime(
@@ -148,5 +149,32 @@ class NotificationService {
 
   static Future<void> cancelAllNotifications() async {
     await _notifications.cancelAll();
+  }
+
+  static Future<void> scheduleStreakReminder({
+    required int id,
+    required String habitName,
+    required int currentStreak,
+    required DateTime scheduledDate,
+  }) async {
+    String title = "Don't break your streak!";
+    String body =
+        "Your $habitName streak is at $currentStreak days. Complete it now to keep it going!";
+
+    if (currentStreak >= 7) {
+      body =
+          "🔥 $currentStreak day streak for $habitName! Don't let it slip away now!";
+    } else if (currentStreak >= 30) {
+      body =
+          "🏆 Incredible $currentStreak day streak for $habitName! You've come too far to stop now!";
+    }
+
+    await scheduleNotification(
+      id: id + 10000, // Use a different ID range for streak reminders
+      title: title,
+      body: body,
+      scheduledDate: scheduledDate,
+      payload: 'habit_$id',
+    );
   }
 }

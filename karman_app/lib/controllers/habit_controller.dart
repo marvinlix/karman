@@ -1,17 +1,26 @@
 import 'package:flutter/foundation.dart';
 import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/models/habits/habit_log.dart';
+import 'package:karman_app/services/badges/habit_badge_service.dart';
 import 'package:karman_app/services/habit_service.dart';
 import 'package:karman_app/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'dart:async';
+
 class HabitController extends ChangeNotifier {
   final HabitService _habitService = HabitService();
+  final HabitBadgeService _habitBadgeService = HabitBadgeService();
   List<Habit> _habits = [];
   final Map<int, List<HabitLog>> _habitLogs = {};
 
+  final StreamController<List<String>> _achievementStreamController =
+      StreamController<List<String>>.broadcast();
+
   List<Habit> get habits => _habits;
   Map<int, List<HabitLog>> get habitLogs => _habitLogs;
+  Stream<List<String>> get achievementStream =>
+      _achievementStreamController.stream;
 
   Future<void> loadHabits() async {
     await checkAndResetStreaks();
@@ -19,6 +28,7 @@ class HabitController extends ChangeNotifier {
     for (var habit in _habits) {
       await loadHabitLogs(habit.habitId!);
     }
+    await scheduleStreakReminders();
     notifyListeners();
   }
 
@@ -32,6 +42,14 @@ class HabitController extends ChangeNotifier {
     final newHabit = habit.copyWith(habitId: id);
     _habits.add(newHabit);
     _scheduleReminder(newHabit);
+
+    List<String> newlyAchievedBadges =
+        await _habitBadgeService.checkNewlyAchievedBadges(_habits);
+    if (newlyAchievedBadges.isNotEmpty) {
+      _achievementStreamController.add(newlyAchievedBadges);
+    }
+
+    await scheduleStreakReminders();
     notifyListeners();
   }
 
@@ -41,6 +59,7 @@ class HabitController extends ChangeNotifier {
     if (index != -1) {
       _habits[index] = habit;
       _scheduleReminder(habit);
+      await scheduleStreakReminders();
       notifyListeners();
     }
   }
@@ -50,6 +69,8 @@ class HabitController extends ChangeNotifier {
     _habits.removeWhere((habit) => habit.habitId == id);
     _habitLogs.remove(id);
     NotificationService.cancelNotification(id);
+    await NotificationService.cancelNotification(
+        id + 10000); // Cancel streak reminder
     notifyListeners();
   }
 
@@ -63,6 +84,14 @@ class HabitController extends ChangeNotifier {
       }
     }
     await loadHabitLogs(habit.habitId!);
+
+    List<String> newlyAchievedBadges =
+        await _habitBadgeService.checkNewlyAchievedBadges(_habits);
+    if (newlyAchievedBadges.isNotEmpty) {
+      _achievementStreamController.add(newlyAchievedBadges);
+    }
+
+    await NotificationService.cancelNotification(habit.habitId! + 10000);
     notifyListeners();
   }
 
@@ -123,5 +152,35 @@ class HabitController extends ChangeNotifier {
         payload: 'habit_${habit.habitId}',
       );
     }
+  }
+
+  Future<void> scheduleStreakReminders() async {
+    final now = DateTime.now();
+    final reminderTime =
+        DateTime(now.year, now.month, now.day, 21, 0); // 9:00 PM
+
+    var adjustedReminderTime = reminderTime;
+    if (reminderTime.isBefore(now)) {
+      adjustedReminderTime = reminderTime.add(Duration(days: 1));
+    }
+
+    for (var habit in _habits) {
+      if (!habit.isCompletedToday && habit.currentStreak > 0) {
+        await NotificationService.scheduleStreakReminder(
+          id: habit.habitId!,
+          habitName: habit.habitName,
+          currentStreak: habit.currentStreak,
+          scheduledDate: adjustedReminderTime,
+        );
+      } else {
+        await NotificationService.cancelNotification(habit.habitId! + 10000);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _achievementStreamController.close();
+    super.dispose();
   }
 }

@@ -5,6 +5,28 @@ import 'package:karman_app/database/focus_db.dart';
 class FocusBadgeService {
   final FocusDatabase _focusDatabase = FocusDatabase();
 
+  Future<List<String>> checkNewlyAchievedBadges() async {
+    print("FocusBadgeService: Checking for newly achieved badges");
+    final database = await DatabaseService().database;
+    final achievedBadges = await checkFocusBadges();
+
+    List<String> newlyAchievedBadges = [];
+
+    for (var entry in achievedBadges.entries) {
+      if (entry.value) {
+        bool isAlreadyAchieved =
+            await _focusDatabase.isBadgeAchieved(database, entry.key);
+        if (!isAlreadyAchieved) {
+          await _focusDatabase.addAchievedBadge(database, entry.key);
+          newlyAchievedBadges.add(entry.key);
+        }
+      }
+    }
+
+    print("FocusBadgeService: Newly achieved badges: $newlyAchievedBadges");
+    return newlyAchievedBadges;
+  }
+
   Future<Map<String, bool>> checkFocusBadges() async {
     final database = await DatabaseService().database;
     final today = DateTime.now();
@@ -36,14 +58,21 @@ class FocusBadgeService {
     Map<String, bool> achievedBadges = {};
 
     for (var badge in FocusBadgeConstants.focusBadges) {
-      achievedBadges[badge.name] = await _checkFocusBadge(
-        badge,
-        database,
-        todayTotalMinutes,
-        weekTotalMinutes,
-        monthTotalMinutes,
-        threeMonthTotalMinutes,
-      );
+      bool isAlreadyAchieved =
+          await _focusDatabase.isBadgeAchieved(database, badge.name);
+      if (isAlreadyAchieved) {
+        achievedBadges[badge.name] = true;
+      } else {
+        bool isNewlyAchieved = await _checkFocusBadge(
+          badge,
+          database,
+          todayTotalMinutes,
+          weekTotalMinutes,
+          monthTotalMinutes,
+          threeMonthTotalMinutes,
+        );
+        achievedBadges[badge.name] = isNewlyAchieved;
+      }
     }
 
     return achievedBadges;
@@ -58,6 +87,8 @@ class FocusBadgeService {
     int threeMonthTotalMinutes,
   ) async {
     switch (badge.name) {
+      case "First Focus":
+        return todayTotalMinutes >= 10;
       case "Half-Hour Hero":
         return todayTotalMinutes >= 30;
       case "Hour Hero":

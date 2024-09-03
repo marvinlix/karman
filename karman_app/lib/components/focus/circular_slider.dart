@@ -27,7 +27,6 @@ class CircularSlider extends StatelessWidget {
       children: [
         SleekCircularSlider(
           appearance: CircularSliderAppearance(
-            animDurationMultiplier: 0.8,
             size: 400,
             startAngle: 120,
             angleRange: 300,
@@ -57,7 +56,9 @@ class CircularSlider extends StatelessWidget {
           ),
           min: 1,
           max: 60,
-          initialValue: isTimerRunning ? progress : currentValue.toDouble(),
+          initialValue: isTimerRunning
+              ? (progress * 59 + 1)
+              : currentValue.toDouble().clamp(1, 60),
           onChange: isTimerRunning
               ? null
               : (double value) {

@@ -5,6 +5,8 @@ class FocusService {
   final FocusDatabase _focusDatabase = FocusDatabase();
 
   Future<void> addFocusSession(int duration) async {
+    print(
+        "FocusService: Adding focus session with duration: $duration seconds"); // Debug print
     final database = await DatabaseService().database;
     final date = DateTime.now().toIso8601String().split('T')[0];
     await _focusDatabase.addFocusSession(database, duration, date);
