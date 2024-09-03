@@ -5,139 +5,202 @@
 </p>
 
 <p align="center">
-  <strong>karman</strong> is a minimalist and intuitive productivity app designed to help you manage tasks, track habits, and stay focused. Completely free and open-source, karman is perfect for individuals who value simplicity and efficiency.
+  A minimalist and intuitive productivity app for task management, habit tracking, and focus enhancement.
 </p>
 
 <p align="center">
-  <a href="https://github.com/surtecha/karman/releases">
-    <img src="https://img.shields.io/github/v/release/surtecha/karman?include_prereleases&style=flat" alt="Latest Release">
-  </a>
-  <a href="https://github.com/surtecha/karman/issues">
-    <img src="https://img.shields.io/github/issues/surtecha/karman?style=flat" alt="Issues">
-  </a>
-  <a href="https://github.com/surtecha/karman/blob/main/LICENSE">
-    <img src="https://img.shields.io/github/license/surtecha/karman?style=flat" alt="License">
-  </a>
+  <a href="https://play.google.com/store/apps/details?id=com.surtecha.karman"><img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" alt="Get it on Google Play" height="80"></a>
 </p>
+
+<p align="center">
+  <a href="https://github.com/surtecha/karman/releases"><img src="https://img.shields.io/github/v/release/surtecha/karman?include_prereleases&style=flat&color=006400" alt="Latest Release"></a>
+  <a href="https://github.com/surtecha/karman/blob/main/LICENSE"><img src="https://img.shields.io/github/license/surtecha/karman?style=flat&color=9370DB" alt="License"></a>
+  <a href="https://discord.gg/AH7dAXfxkD"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat&logo=discord&logoColor=white" alt="Discord"></a>
+  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS-444444?style=flat&logo=android&logoColor=white" alt="Platform">
+  <img src="https://img.shields.io/badge/Made%20with-Flutter-blue?style=flat&logo=flutter" alt="Made with Flutter">
+</p>
+
+## Table of Contents
+
+- [Features](#features)
+- [Screenshots](#screenshots)
+- [Getting Started](#getting-started)
+- [Contributing](#contributing)
+- [Roadmap](#roadmap)
+- [Contributors](#contributors)
+- [Sponsorship](#sponsorship)
+- [License](#license)
 
 ## Features
 
-<table align="center">
+- **Task Management**: Organize and prioritize tasks with a clean interface
+- **Habit Tracking**: Build and maintain daily habits
+- **Focus Timer**: Boost productivity with a built-in Pomodoro-style timer
+- **Minimalism**: Distraction-free and intuitive design
+- **Absoultely Free**: No paywalls, hidden charges, or in-app purchases
+- **Privacy-Focused**: No data collection or tracking
+- **Lightweight**: Minimal impact on device storage and performance
+
+## Screenshots
+
+<table align="center" border="0">
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/ce5df2f6-f7dc-41c7-9129-85add2e264c0" alt="Tasks" width="250"></td>
-    <td style="width: 50px;"></td>
-    <td><img src="https://github.com/user-attachments/assets/e775091b-da85-4f0b-899b-bef307d6715a" alt="Habits" width="250"></td>
-    <td style="width: 50px;"></td>
-    <td><img src="https://github.com/user-attachments/assets/97859270-533e-42b1-af4a-9233492870a3" alt="Focus" width="250"></td>
+    <td align="center">
+      <img src="preview/tasks.gif" alt="Tasks Screen" width="250"><br>
+      <em>Task Management</em>
+    </td>
+    <td width="50"></td>
+    <td align="center">
+      <img src="preview/habits.gif" alt="Habits Screen" width="250"><br>
+      <em>Habit Tracking</em>
+    </td>
+    <td width="50"></td>
+    <td align="center">
+      <img src="preview/focus.gif" alt="Focus Screen" width="250"><br>
+      <em>Focus Timer</em>
+    </td>
   </tr>
 </table>
 
-### ✅ Task Management
-
-Organize and prioritize your tasks effortlessly with a clean, user-friendly interface.
-<p align="center">
-  <img src="preview/tasks.gif" alt="Task Management" width="25%">
-</p>
-
-### 🔄 Habit Tracking
-
-Track your daily habits and maintain your streaks to build a better you.
-<p align="center">
-  <img src="preview/habits.gif" alt="Habit Tracking" width="25%">
-</p>
-
-### ⏳ Focus Timer
-
-Maximize productivity with a built-in focus timer designed to keep you on track.
-<p align="center">
-  <img src="preview/focus.gif" alt="Focus Timer" width="25%">
-</p>
-
----
-
-## Installation
+## Getting Started
 
 ### Prerequisites
 
-- **Flutter SDK**: Ensure you have Flutter installed. Download it from the [official website](https://flutter.dev/docs/get-started/install).
-- **Git**: Clone the repository using Git.
+- Flutter SDK: [Installation Guide](https://flutter.dev/docs/get-started/install)
+- Android Studio / VS Code
+- Git
 
-### Clone the Repository
+### Installation
 
-```bash
-git clone https://github.com/surtecha/karman.git
-cd karman
-```
-### Install Dependencies
+1. Clone the repository:
+   ```bash
+     flutter pub get
+   ```
+2. Install dependencies:
+  ```bash
+    flutter pub get
+  ```
+3. Run the app:
+  ```bash
+    flutter run
+  ```
 
-```bash
-flutter pub get
-```
-### Run the App
-
-```bash
-flutter run
-```
----
-
-## 🛠️ Development Status
-
-karman is currently under review for the Google Play Store. Be among the first to experience the app by signing up for the Beta Testing program!
-
-### 📲 Beta Testing
-
-Join the waitlist to become a beta tester and get early access to karman before its official release. Sign up [here](https://getwaitlist.com/waitlist/18391).
-
-### 💬 Join Our Community
-
-We value your feedback! Join our [Discord server](https://discord.gg/wDkZDfpVwp) to provide suggestions, report bugs, and connect with other karman users.
-
----
 
 ## Contributing
 
-We love contributions! Check out our [Contributing Guidelines](CONTRIBUTING.md) and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to get started.
+We welcome contributions from the community! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting any pull requests.
 
-### 🐛 Reporting Issues
+### Reporting Issues
 
-Found a bug? Have a feature request? Open an issue on our [Issues page](https://github.com/surtecha/karman/issues).
+Found a bug or have a feature request? Open an issue on our [Issues page](https://github.com/surtecha/karman/issues).
 
-### 📥 Pull Requests
+### Development Setup
 
-Please ensure your pull request is well-documented and adheres to our coding standards.
-
----
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ## Roadmap
 
-- [ ] Add more ambient sounds to focus timer
-- [ ] Update badges for habits
-- [ ] Optimize icons for Android notifications
+- [ ] Additional ambient sounds for the focus timer
+- [ ] Enhanced habit tracking badges
+- [ ] Optimized Android notification icons
+- [ ] iOS version
 
----
+## Contributors
+
+### Founder & Lead Developer
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/surtecha"><img src="https://github.com/surtecha.png" width="100px;" alt=""/><br /><sub><b>Suryateja Challa</b></sub></a></td>
+  </tr>
+</table>
+
+### UI/UX Designer & Brand Strategist
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/SkinnyFatBoy05"><img src="https://github.com/SkinnyFatBoy05.png" width="100px;" alt=""/><br /><sub><b>Kishore Srinivasan</b></sub></a></td>
+  </tr>
+</table>
+
+### Key Contributors & Beta Testers
+We extend our heartfelt gratitude to the following individuals for their significant contributions in testing and providing valuable feedback:
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/sathwik2809"><img src="https://github.com/sathwik2809.png" width="100px;" alt=""/><br /><sub><b>Sree Sathwik Challa</b></sub></a></td>
+    <td align="center"><a href="https://github.com/silver-shadow"><img src="https://github.com/silver-shadow.png" width="100px;" alt=""/><br /><sub><b>Kusha Makapur</b></sub></a></td>
+    <td align="center"><a href="https://github.com/pkv-woodstock"><img src="https://github.com/pkv-woodstock.png" width="100px;" alt=""/><br /><sub><b>Pavan Kumar</b></sub></a></td>
+    <td align="center"><a href="https://github.com/tejasrajegowda"><img src="https://github.com/tejasrajegowda.png" width="100px;" alt=""/><br /><sub><b>Tejas Rajegowda</b></sub></a></td>
+  </tr>
+</table>
+
+We also express our sincere appreciation to all our beta testers and users whose invaluable feedback has been instrumental in shaping and improving karman.
 
 ## Sponsorship
 
-karman is a completely free and open-source project, dedicated to providing the best possible experience for our users. We do not monetize the app in any way, ensuring that productivity remains accessible to everyone. However, publishing the app on the App Store requires an annual fee of $100. 
+karman is more than just another productivity app—it's a movement towards accessible, ad-free tools that empower everyone to achieve their goals. By becoming a sponsor, you're not just supporting an app; you're investing in a vision of digital well-being for all.
 
-To make karman available to a wider audience and keep the project alive, we rely on your generous support. Your sponsorship will help cover these costs, ensuring that karman remains free and open for everyone. Every contribution, no matter how small, makes a difference.
+### Why Sponsor karman?
 
-If you’d like to support karman, please consider [becoming a sponsor](https://github.com/sponsors/surtecha).
+1. **Empower Universal Productivity**: Your support ensures karman remains free and accessible to everyone, from students to professionals, regardless of their financial situation.
 
----
+2. **Foster Innovation**: As an open-source project, karman pushes the boundaries of what's possible in mobile productivity. Your sponsorship fuels continued innovation and improvement.
+
+3. **Promote Digital Well-being**: By keeping karman ad-free and focused on user needs, you're supporting a healthier relationship with technology for thousands of users.
+
+4. **Support Ethical Software Development**: Your contribution helps set an example for transparent, user-focused software in an age of data mining and privacy concerns.
+
+5. **Join a Community**: Sponsors become part of the karman family, with opportunities to influence the app's direction and connect with like-minded individuals passionate about productivity.
+
+6. **Make a Tangible Impact**: Every feature added, every bug fixed, and every new user reached is a direct result of your support. Watch your contribution make a real difference.
+
+### How Your Sponsorship Helps
+
+- Covers essential costs for app store fees, ensuring karman remains available on major platforms
+- Allows for dedicated development time to implement new features and optimizations
+- Enables participation in open-source events and conferences to spread the word about karman
+
+### Be the Change
+
+In a world where attention is constantly commodified, your sponsorship of karman stands as a beacon for what software can be—helpful, respectful, and empowering. 
+
+Every contribution, no matter the size, moves us closer to a future where top-tier productivity tools are a right, not a privilege.
+
+**Ready to make a difference?** [Become a sponsor today](https://github.com/sponsors/surtecha) and help shape the future of productivity for everyone.
+
+## Community
+
+Join our [Discord server](https://discord.gg/AH7dAXfxkD) to connect with other users, provide feedback, and get support.
 
 ## License
 
-karman is licensed under the GNU General Public License v3.0 (GPL-3.0). See the [LICENSE](LICENSE) file for details.
-
----
+karman is licensed under the [GNU General Public License v3.0 (GPL-3.0)](LICENSE).
 
 ## Acknowledgements
 
-Special thanks to the open-source community for their continuous support and contributions.
+- [Flutter](https://flutter.dev/) for the amazing framework
+- [SQLite](https://sqlite.org/) for local storage
+- The creators of the following ```pub.dev``` packages that made this project possible:
+  - [flutter_slidable](https://pub.dev/packages/flutter_slidable)
+  - [go_router](https://pub.dev/packages/go_router)
+  - [flutter_local_notifications](https://pub.dev/packages/flutter_local_notifications)
+  - [provider](https://pub.dev/packages/provider)
+  - [slide_to_act](https://pub.dev/packages/slide_to_act)
+  - [sleek_circular_slider](https://pub.dev/packages/sleek_circular_slider)
+  - [audioplayers](https://pub.dev/packages/audioplayers)
+  - [just_audio](https://pub.dev/packages/just_audio)
+  - [table_calendar](https://pub.dev/packages/table_calendar)
+  - [smooth_page_indicator](https://pub.dev/packages/smooth_page_indicator)
+  - [lottie](https://pub.dev/packages/lottie)
+  - [url_launcher](https://pub.dev/packages/url_launcher)
+  - [flutter_native_splash](https://pub.dev/packages/flutter_native_splash)
+  - And all other packages listed in our pubspec.yaml
 
 ---
 
 <p align="center">
-  Maintained with passion by <a href="https://github.com/surtecha">surtecha</a>.
+  Made with passion by <a href="https://github.com/surtecha">surtecha</a>
 </p>
