@@ -9,7 +9,7 @@ class DatabaseService {
   static Database? _database;
 
   static const _databaseName = "karman_app.db";
-  static const _databaseVersion = 4;
+  static const _databaseVersion = 1;
 
   factory DatabaseService() => _instance;
 
@@ -32,7 +32,6 @@ class DatabaseService {
       path,
       version: _databaseVersion,
       onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
       singleInstance: true,
     );
     return database;
@@ -43,24 +42,6 @@ class DatabaseService {
     await HabitDatabase().createTables(db);
     await FocusDatabase().createTable(db);
     await HabitDatabase().createBadgesTable(db);
-  }
-
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      await FocusDatabase().createTable(db);
-    }
-    if (oldVersion < 3) {
-      await db.execute('''
-        CREATE TABLE IF NOT EXISTS ${FocusDatabase().badgesTableName} (
-          id INTEGER PRIMARY KEY AUTOINCREMENT,
-          badge_name TEXT NOT NULL,
-          achieved_date TEXT NOT NULL
-        )
-      ''');
-    }
-    if (oldVersion < 4) {
-      await HabitDatabase().createBadgesTable(db);
-    }
   }
 
   Future<void> ensureInitialized() async {
