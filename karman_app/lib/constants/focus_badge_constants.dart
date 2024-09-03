@@ -7,6 +7,10 @@ class FocusBadge {
 
 class FocusBadgeConstants {
   static const List<FocusBadge> focusBadges = [
+     FocusBadge(
+      name: "First Focus",
+      description: "Complete a 10-minutes focus session",
+    ),
     FocusBadge(
       name: "Half-Hour Hero",
       description: "Complete a 30-minute focus session",

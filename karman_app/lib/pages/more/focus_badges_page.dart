@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:karman_app/components/badges/achievement_overlay.dart';
 import 'package:karman_app/constants/focus_badge_constants.dart';
+import 'package:karman_app/controllers/focus_controller.dart';
 import 'package:karman_app/services/focus_badge_service.dart';
 
 class FocusBadgesPage extends StatefulWidget {
@@ -15,16 +17,42 @@ class _FocusBadgesPageState extends State<FocusBadgesPage> {
   Map<String, bool> unlockedBadges = {};
   bool _isInitialLoad = true;
   Timer? _debounce;
+  late StreamSubscription _achievementSubscription;
 
   @override
   void initState() {
     super.initState();
     _initialLoadBadges();
+    _listenForAchievements();
+  }
+
+  void _listenForAchievements() {
+    _achievementSubscription =
+        FocusController().achievementStream.listen((achievedBadges) {
+      print(
+          "FocusBadgesPage: Received new achievements: $achievedBadges"); // Debug print
+      for (String badgeName in achievedBadges) {
+        _showAchievementOverlay(badgeName);
+      }
+    });
+  }
+
+  void _showAchievementOverlay(String badgeName) {
+    print(
+        "FocusBadgesPage: Showing achievement overlay for: $badgeName"); // Debug print
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) => AchievementOverlay(
+        badgeName: badgeName,
+        onDismiss: () => Navigator.of(context).pop(),
+      ),
+    );
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
+    _achievementSubscription.cancel();
     super.dispose();
   }
 

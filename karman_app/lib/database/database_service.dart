@@ -28,7 +28,7 @@ class DatabaseService {
     final path = await fullPath;
     var database = await openDatabase(
       path,
-      version: 2, 
+      version: 3, 
       onCreate: _onCreate,
       onUpgrade: _onUpgrade,
       singleInstance: true,
@@ -45,6 +45,15 @@ class DatabaseService {
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await FocusDatabase().createTable(db);
+    }
+    if (oldVersion < 3) {
+      await db.execute('''
+        CREATE TABLE IF NOT EXISTS ${FocusDatabase().badgesTableName} (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          badge_name TEXT NOT NULL,
+          achieved_date TEXT NOT NULL
+        )
+      ''');
     }
   }
 
