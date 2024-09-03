@@ -36,6 +36,7 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
     _loadHabits();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkFirstLaunch();
+      _scheduleStreakReminders();
     });
   }
 
@@ -83,7 +84,14 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
       final habitController =
           Provider.of<HabitController>(context, listen: false);
       await habitController.loadHabits();
+      await _scheduleStreakReminders();
     });
+  }
+
+  Future<void> _scheduleStreakReminders() async {
+    final habitController =
+        Provider.of<HabitController>(context, listen: false);
+    await habitController.scheduleStreakReminders();
   }
 
   void _showAddHabitDialog() {

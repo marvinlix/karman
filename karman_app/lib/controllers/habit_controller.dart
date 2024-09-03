@@ -27,6 +27,7 @@ class HabitController extends ChangeNotifier {
     for (var habit in _habits) {
       await loadHabitLogs(habit.habitId!);
     }
+    await scheduleStreakReminders();
     notifyListeners();
   }
 
@@ -41,13 +42,13 @@ class HabitController extends ChangeNotifier {
     _habits.add(newHabit);
     _scheduleReminder(newHabit);
 
-    // Check for newly achieved badges
     List<String> newlyAchievedBadges =
         await _habitBadgeService.checkNewlyAchievedBadges(_habits);
     if (newlyAchievedBadges.isNotEmpty) {
       _achievementStreamController.add(newlyAchievedBadges);
     }
 
+    await scheduleStreakReminders();
     notifyListeners();
   }
 
@@ -57,6 +58,7 @@ class HabitController extends ChangeNotifier {
     if (index != -1) {
       _habits[index] = habit;
       _scheduleReminder(habit);
+      await scheduleStreakReminders();
       notifyListeners();
     }
   }
@@ -66,6 +68,8 @@ class HabitController extends ChangeNotifier {
     _habits.removeWhere((habit) => habit.habitId == id);
     _habitLogs.remove(id);
     NotificationService.cancelNotification(id);
+    await NotificationService.cancelNotification(
+        id + 10000); // Cancel streak reminder
     notifyListeners();
   }
 
@@ -80,13 +84,13 @@ class HabitController extends ChangeNotifier {
     }
     await loadHabitLogs(habit.habitId!);
 
-    // Check for newly achieved badges
     List<String> newlyAchievedBadges =
         await _habitBadgeService.checkNewlyAchievedBadges(_habits);
     if (newlyAchievedBadges.isNotEmpty) {
       _achievementStreamController.add(newlyAchievedBadges);
     }
 
+    await NotificationService.cancelNotification(habit.habitId! + 10000);
     notifyListeners();
   }
 
@@ -146,6 +150,30 @@ class HabitController extends ChangeNotifier {
         scheduledDate: scheduledTime,
         payload: 'habit_${habit.habitId}',
       );
+    }
+  }
+
+  Future<void> scheduleStreakReminders() async {
+    final now = DateTime.now();
+    final reminderTime =
+        DateTime(now.year, now.month, now.day, 21, 0); // 9:00 PM
+
+    var adjustedReminderTime = reminderTime;
+    if (reminderTime.isBefore(now)) {
+      adjustedReminderTime = reminderTime.add(Duration(days: 1));
+    }
+
+    for (var habit in _habits) {
+      if (!habit.isCompletedToday && habit.currentStreak > 0) {
+        await NotificationService.scheduleStreakReminder(
+          id: habit.habitId!,
+          habitName: habit.habitName,
+          currentStreak: habit.currentStreak,
+          scheduledDate: adjustedReminderTime,
+        );
+      } else {
+        await NotificationService.cancelNotification(habit.habitId! + 10000);
+      }
     }
   }
 
