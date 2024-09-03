@@ -1,10 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/models/habits/habit_log.dart';
+import 'package:karman_app/services/badges/habit_badge_service.dart';
 import 'package:karman_app/services/habit_service.dart';
 import 'package:karman_app/services/notification_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:karman_app/services/habit_badge_service.dart';
+
 import 'dart:async';
 
 class HabitController extends ChangeNotifier {
