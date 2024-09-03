@@ -35,7 +35,7 @@ class MorePage extends StatelessWidget {
                   child: _buildActionTile(
                     context,
                     'Focus Badges',
-                    CupertinoIcons.timer,
+                    CupertinoIcons.rosette,
                     () => Navigator.push(
                       context,
                       CupertinoPageRoute(
@@ -49,7 +49,7 @@ class MorePage extends StatelessWidget {
                   child: _buildActionTile(
                     context,
                     'Habit Badges',
-                    CupertinoIcons.checkmark_seal,
+                    CupertinoIcons.star_circle,
                     () => Navigator.push(
                       context,
                       CupertinoPageRoute(
