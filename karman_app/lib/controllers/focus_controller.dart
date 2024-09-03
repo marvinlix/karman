@@ -11,12 +11,12 @@ class FocusController extends ChangeNotifier {
   final FocusService _focusService = FocusService();
   final FocusBadgeService _achievementService = FocusBadgeService();
 
-  int _timerValue = 5;
+  int _timerValue = 1;
   bool _isTimerRunning = false;
   late DateTime _endTime;
   Timer? _timer;
-  int _remainingSeconds = 300;
-  int _totalSeconds = 300;
+  int _remainingSeconds = 60;
+  int _totalSeconds = 60;
 
   int get timerValue => _timerValue;
   bool get isTimerRunning => _isTimerRunning;
