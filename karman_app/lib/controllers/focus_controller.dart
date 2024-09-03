@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:karman_app/manager/sound_manager.dart';
+import 'package:karman_app/services/badges/focus_badge_service.dart';
 import 'package:karman_app/services/timer_service.dart';
 import 'package:karman_app/services/focus_service.dart';
-import 'package:karman_app/services/focus_badge_service.dart';
 
 class FocusController extends ChangeNotifier {
   final SoundManager _soundManager = SoundManager();

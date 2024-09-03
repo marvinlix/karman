@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:karman_app/components/badges/achievement_overlay.dart';
 import 'package:karman_app/constants/focus_badge_constants.dart';
 import 'package:karman_app/controllers/focus_controller.dart';
-import 'package:karman_app/services/focus_badge_service.dart';
+import 'package:karman_app/services/badges/focus_badge_service.dart';
 
 class FocusBadgesPage extends StatefulWidget {
   const FocusBadgesPage({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:karman_app/constants/habit_badge_constants.dart';
-import 'package:karman_app/services/habit_badge_service.dart';
 import 'package:karman_app/controllers/habit_controller.dart';
+import 'package:karman_app/services/badges/habit_badge_service.dart';
 import 'package:provider/provider.dart';
 
 class HabitBadgesPage extends StatelessWidget {
