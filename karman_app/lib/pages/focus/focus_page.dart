@@ -98,9 +98,7 @@ class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
                       onPressed: controller.isTimerRunning ? _toggleMenu : null,
                       child: Icon(
                         controller.soundManager.currentIcon,
-                        color: controller.isTimerRunning
-                            ? CupertinoColors.white
-                            : CupertinoColors.systemGrey,
+                        color: CupertinoColors.white,
                         size: 32,
                       ),
                     )
