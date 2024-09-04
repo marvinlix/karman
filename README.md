@@ -26,10 +26,12 @@
 - [Screenshots](#screenshots)
 - [Getting Started](#getting-started)
 - [Contributing](#contributing)
-- [Roadmap](#roadmap)
 - [Contributors](#contributors)
+- [Roadmap](#roadmap)
+- [Community](#community)
 - [Sponsorship](#sponsorship)
 - [License](#license)
+- [Acknowledgements](#acknowledgements)
 
 ## Features
 
@@ -88,13 +90,6 @@ Found a bug or have a feature request? Open an issue on our [Issues page](https:
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## Roadmap
-
-- [ ] Additional ambient sounds for the focus timer
-- [ ] Enhanced habit tracking badges
-- [ ] Optimized Android notification icons
-- [ ] iOS version
-
 ## Contributors
 
 ### Founder & Lead Developer
@@ -124,6 +119,32 @@ We extend our heartfelt gratitude to the following individuals for their signifi
 </table>
 
 We also express our sincere appreciation to all our beta testers and users whose invaluable feedback has been instrumental in shaping and improving karman.
+
+## Roadmap
+
+- [ ] Additional ambient sounds for the focus timer
+- [ ] Enhanced habit tracking badges
+- [ ] Optimized Android notification icons
+- [ ] iOS version
+
+## Community
+
+<p align="center">
+  <a href="https://discord.gg/AH7dAXfxkD">
+    <img src="https://img.shields.io/badge/Join%20our-Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Join our Discord" height="30">
+  </a>
+</p>
+
+Join our vibrant Discord community to become part of the karman family! By joining, you can:
+
+- Connect directly with the development team
+- Suggest new ideas and feature requests
+- Report bugs and get quick support
+- Interact with other karman users
+- Stay updated on the latest developments
+- Contribute to the project's growth
+
+Your input is valuable to us, and we're excited to hear from you!
 
 ## Sponsorship
 
@@ -171,10 +192,6 @@ In a world where attention is constantly commodified, your sponsorship of karman
 Every contribution, no matter the size, moves us closer to a future where top-tier productivity tools are a right, not a privilege.
 
 **Ready to make a difference?** [Become a sponsor today](https://github.com/sponsors/surtecha) and help shape the future of productivity for everyone.
-
-## Community
-
-Join our [Discord server](https://discord.gg/AH7dAXfxkD) to connect with other users, provide feedback, and get support.
 
 ## License
 
