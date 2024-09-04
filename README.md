@@ -152,8 +152,8 @@ Your input is valuable to us, and we're excited to hear from you!
   <a href="https://github.com/sponsors/surtecha">
     <img src="https://img.shields.io/badge/Sponsor-EA4AAA?style=for-the-badge&logo=GitHub-Sponsors&logoColor=white" alt="GitHub Sponsor" height="30">
   </a>
-  <a href="https://ko-fi.com/surtecha">
-    <img src="https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Ko-Fi" height="30">
+  <a href="https://www.buymeacoffee.com/surtecha">
+    <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee" height="30">
   </a>
   <a href="https://paypal.me/surtecha">
     <img src="https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="PayPal" height="30">
