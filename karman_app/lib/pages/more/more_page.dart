@@ -34,8 +34,8 @@ class MorePage extends StatelessWidget {
                 Expanded(
                   child: _buildActionTile(
                     context,
-                    'Focus Badges',
-                    CupertinoIcons.rosette,
+                    'Focus',
+                    'lib/assets/images/badges/focus_badge.png',
                     () => Navigator.push(
                       context,
                       CupertinoPageRoute(
@@ -48,8 +48,8 @@ class MorePage extends StatelessWidget {
                 Expanded(
                   child: _buildActionTile(
                     context,
-                    'Habit Badges',
-                    CupertinoIcons.star_circle,
+                    'Habits',
+                    'lib/assets/images/badges/habit_badge.png',
                     () => Navigator.push(
                       context,
                       CupertinoPageRoute(
@@ -113,12 +113,12 @@ class MorePage extends StatelessWidget {
     );
   }
 
-  Widget _buildActionTile(
-      BuildContext context, String title, IconData icon, VoidCallback onTap) {
+  Widget _buildActionTile(BuildContext context, String title, String imagePath,
+      VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: CupertinoColors.darkBackgroundGray,
           borderRadius: BorderRadius.circular(12),
@@ -126,7 +126,11 @@ class MorePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 40, color: CupertinoColors.white),
+            Image.asset(
+              imagePath,
+              width: 80,
+              height: 80,
+            ),
             SizedBox(height: 16),
             Text(
               title,

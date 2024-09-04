@@ -56,6 +56,8 @@ flutter:
     - lib/assets/lottie/github.json
     - lib/assets/lottie/discord.json
     - lib/assets/lottie/support.json
+    - lib/assets/images/badges/focus_badge.png
+    - lib/assets/images/badges/habit_badge.png
     - lib/assets/tutorials/tasks/create_task.png
     - lib/assets/tutorials/tasks/clear_completed.png
     - lib/assets/tutorials/tasks/task_details.png
