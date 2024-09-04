@@ -4,7 +4,7 @@ final contributionPage = SkeletonPage(
   title: 'Contribute',
   animationAsset: 'lib/assets/lottie/github.json',
   linkText: 'Contribute on GitHub',
-  linkUrl: 'https://github.com/surtecha/karman',
+  linkUrl: 'https://github.com/surtecha/karman?tab=readme-ov-file#karman',
   paragraphs: const [
     'karman thrives as an open-source project dedicated to offering a seamless, ad-free experience.',
     'Your contributions, whether in code, design, or community feedback, are vital in sustaining this minimalist, user-centered app.',
