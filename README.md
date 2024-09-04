@@ -13,11 +13,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/surtecha/karman/releases"><img src="https://img.shields.io/github/v/release/surtecha/karman?include_prereleases&style=flat&color=006400" alt="Latest Release"></a>
-  <a href="https://github.com/surtecha/karman/blob/main/LICENSE"><img src="https://img.shields.io/github/license/surtecha/karman?style=flat&color=9370DB" alt="License"></a>
-  <a href="https://discord.gg/AH7dAXfxkD"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=flat&logo=discord&logoColor=white" alt="Discord"></a>
-  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS-444444?style=flat&logo=android&logoColor=white" alt="Platform">
-  <img src="https://img.shields.io/badge/Made%20with-Flutter-blue?style=flat&logo=flutter" alt="Made with Flutter">
+  <a href="https://github.com/surtecha/karman/releases"><img src="https://img.shields.io/github/v/release/surtecha/karman?include_prereleases&style=for-the-badge&color=006400" alt="Latest Release" height="28"></a>
+  <a href="https://github.com/surtecha/karman/blob/main/LICENSE"><img src="https://img.shields.io/github/license/surtecha/karman?style=for-the-badge&color=9370DB" alt="License" height="28"></a>
+  <a href="https://discord.gg/AH7dAXfxkD"><img src="https://img.shields.io/badge/Discord-Join-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord" height="28"></a>
+  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS-444444?style=for-the-badge&logo=android&logo=ios&logoColor=white" alt="Platform" height="28">
+  <img src="https://img.shields.io/badge/Made%20with-Flutter-blue?style=for-the-badge&logo=flutter" alt="Made with Flutter" height="28">
 </p>
 
 ## Table of Contents
@@ -43,24 +43,10 @@
 
 ## Screenshots
 
-<table align="center" border="0">
-  <tr>
-    <td align="center">
-      <img src="preview/tasks.png" alt="Tasks Screen" width="250"><br>
-      <em>Task Management</em>
-    </td>
-    <td width="50"></td>
-    <td align="center">
-      <img src="preview/habits.png" alt="Habits Screen" width="250"><br>
-      <em>Habit Tracking</em>
-    </td>
-    <td width="50"></td>
-    <td align="center">
-      <img src="preview/focus.png" alt="Focus Screen" width="250"><br>
-      <em>Focus Timer</em>
-    </td>
-  </tr>
-</table>
+| Task Management | &nbsp;&nbsp;&nbsp; | Habit Tracking | &nbsp;&nbsp;&nbsp; | Focus Timer |
+|:---------------:|:---:|:--------------:|:---:|:-----------:|
+| <img src="preview/tasks.png" alt="Tasks Screen" width="250" /> | | <img src="preview/habits.png" alt="Habits Screen" width="250" /> | | <img src="preview/focus.png" alt="Focus Screen" width="250" /> |
+
 
 ## Getting Started
 
@@ -140,6 +126,21 @@ We extend our heartfelt gratitude to the following individuals for their signifi
 We also express our sincere appreciation to all our beta testers and users whose invaluable feedback has been instrumental in shaping and improving karman.
 
 ## Sponsorship
+
+<p align="center">
+  <a href="https://github.com/sponsors/surtecha">
+    <img src="https://img.shields.io/badge/Sponsor-EA4AAA?style=for-the-badge&logo=GitHub-Sponsors&logoColor=white" alt="GitHub Sponsor" height="30">
+  </a>
+  <a href="https://ko-fi.com/surtecha">
+    <img src="https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Ko-Fi" height="30">
+  </a>
+  <a href="https://paypal.me/surtecha">
+    <img src="https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white" alt="PayPal" height="30">
+  </a>
+  <a href="https://github.com/surtecha/karman/blob/main/assets/phonepe_qr.png">
+    <img src="https://img.shields.io/badge/PhonePe-5f259f?style=for-the-badge&logo=phonepe&logoColor=white" alt="PhonePe QR" height="30">
+  </a>
+</p>
 
 karman is more than just another productivity app—it's a movement towards accessible, ad-free tools that empower everyone to achieve their goals. By becoming a sponsor, you're not just supporting an app; you're investing in a vision of digital well-being for all.
 
