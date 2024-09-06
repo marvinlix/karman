@@ -62,7 +62,7 @@
 
 1. Clone the repository:
    ```bash
-     flutter pub get
+     git clone https://github.com/surtecha/karman.git
    ```
 2. Install dependencies:
   ```bash
