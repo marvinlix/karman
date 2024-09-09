@@ -159,10 +159,7 @@ class _DateOptionWidgetState extends State<DateOptionWidget>
                 shape: BoxShape.circle,
               ),
             ),
-            daysOfWeekStyle: DaysOfWeekStyle(
-              weekdayStyle: TextStyle(color: CupertinoColors.white),
-              weekendStyle: TextStyle(color: CupertinoColors.white),
-            ),
+            daysOfWeekHeight: 40,
             headerStyle: HeaderStyle(
               formatButtonVisible: false,
               titleCentered: true,
@@ -178,6 +175,41 @@ class _DateOptionWidgetState extends State<DateOptionWidget>
                 CupertinoIcons.right_chevron,
                 color: CupertinoColors.white,
               ),
+              headerPadding: EdgeInsets.symmetric(vertical: 16),
+            ),
+            calendarBuilders: CalendarBuilders(
+              dowBuilder: (context, day) {
+                final text = DateFormat.E().format(day);
+                final isSunday = day.weekday == DateTime.sunday;
+                return Container(
+                  height: 40,
+                  alignment: Alignment.center,
+                  child: Text(
+                    text[0],
+                    style: TextStyle(
+                      color: isSunday
+                          ? CupertinoColors.destructiveRed
+                          : CupertinoColors.white,
+                      fontSize: 16,
+                    ),
+                  ),
+                );
+              },
+              defaultBuilder: (context, day, focusedDay) {
+                final isSunday = day.weekday == DateTime.sunday;
+                return Container(
+                  margin: EdgeInsets.all(4),
+                  alignment: Alignment.center,
+                  child: Text(
+                    day.day.toString(),
+                    style: TextStyle(
+                      color: isSunday
+                          ? CupertinoColors.destructiveRed
+                          : CupertinoColors.white,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
           CupertinoButton(
