@@ -8,12 +8,12 @@ class HabitReminder extends StatefulWidget {
   final Function(TimeOfDay) onTimeSelected;
 
   const HabitReminder({
-    Key? key,
+    super.key,
     required this.isEnabled,
     required this.time,
     required this.onToggle,
     required this.onTimeSelected,
-  }) : super(key: key);
+  });
 
   @override
   _HabitReminderState createState() => _HabitReminderState();
@@ -119,6 +119,15 @@ class _HabitReminderState extends State<HabitReminder>
   }
 
   Widget _buildTimePicker() {
+    DateTime initialTime;
+    if (widget.time != null) {
+      final now = DateTime.now();
+      initialTime = DateTime(
+          now.year, now.month, now.day, widget.time!.hour, widget.time!.minute);
+    } else {
+      initialTime = DateTime.now().add(Duration(minutes: 1));
+    }
+
     return SizedBox(
       height: 220,
       child: Column(
@@ -126,10 +135,11 @@ class _HabitReminderState extends State<HabitReminder>
           Expanded(
             child: CupertinoDatePicker(
               mode: CupertinoDatePickerMode.time,
-              initialDateTime: DateTime.now().add(Duration(minutes: 1)),
+              initialDateTime: initialTime,
               onDateTimeChanged: (DateTime dateTime) {
                 widget.onTimeSelected(TimeOfDay.fromDateTime(dateTime));
               },
+              use24hFormat: true,
             ),
           ),
           CupertinoButton(
