@@ -61,7 +61,7 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isFirstLaunch = prefs.getBool('first_launch_habits') ?? true;
     if (isFirstLaunch) {
-      await Future.delayed(Duration(milliseconds: 1000));
+      await Future.delayed(Duration(milliseconds: 200));
       setState(() {
         _showTutorial = true;
       });

@@ -46,7 +46,7 @@ class _TasksPageState extends State<TasksPage> with TickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isFirstLaunch = prefs.getBool('first_launch') ?? true;
     if (isFirstLaunch) {
-      await Future.delayed(Duration(milliseconds: 1000));
+      await Future.delayed(Duration(milliseconds: 200));
       setState(() {
         _showTutorial = true;
       });
