@@ -23,7 +23,7 @@ class AppShellState extends State<AppShell> {
     });
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
       controller: _controller,
@@ -31,21 +31,35 @@ class AppShellState extends State<AppShell> {
         iconSize: 32,
         backgroundColor: CupertinoColors.black,
         activeColor: CupertinoColors.white,
+        height: 60, // Increase the height of the tab bar
+        border: null, // Remove the top border
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.repeat),
+            icon: Padding(
+              padding: EdgeInsets.only(top: 8), // Add padding above the icon
+              child: Icon(CupertinoIcons.repeat),
+            ),
             label: 'Habit',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.list_bullet),
+            icon: Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Icon(CupertinoIcons.list_bullet),
+            ),
             label: 'Tasks',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.timer),
+            icon: Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Icon(CupertinoIcons.timer),
+            ),
             label: 'Focus',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.square_grid_2x2),
+            icon: Padding(
+              padding: EdgeInsets.only(top: 8),
+              child: Icon(CupertinoIcons.square_grid_2x2),
+            ),
             label: 'More',
           ),
         ],
