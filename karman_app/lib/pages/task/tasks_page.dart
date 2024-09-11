@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:karman_app/components/generic/minimal_floating_action_button.dart';
 import 'package:karman_app/controllers/task_controller.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/pages/task/task_details_sheet.dart';
@@ -18,18 +19,19 @@ class _TasksPageState extends State<TasksPage> with TickerProviderStateMixin {
   List<Task> _sortedTasks = [];
   final Map<int, bool> _expandedSections = {1: true, 2: true, 3: true, 0: true};
   bool _showTutorial = false;
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
+  late AnimationController _tutorialAnimationController;
+  late Animation<double> _tutorialFadeAnimation;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
+    _tutorialAnimationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 500),
     );
-    _fadeAnimation =
-        Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
+    _tutorialFadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(_tutorialAnimationController);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<TaskController>().loadTasks();
       _checkFirstLaunch();
@@ -38,7 +40,7 @@ class _TasksPageState extends State<TasksPage> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _tutorialAnimationController.dispose();
     super.dispose();
   }
 
@@ -50,12 +52,12 @@ class _TasksPageState extends State<TasksPage> with TickerProviderStateMixin {
       setState(() {
         _showTutorial = true;
       });
-      _animationController.forward();
+      _tutorialAnimationController.forward();
     }
   }
 
   void _onTutorialComplete() async {
-    await _animationController.reverse();
+    await _tutorialAnimationController.reverse();
     setState(() {
       _showTutorial = false;
     });
@@ -177,32 +179,25 @@ class _TasksPageState extends State<TasksPage> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-                trailing: CupertinoButton(
-                  onPressed: _addTask,
-                  child: Icon(
-                    CupertinoIcons.plus_circle,
-                    color: CupertinoColors.white,
-                    size: 32,
-                  ),
-                ),
               ),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 16),
-                child: SafeArea(
-                  child: TaskList(
-                    tasks: _sortedTasks,
-                    expandedSections: _expandedSections,
-                    onToggleSection: _toggleSection,
-                    onTaskToggle: _toggleTaskCompletion,
-                    onTaskDelete: _deleteTask,
-                    onTaskTap: _openTaskDetails,
-                  ),
+              child: SafeArea(
+                child: TaskList(
+                  tasks: _sortedTasks,
+                  expandedSections: _expandedSections,
+                  onToggleSection: _toggleSection,
+                  onTaskToggle: _toggleTaskCompletion,
+                  onTaskDelete: _deleteTask,
+                  onTaskTap: _openTaskDetails,
                 ),
               ),
             ),
+            MinimalFloatingActionButton(
+              onPressed: _addTask,
+              icon: CupertinoIcons.plus,
+            ),
             if (_showTutorial)
               FadeTransition(
-                opacity: _fadeAnimation,
+                opacity: _tutorialFadeAnimation,
                 child: TasksTutorial.build(context, _onTutorialComplete),
               ),
           ],
