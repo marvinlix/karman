@@ -25,7 +25,7 @@ class MinimalFloatingActionButton extends StatelessWidget {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: CupertinoColors.white.withOpacity(0.2),
+                color: CupertinoColors.white.withOpacity(0.15),
                 blurRadius: 10,
                 spreadRadius: 2,
               ),
