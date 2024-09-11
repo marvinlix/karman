@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:karman_app/components/generic/minimal_floating_action_button.dart';
 import 'package:karman_app/components/habit/habit_tile.dart';
 import 'package:karman_app/controllers/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
@@ -163,14 +164,6 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
-                trailing: CupertinoButton(
-                  onPressed: _showAddHabitDialog,
-                  child: Icon(
-                    CupertinoIcons.plus_circle,
-                    color: CupertinoColors.white,
-                    size: 32,
-                  ),
-                ),
               ),
               child: SafeArea(
                 child: _isLoading
@@ -206,6 +199,10 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
                             ],
                           ),
               ),
+            ),
+            MinimalFloatingActionButton(
+              onPressed: _showAddHabitDialog,
+              icon: CupertinoIcons.plus,
             ),
             if (_showTutorial)
               FadeTransition(

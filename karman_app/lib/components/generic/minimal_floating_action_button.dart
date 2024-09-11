@@ -12,29 +12,33 @@ class MinimalFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(
-      right: 20,
-      bottom: 40,
-      child: GestureDetector(
-        onTap: onPressed,
-        child: Container(
-          width: 60,
-          height: 60,
-          decoration: BoxDecoration(
-            color: CupertinoColors.black,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: CupertinoColors.white.withOpacity(0.15),
-                blurRadius: 10,
-                spreadRadius: 2,
+    return SafeArea(
+      child: Align(
+        alignment: Alignment.bottomRight,
+        child: Padding(
+          padding: const EdgeInsets.only(right: 24, bottom: 24),
+          child: GestureDetector(
+            onTap: onPressed,
+            child: Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: CupertinoColors.black,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: CupertinoColors.white.withOpacity(0.15),
+                    blurRadius: 10,
+                    spreadRadius: 2,
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Icon(
-            icon,
-            color: CupertinoColors.white,
-            size: 30,
+              child: Icon(
+                icon,
+                color: CupertinoColors.white,
+                size: 30,
+              ),
+            ),
           ),
         ),
       ),
