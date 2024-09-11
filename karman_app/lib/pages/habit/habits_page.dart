@@ -153,7 +153,7 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
               navigationBar: CupertinoNavigationBar(
                 backgroundColor: CupertinoColors.black,
                 middle: Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
+                  padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                   child: Text(
                     sortedHabits.isEmpty
                         ? 'No habits left'

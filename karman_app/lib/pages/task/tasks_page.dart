@@ -157,26 +157,28 @@ class _TasksPageState extends State<TasksPage> with TickerProviderStateMixin {
               navigationBar: CupertinoNavigationBar(
                 backgroundColor: CupertinoColors.black,
                 border: null,
-                leading: CupertinoButton(
-                  onPressed: hasCompletedTasks ? _clearCompletedTasks : null,
-                  child: Icon(
-                    CupertinoIcons.clear_circled,
-                    color: hasCompletedTasks
-                        ? CupertinoColors.white
-                        : CupertinoColors.systemGrey,
-                    size: 32,
+                padding: EdgeInsetsDirectional.fromSTEB(16, 10, 16, 10),
+                leading: Padding(
+                  padding: EdgeInsets.only(left: 8),
+                  child: CupertinoButton(
+                    padding: EdgeInsets.zero,
+                    onPressed: hasCompletedTasks ? _clearCompletedTasks : null,
+                    child: Icon(
+                      CupertinoIcons.clear_circled,
+                      color: hasCompletedTasks
+                          ? CupertinoColors.white
+                          : CupertinoColors.systemGrey,
+                      size: 28,
+                    ),
                   ),
                 ),
-                middle: Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Text(
-                    incompleteTasks == 0
-                        ? 'No tasks left'
-                        : '$incompleteTasks task${incompleteTasks == 1 ? '' : 's'} left',
-                    style: TextStyle(
-                      color: CupertinoColors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+                middle: Text(
+                  incompleteTasks == 0
+                      ? 'No tasks left'
+                      : '$incompleteTasks task${incompleteTasks == 1 ? '' : 's'} left',
+                  style: TextStyle(
+                    color: CupertinoColors.white,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),

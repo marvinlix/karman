@@ -121,14 +121,19 @@ class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
               return CupertinoPageScaffold(
                 navigationBar: CupertinoNavigationBar(
                   backgroundColor: CupertinoColors.black,
+                  padding: EdgeInsetsDirectional.fromSTEB(16, 10, 16, 10),
                   trailing: controller.isTimerRunning
-                      ? CupertinoButton(
-                          onPressed:
-                              controller.isTimerRunning ? _toggleMenu : null,
-                          child: Icon(
-                            controller.soundManager.currentIcon,
-                            color: CupertinoColors.white,
-                            size: 32,
+                      ? Padding(
+                          padding: EdgeInsets.only(right: 8),
+                          child: CupertinoButton(
+                            padding: EdgeInsets.zero,
+                            onPressed:
+                                controller.isTimerRunning ? _toggleMenu : null,
+                            child: Icon(
+                              controller.soundManager.currentIcon,
+                              color: CupertinoColors.white,
+                              size: 28,
+                            ),
                           ),
                         )
                       : null,
