@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:karman_app/models/task/task.dart';
 import '../services/task_service.dart';
+import '../services/task_notification_service.dart';
 import 'dart:async';
 
 class TaskController extends ChangeNotifier {
@@ -24,10 +25,13 @@ class TaskController extends ChangeNotifier {
       final newTask = await _taskService.createTask(task);
       _tasks.add(newTask);
       _scheduleTaskUpdates(newTask);
+      await TaskNotificationService.scheduleNotification(newTask);
       notifyListeners();
       return newTask;
     } catch (e) {
-      print('Error adding task: $e');
+      if (kDebugMode) {
+        print('Error adding task: $e');
+      }
       rethrow;
     }
   }
@@ -38,6 +42,7 @@ class TaskController extends ChangeNotifier {
     if (index != -1) {
       _tasks[index] = task;
       _scheduleTaskUpdates(task);
+      await TaskNotificationService.updateNotification(task);
       notifyListeners();
     }
     return task;
@@ -51,9 +56,10 @@ class TaskController extends ChangeNotifier {
       _pendingCompletions[taskId] = false;
     } else if (!task.isCompleted) {
       _pendingCompletions[taskId] = true;
-      _completionTimers[taskId] = Timer(Duration(seconds: 1), () {
+      _completionTimers[taskId] = Timer(Duration(seconds: 1), () async {
         final updatedTask = task.copyWith(isCompleted: true);
-        updateTask(updatedTask);
+        await updateTask(updatedTask);
+        await TaskNotificationService.cancelNotification(taskId);
         _completionTimers.remove(taskId);
         _pendingCompletions.remove(taskId);
         notifyListeners();
@@ -77,6 +83,7 @@ class TaskController extends ChangeNotifier {
     _pendingCompletions.remove(id);
     _updateTimers[id]?.cancel();
     _updateTimers.remove(id);
+    await TaskNotificationService.cancelNotification(id);
     notifyListeners();
   }
 
@@ -86,6 +93,7 @@ class TaskController extends ChangeNotifier {
       if (task.isCompleted) {
         _updateTimers[task.taskId]?.cancel();
         _updateTimers.remove(task.taskId);
+        TaskNotificationService.cancelNotification(task.taskId!);
         return true;
       }
       return false;
@@ -105,7 +113,9 @@ class TaskController extends ChangeNotifier {
     try {
       return await _taskService.getTaskById(taskId);
     } catch (e) {
-      print('Error fetching task: $e');
+      if (kDebugMode) {
+        print('Error fetching task: $e');
+      }
       return null;
     }
   }

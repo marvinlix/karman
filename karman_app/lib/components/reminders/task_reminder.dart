@@ -5,7 +5,7 @@ class TaskReminder extends StatefulWidget {
   final bool isEnabled;
   final DateTime? dateTime;
   final Function(bool) onToggle;
-  final Function(DateTime) onDateTimeSelected;
+  final Function(DateTime?) onDateTimeSelected;
   final String title;
   final String placeholder;
 
@@ -20,18 +20,20 @@ class TaskReminder extends StatefulWidget {
   });
 
   @override
-  _TaskReminderState createState() => _TaskReminderState();
+  TaskReminderState createState() => TaskReminderState();
 }
 
-class _TaskReminderState extends State<TaskReminder>
+class TaskReminderState extends State<TaskReminder>
     with SingleTickerProviderStateMixin {
   bool isPickerVisible = false;
   late AnimationController _animationController;
   late Animation<double> _animation;
+  DateTime? _selectedDateTime;
 
   @override
   void initState() {
     super.initState();
+    _selectedDateTime = widget.dateTime ?? _getInitialDateTime();
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -64,6 +66,13 @@ class _TaskReminderState extends State<TaskReminder>
     }
   }
 
+  void _handleDateTimeSelection(DateTime dateTime) {
+    setState(() {
+      _selectedDateTime = dateTime;
+    });
+    widget.onDateTimeSelected(dateTime);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -71,7 +80,9 @@ class _TaskReminderState extends State<TaskReminder>
         _buildToggleRow(),
         SizeTransition(
           sizeFactor: _animation,
-          child: isPickerVisible ? _buildDateTimePicker() : SizedBox.shrink(),
+          child: isPickerVisible
+              ? _buildDateTimePicker()
+              : const SizedBox.shrink(),
         ),
       ],
     );
@@ -80,8 +91,8 @@ class _TaskReminderState extends State<TaskReminder>
   Widget _buildToggleRow() {
     return Row(
       children: [
-        Icon(CupertinoIcons.bell, color: CupertinoColors.white),
-        SizedBox(width: 10),
+        const Icon(CupertinoIcons.bell, color: CupertinoColors.white),
+        const SizedBox(width: 10),
         Expanded(
           child: GestureDetector(
             onTap: () {
@@ -90,15 +101,16 @@ class _TaskReminderState extends State<TaskReminder>
               }
             },
             child: Text(
-              widget.dateTime == null
-                  ? widget.placeholder
-                  : DateFormat('MMM d, yyyy HH:mm').format(widget.dateTime!),
+              widget.isEnabled && _selectedDateTime != null
+                  ? DateFormat('MMM d, yyyy HH:mm').format(_selectedDateTime!)
+                  : widget.placeholder,
               style: TextStyle(
-                  color: widget.isEnabled
-                      ? CupertinoColors.white
-                      : CupertinoColors.systemGrey,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500),
+                color: widget.isEnabled
+                    ? CupertinoColors.white
+                    : CupertinoColors.systemGrey,
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
         ),
@@ -114,6 +126,7 @@ class _TaskReminderState extends State<TaskReminder>
   }
 
   Widget _buildDateTimePicker() {
+    final minimumDate = _getInitialDateTime();
     return SizedBox(
       height: 220,
       child: Column(
@@ -121,12 +134,15 @@ class _TaskReminderState extends State<TaskReminder>
           Expanded(
             child: CupertinoDatePicker(
               mode: CupertinoDatePickerMode.dateAndTime,
-              initialDateTime: widget.dateTime ?? DateTime.now(),
-              onDateTimeChanged: widget.onDateTimeSelected,
+              initialDateTime: _selectedDateTime!.isAfter(minimumDate)
+                  ? _selectedDateTime
+                  : minimumDate,
+              minimumDate: minimumDate,
+              onDateTimeChanged: _handleDateTimeSelection,
             ),
           ),
           CupertinoButton(
-            child: Text(
+            child: const Text(
               'Done',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
@@ -144,5 +160,10 @@ class _TaskReminderState extends State<TaskReminder>
         ],
       ),
     );
+  }
+
+  DateTime _getInitialDateTime() {
+    final now = DateTime.now();
+    return DateTime(now.year, now.month, now.day, now.hour, now.minute + 1);
   }
 }

@@ -6,7 +6,7 @@ class DateOptionWidget extends StatefulWidget {
   final bool isEnabled;
   final DateTime? date;
   final Function(bool) onToggle;
-  final Function(DateTime) onDateSelected;
+  final Function(DateTime?) onDateSelected;
   final String title;
   final String placeholder;
 
@@ -21,10 +21,10 @@ class DateOptionWidget extends StatefulWidget {
   });
 
   @override
-  _DateOptionWidgetState createState() => _DateOptionWidgetState();
+  DateOptionWidgetState createState() => DateOptionWidgetState();
 }
 
-class _DateOptionWidgetState extends State<DateOptionWidget>
+class DateOptionWidgetState extends State<DateOptionWidget>
     with SingleTickerProviderStateMixin {
   late DateTime _focusedDay;
   DateTime? _selectedDay;
@@ -69,6 +69,19 @@ class _DateOptionWidgetState extends State<DateOptionWidget>
     }
   }
 
+  bool _isDateInPast(DateTime date) {
+    final now = DateTime.now();
+    return date.isBefore(DateTime(now.year, now.month, now.day));
+  }
+
+  void _handleDateSelection(DateTime selectedDay, DateTime focusedDay) {
+    setState(() {
+      _selectedDay = selectedDay;
+      _focusedDay = focusedDay;
+    });
+    widget.onDateSelected(selectedDay);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -76,7 +89,9 @@ class _DateOptionWidgetState extends State<DateOptionWidget>
         _buildToggleRow(),
         SizeTransition(
           sizeFactor: _animation,
-          child: isPickerVisible ? _buildCalendarPicker() : SizedBox.shrink(),
+          child: isPickerVisible
+              ? _buildCalendarPicker()
+              : const SizedBox.shrink(),
         ),
       ],
     );
@@ -85,8 +100,8 @@ class _DateOptionWidgetState extends State<DateOptionWidget>
   Widget _buildToggleRow() {
     return Row(
       children: [
-        Icon(CupertinoIcons.calendar, color: CupertinoColors.white),
-        SizedBox(width: 10),
+        const Icon(CupertinoIcons.calendar, color: CupertinoColors.white),
+        const SizedBox(width: 10),
         Expanded(
           child: GestureDetector(
             onTap: () {
@@ -100,7 +115,9 @@ class _DateOptionWidgetState extends State<DateOptionWidget>
                   : DateFormat('MMM d, yyyy').format(widget.date!),
               style: TextStyle(
                 color: widget.isEnabled
-                    ? CupertinoColors.white
+                    ? (widget.date != null && _isDateInPast(widget.date!)
+                        ? CupertinoColors.systemRed
+                        : CupertinoColors.white)
                     : CupertinoColors.systemGrey,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
@@ -125,105 +142,56 @@ class _DateOptionWidgetState extends State<DateOptionWidget>
       child: Column(
         children: [
           TableCalendar(
-            firstDay: DateTime.utc(2010, 10, 16),
-            lastDay: DateTime.utc(2030, 3, 14),
+            firstDay: DateTime.now(),
+            lastDay: DateTime.now().add(const Duration(days: 365 * 10)),
             focusedDay: _focusedDay,
             calendarFormat: CalendarFormat.month,
-            selectedDayPredicate: (day) {
-              return isSameDay(_selectedDay, day);
-            },
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-            },
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: _handleDateSelection,
             onPageChanged: (focusedDay) {
               _focusedDay = focusedDay;
             },
+            daysOfWeekHeight: 50,
             calendarStyle: CalendarStyle(
               outsideDaysVisible: false,
-              weekendTextStyle: TextStyle(color: CupertinoColors.white),
-              holidayTextStyle: TextStyle(color: CupertinoColors.white),
-              todayTextStyle: TextStyle(
+              weekendTextStyle: const TextStyle(color: CupertinoColors.white),
+              holidayTextStyle: const TextStyle(color: CupertinoColors.white),
+              defaultTextStyle: const TextStyle(color: CupertinoColors.white),
+              todayTextStyle: const TextStyle(
                   color: CupertinoColors.black, fontWeight: FontWeight.bold),
-              selectedTextStyle: TextStyle(
+              selectedTextStyle: const TextStyle(
                   color: CupertinoColors.black, fontWeight: FontWeight.bold),
-              defaultTextStyle: TextStyle(color: CupertinoColors.white),
               todayDecoration: BoxDecoration(
                 color: CupertinoColors.white.withOpacity(0.5),
                 shape: BoxShape.circle,
               ),
-              selectedDecoration: BoxDecoration(
+              selectedDecoration: const BoxDecoration(
                 color: CupertinoColors.white,
                 shape: BoxShape.circle,
               ),
             ),
-            daysOfWeekHeight: 40,
-            headerStyle: HeaderStyle(
+            headerStyle: const HeaderStyle(
               formatButtonVisible: false,
               titleCentered: true,
-              titleTextStyle: TextStyle(
-                color: CupertinoColors.white,
-                fontSize: 17,
-              ),
-              leftChevronIcon: Icon(
-                CupertinoIcons.left_chevron,
-                color: CupertinoColors.white,
-              ),
-              rightChevronIcon: Icon(
-                CupertinoIcons.right_chevron,
-                color: CupertinoColors.white,
-              ),
-              headerPadding: EdgeInsets.symmetric(vertical: 16),
+              titleTextStyle:
+                  TextStyle(color: CupertinoColors.white, fontSize: 17),
+              leftChevronIcon: Icon(CupertinoIcons.left_chevron,
+                  color: CupertinoColors.white),
+              rightChevronIcon: Icon(CupertinoIcons.right_chevron,
+                  color: CupertinoColors.white),
             ),
-            calendarBuilders: CalendarBuilders(
-              dowBuilder: (context, day) {
-                final text = DateFormat.E().format(day);
-                final isSunday = day.weekday == DateTime.sunday;
-                return Container(
-                  height: 40,
-                  alignment: Alignment.center,
-                  child: Text(
-                    text[0],
-                    style: TextStyle(
-                      color: isSunday
-                          ? CupertinoColors.destructiveRed
-                          : CupertinoColors.white,
-                      fontSize: 16,
-                    ),
-                  ),
-                );
-              },
-              defaultBuilder: (context, day, focusedDay) {
-                final isSunday = day.weekday == DateTime.sunday;
-                return Container(
-                  margin: EdgeInsets.all(4),
-                  alignment: Alignment.center,
-                  child: Text(
-                    day.day.toString(),
-                    style: TextStyle(
-                      color: isSunday
-                          ? CupertinoColors.destructiveRed
-                          : CupertinoColors.white,
-                    ),
-                  ),
-                );
-              },
+            daysOfWeekStyle: const DaysOfWeekStyle(
+              weekdayStyle: TextStyle(color: CupertinoColors.white),
+              weekendStyle: TextStyle(color: CupertinoColors.white),
             ),
           ),
           CupertinoButton(
-            child: Text(
+            child: const Text(
               'Done',
               style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: CupertinoColors.white,
-              ),
+                  fontWeight: FontWeight.bold, color: CupertinoColors.white),
             ),
             onPressed: () {
-              if (_selectedDay != null) {
-                widget.onDateSelected(_selectedDay!);
-              }
               _animationController.reverse().then((_) {
                 setState(() {
                   isPickerVisible = false;

@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
-import 'package:karman_app/components/task/taskDetailsWidgets/task_name_input.dart';
-import 'package:karman_app/components/task/taskDetailsWidgets/task_options_section.dart';
 import 'package:karman_app/components/task/taskDetailsWidgets/priority_selector.dart';
+import 'package:karman_app/components/task/taskDetailsWidgets/task_name_input.dart';
 import 'package:karman_app/components/task/taskDetailsWidgets/task_note.dart';
-import 'package:karman_app/controllers/task_controller.dart';
-import 'package:karman_app/models/task/task.dart';
-import 'package:karman_app/services/notification_service.dart';
+import 'package:karman_app/components/task/taskDetailsWidgets/task_options_section.dart';
 import 'package:provider/provider.dart';
+import 'package:karman_app/models/task/task.dart';
+import 'package:karman_app/controllers/task_controller.dart';
+import 'package:karman_app/services/task_notification_service.dart';
 
 class TaskDetailsSheet extends StatefulWidget {
   final Task? task;
@@ -19,10 +19,10 @@ class TaskDetailsSheet extends StatefulWidget {
   });
 
   @override
-  _TaskDetailsSheetState createState() => _TaskDetailsSheetState();
+  TaskDetailsSheetState createState() => TaskDetailsSheetState();
 }
 
-class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
+class TaskDetailsSheetState extends State<TaskDetailsSheet> {
   late TextEditingController _nameController;
   late TextEditingController _noteController;
   late DateTime? _dueDate;
@@ -36,6 +36,11 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   @override
   void initState() {
     super.initState();
+    _initializeControllers();
+    _setupListeners();
+  }
+
+  void _initializeControllers() {
     _nameController = TextEditingController(text: widget.task?.name ?? '');
     _noteController = TextEditingController(text: widget.task?.note ?? '');
     _dueDate = widget.task?.dueDate;
@@ -44,16 +49,12 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
     _isDateEnabled = widget.task?.dueDate != null;
     _isReminderEnabled = widget.task?.reminder != null;
     _isTaskNameEmpty = _nameController.text.trim().isEmpty;
+    _hasChanges = widget.isNewTask;
+  }
 
+  void _setupListeners() {
     _nameController.addListener(_checkForChanges);
     _noteController.addListener(_checkForChanges);
-
-    if (widget.isNewTask) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        FocusScope.of(context).requestFocus(_nameFocusNode);
-      });
-      _hasChanges = true;
-    }
   }
 
   @override
@@ -66,7 +67,14 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
   }
 
   void _checkForChanges() {
-    bool newHasChanges = widget.isNewTask ||
+    setState(() {
+      _hasChanges = _hasChangesOccurred();
+      _isTaskNameEmpty = _nameController.text.trim().isEmpty;
+    });
+  }
+
+  bool _hasChangesOccurred() {
+    return widget.isNewTask ||
         _nameController.text != (widget.task?.name ?? '') ||
         _noteController.text != (widget.task?.note ?? '') ||
         _dueDate != widget.task?.dueDate ||
@@ -74,37 +82,17 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
         _reminder != widget.task?.reminder ||
         _isDateEnabled != (widget.task?.dueDate != null) ||
         _isReminderEnabled != (widget.task?.reminder != null);
-
-    if (newHasChanges != _hasChanges) {
-      setState(() {
-        _hasChanges = newHasChanges;
-      });
-    }
-
-    _updateTaskNameStatus();
   }
-
-  void _updateTaskNameStatus() {
-    setState(() {
-      _isTaskNameEmpty = _nameController.text.trim().isEmpty;
-    });
-  }
-
-  final FocusNode _nameFocusNode = FocusNode();
 
   void _saveChanges() async {
-    final now = DateTime.now();
-    bool isPastDueDate =
-        _isDateEnabled && _dueDate != null && _dueDate!.isBefore(now);
-    bool isPastReminder =
-        _isReminderEnabled && _reminder != null && _reminder!.isBefore(now);
+    final updatedTask = _createUpdatedTask();
+    final savedTask = await _saveTaskToController(updatedTask);
+    await _handleNotification(savedTask);
+    Navigator.of(context).pop(true);
+  }
 
-    if (isPastDueDate || isPastReminder) {
-      _showPastDateReminderDialog(isPastDueDate, isPastReminder);
-      return;
-    }
-
-    final updatedTask = Task(
+  Task _createUpdatedTask() {
+    return Task(
       taskId: widget.task?.taskId,
       name: _nameController.text.trim(),
       note: _noteController.text,
@@ -113,84 +101,22 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
       reminder: _isReminderEnabled ? _reminder : null,
       isCompleted: widget.task?.isCompleted ?? false,
     );
+  }
 
-    Task savedTask;
-    try {
-      if (widget.isNewTask) {
-        savedTask = await context.read<TaskController>().addTask(updatedTask);
-      } else {
-        savedTask =
-            await context.read<TaskController>().updateTask(updatedTask);
-      }
-
-      if (savedTask.reminder != null && savedTask.taskId != null) {
-        await NotificationService.scheduleNotification(
-          id: savedTask.taskId!,
-          title: 'You\'ve got a task to do!',
-          body: savedTask.name,
-          scheduledDate: savedTask.reminder!,
-          payload: 'task_${savedTask.taskId}',
-        );
-      } else if (savedTask.taskId != null) {
-        await NotificationService.cancelNotification(savedTask.taskId!);
-      }
-
-      Navigator.of(context).pop(true);
-    } catch (e) {
-      print('Error saving task: $e');
-      _showQuirkyDialog('Oops! Something Went Wrong',
-          'The task gremlins are acting up. Please try again later.');
+  Future<Task> _saveTaskToController(Task task) async {
+    if (widget.isNewTask) {
+      return await context.read<TaskController>().addTask(task);
+    } else {
+      return await context.read<TaskController>().updateTask(task);
     }
   }
 
-  void _showQuirkyDialog(String title, String content) {
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) => CupertinoAlertDialog(
-        title: Text(title, style: TextStyle(fontSize: 18)),
-        content: Text(content),
-        actions: <CupertinoDialogAction>[
-          CupertinoDialogAction(
-            child: Text('Got it!'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showPastDateReminderDialog(bool isPastDueDate, bool isPastReminder) {
-    String title = 'Time Travel Alert!';
-    String content = '';
-
-    if (isPastDueDate && isPastReminder) {
-      content =
-          'The due date and reminder are set in the past. Please update them or turn them off to save the changes.';
-    } else if (isPastDueDate) {
-      content =
-          'The due date is set in the past. Please update it or turn it off to save the changes.';
-    } else if (isPastReminder) {
-      content =
-          'The reminder is set in the past. Please update it or turn it off to save the changes.';
+  Future<void> _handleNotification(Task task) async {
+    if (task.reminder != null && task.taskId != null) {
+      await TaskNotificationService.scheduleNotification(task);
+    } else if (task.taskId != null) {
+      await TaskNotificationService.cancelNotification(task.taskId!);
     }
-
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) => CupertinoAlertDialog(
-        title: Text(title, style: TextStyle(fontSize: 18)),
-        content: Text(content),
-        actions: <CupertinoDialogAction>[
-          CupertinoDialogAction(
-            child: Text('OK'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -215,7 +141,6 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
             children: [
               TaskNameInput(
                 controller: _nameController,
-                focusNode: _nameFocusNode,
                 onSave: _hasChanges && !_isTaskNameEmpty ? _saveChanges : null,
                 isTaskNameEmpty: _isTaskNameEmpty,
                 hasChanges: _hasChanges,
@@ -231,42 +156,32 @@ class _TaskDetailsSheetState extends State<TaskDetailsSheet> {
                 isReminderEnabled: _isReminderEnabled,
                 dueDate: _dueDate,
                 reminder: _reminder,
-                onDateToggle: (value) {
-                  setState(() {
-                    _isDateEnabled = value;
-                    if (!value) _dueDate = null;
-                    _checkForChanges();
-                  });
-                },
-                onReminderToggle: (value) {
-                  setState(() {
-                    _isReminderEnabled = value;
-                    if (!value) _reminder = null;
-                    _checkForChanges();
-                  });
-                },
-                onDateSelected: (date) {
-                  setState(() {
-                    _dueDate = date;
-                    _checkForChanges();
-                  });
-                },
-                onReminderSet: (DateTime newDateTime) {
-                  setState(() {
-                    _reminder = newDateTime;
-                    _checkForChanges();
-                  });
-                },
+                onDateToggle: (value) => setState(() {
+                  _isDateEnabled = value;
+                  if (!value) _dueDate = null;
+                  _checkForChanges();
+                }),
+                onReminderToggle: (value) => setState(() {
+                  _isReminderEnabled = value;
+                  if (!value) _reminder = null;
+                  _checkForChanges();
+                }),
+                onDateSelected: (date) => setState(() {
+                  _dueDate = date;
+                  _checkForChanges();
+                }),
+                onReminderSet: (DateTime? newDateTime) => setState(() {
+                  _reminder = newDateTime;
+                  _checkForChanges();
+                }),
               ),
               SizedBox(height: 30),
               PrioritySelector(
                 selectedPriority: _priority,
-                onPriorityChanged: (priority) {
-                  setState(() {
-                    _priority = priority;
-                    _checkForChanges();
-                  });
-                },
+                onPriorityChanged: (priority) => setState(() {
+                  _priority = priority;
+                  _checkForChanges();
+                }),
               ),
             ],
           ),

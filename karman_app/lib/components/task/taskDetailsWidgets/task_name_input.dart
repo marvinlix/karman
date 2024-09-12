@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 class TaskNameInput extends StatelessWidget {
   final TextEditingController controller;
-  final FocusNode focusNode;
   final VoidCallback? onSave;
   final bool isTaskNameEmpty;
   final bool hasChanges;
@@ -11,7 +10,6 @@ class TaskNameInput extends StatelessWidget {
   const TaskNameInput({
     super.key,
     required this.controller,
-    required this.focusNode,
     required this.onSave,
     required this.isTaskNameEmpty,
     required this.hasChanges,
@@ -24,7 +22,6 @@ class TaskNameInput extends StatelessWidget {
         Expanded(
           child: CupertinoTextField(
             controller: controller,
-            focusNode: focusNode,
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
