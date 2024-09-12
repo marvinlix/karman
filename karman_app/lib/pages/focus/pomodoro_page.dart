@@ -4,6 +4,7 @@ import 'package:karman_app/controllers/pomodoro_controller.dart';
 import 'package:karman_app/components/pomodoro/pomodoro_timer_display.dart';
 import 'package:karman_app/components/pomodoro/pomodoro_session_indicator.dart';
 import 'package:karman_app/components/pomodoro/pomodoro_settings_picker.dart';
+import 'package:karman_app/components/pomodoro/pomodoro_session_type_indicator.dart';
 import 'package:karman_app/components/focus/rolling_menu.dart';
 import 'package:karman_app/app_state.dart';
 
@@ -11,10 +12,10 @@ class PomodoroPage extends StatefulWidget {
   const PomodoroPage({super.key});
 
   @override
-  _PomodoroPageState createState() => _PomodoroPageState();
+  PomodoroPageState createState() => PomodoroPageState();
 }
 
-class _PomodoroPageState extends State<PomodoroPage>
+class PomodoroPageState extends State<PomodoroPage>
     with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -125,71 +126,83 @@ class _PomodoroPageState extends State<PomodoroPage>
                 child: Stack(
                   children: [
                     Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        PomodoroTimerDisplay(controller: controller),
-                        PomodoroSessionIndicator(controller: controller),
-                        SizedBox(height: 20),
-                        AnimatedSwitcher(
-                          duration: Duration(milliseconds: 300),
-                          child: controller.isRunning
-                              ? CupertinoButton(
-                                  onPressed: () {
-                                    controller.toggleTimer();
-                                    appState.setPomodoroActive(false);
-                                  },
-                                  child: Icon(CupertinoIcons.stop_fill,
-                                      color: CupertinoColors.white, size: 40),
-                                )
-                              : PomodoroSettingsPicker(controller: controller),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              PomodoroTimerDisplay(controller: controller),
+                              SizedBox(height: 10),
+                              PomodoroSessionIndicator(controller: controller),
+                              SizedBox(height: 20),
+                              PomodoroSessionTypeIndicator(
+                                  isFocusSession: controller.isFocusSession,
+                                  isRunning: controller.isRunning),
+                              SizedBox(height: 20),
+                              CupertinoButton(
+                                child: Icon(
+                                  controller.isRunning
+                                      ? CupertinoIcons.stop_circle
+                                      : CupertinoIcons.play_circle,
+                                  color: CupertinoColors.white,
+                                  size: 56,
+                                ),
+                                onPressed: () {
+                                  controller.toggleTimer();
+                                  appState
+                                      .setPomodoroActive(controller.isRunning);
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                         SizedBox(height: 20),
-                        if (!controller.isRunning)
-                          CupertinoButton(
-                            child: Icon(CupertinoIcons.play_fill,
-                                color: CupertinoColors.white, size: 40),
-                            onPressed: () {
-                              controller.toggleTimer();
-                              appState.setPomodoroActive(true);
-                            },
+                        AnimatedContainer(
+                          duration: Duration(milliseconds: 300),
+                          height: controller.isRunning ? 0 : 300,
+                          child: SingleChildScrollView(
+                            child:
+                                PomodoroSettingsPicker(controller: controller),
                           ),
-                        SizedBox(height: 40),
+                        ),
                       ],
                     ),
-                    Positioned(
-                      top: 0,
-                      right: 0,
-                      left: 0,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          SizedBox(height: 44),
-                          SizeTransition(
-                            sizeFactor: _animation,
-                            axisAlignment: -1,
-                            child: Container(
-                              color: CupertinoColors.black.withOpacity(0.8),
-                              child: RollingMenu(
-                                items: controller.soundManager.sounds,
-                                onItemSelected: (Map<String, dynamic> sound) {
-                                  controller.soundManager.currentSound =
-                                      sound['file'];
-                                  if (sound['file'] == null) {
-                                    controller.soundManager
-                                        .stopBackgroundSound();
-                                  } else {
-                                    controller.soundManager.playSelectedSound();
-                                  }
-                                  _toggleMenu();
-                                },
-                                currentSound:
-                                    controller.soundManager.currentSound,
+                    if (controller.isRunning)
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        left: 0,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            SizedBox(height: 44),
+                            SizeTransition(
+                              sizeFactor: _animation,
+                              axisAlignment: -1,
+                              child: Container(
+                                color: CupertinoColors.black.withOpacity(0.8),
+                                child: RollingMenu(
+                                  items: controller.soundManager.sounds,
+                                  onItemSelected: (Map<String, dynamic> sound) {
+                                    controller.soundManager.currentSound =
+                                        sound['file'];
+                                    if (sound['file'] == null) {
+                                      controller.soundManager
+                                          .stopBackgroundSound();
+                                    } else {
+                                      controller.soundManager
+                                          .playSelectedSound();
+                                    }
+                                    _toggleMenu();
+                                  },
+                                  currentSound:
+                                      controller.soundManager.currentSound,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
