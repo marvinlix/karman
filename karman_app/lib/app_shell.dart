@@ -51,7 +51,7 @@ class AppShellState extends State<AppShell> {
           BottomNavigationBarItem(
             icon: Padding(
               padding: EdgeInsets.only(top: 8),
-              child: Icon(CupertinoIcons.timer),
+              child: Icon(CupertinoIcons.hourglass),
             ),
             label: 'Focus',
           ),
