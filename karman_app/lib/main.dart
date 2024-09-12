@@ -8,6 +8,7 @@ import 'package:karman_app/services/notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:karman_app/database/database_service.dart';
+import 'package:karman_app/app_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +35,7 @@ void main() async {
     providers: [
       ChangeNotifierProvider(create: (context) => taskController),
       ChangeNotifierProvider(create: (context) => habitController),
+      ChangeNotifierProvider(create: (context) => AppState()),
     ],
     child: KarmanApp(
       navigatorKey: navigatorKey,
@@ -60,7 +62,9 @@ class KarmanApp extends StatelessWidget {
       theme: const CupertinoThemeData(
         brightness: Brightness.dark,
       ),
-      home: showWelcome ? const WelcomeScreen() : AppShell(key: AppShell.globalKey),
+      home: showWelcome
+          ? const WelcomeScreen()
+          : AppShell(key: AppShell.globalKey),
     );
   }
 }

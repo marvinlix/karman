@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:karman_app/app_state.dart';
 import 'package:karman_app/controllers/focus_controller.dart';
+import 'package:karman_app/pages/focus/pomodoro_page.dart';
 import 'package:karman_app/pages/tutorial/focus_tutorial.dart';
 import 'package:provider/provider.dart';
 import 'package:karman_app/components/focus/circular_slider.dart';
@@ -113,22 +115,43 @@ class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => FocusController(),
-      child: Consumer<FocusController>(
-        builder: (context, controller, child) {
+      child: Consumer2<FocusController, AppState>(
+        builder: (context, controller, appState, child) {
           return FutureBuilder(
             future: Future.microtask(() => _listenForAchievements(controller)),
             builder: (context, snapshot) {
               return CupertinoPageScaffold(
                 navigationBar: CupertinoNavigationBar(
                   backgroundColor: CupertinoColors.black,
+                  border: null,
                   padding: EdgeInsetsDirectional.fromSTEB(16, 10, 16, 10),
+                  leading: Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: CupertinoButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: !controller.isTimerRunning
+                          ? () {
+                              Navigator.of(context).push(
+                                CupertinoPageRoute(
+                                    builder: (context) => PomodoroPage()),
+                              );
+                            }
+                          : null,
+                      child: Icon(
+                        CupertinoIcons.timer,
+                        color: !controller.isTimerRunning
+                            ? CupertinoColors.white
+                            : CupertinoColors.systemGrey,
+                        size: 28,
+                      ),
+                    ),
+                  ),
                   trailing: controller.isTimerRunning
                       ? Padding(
                           padding: EdgeInsets.only(right: 8),
                           child: CupertinoButton(
                             padding: EdgeInsets.zero,
-                            onPressed:
-                                controller.isTimerRunning ? _toggleMenu : null,
+                            onPressed: _toggleMenu,
                             child: Icon(
                               controller.soundManager.currentIcon,
                               color: CupertinoColors.white,
