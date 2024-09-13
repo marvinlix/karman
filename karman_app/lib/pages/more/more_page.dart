@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:karman_app/pages/more/badges/focus_badges_page.dart';
+import 'package:karman_app/pages/more/badges/habit_badges_page.dart';
 import 'package:karman_app/pages/more/details/community_page.dart';
 import 'package:karman_app/pages/more/details/contribution_page.dart';
 import 'package:karman_app/pages/more/details/support_page.dart';
-import 'package:karman_app/pages/more/badges/focus_badges_page.dart';
-import 'package:karman_app/pages/more/badges/habit_badges_page.dart';
+import 'package:karman_app/pages/more/details/tutorial_selector.dart';
 
 class MorePage extends StatelessWidget {
   const MorePage({super.key});
@@ -19,7 +20,6 @@ class MorePage extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.all(16),
           children: [
-            // Achievements Section
             Text(
               'Achievements',
               style: TextStyle(
@@ -61,10 +61,8 @@ class MorePage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 40),
-
-            // Make Karman Better Section
             Text(
-              'Make Karman Better',
+              'Make karman Better',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -106,6 +104,22 @@ class MorePage extends StatelessWidget {
                   builder: (context) => supportPage,
                 ),
               ),
+            ),
+            SizedBox(height: 40),
+            Text(
+              'Help',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: CupertinoColors.white,
+              ),
+            ),
+            SizedBox(height: 16),
+            _buildNavigationTile(
+              context,
+              'Repeat Tutorial',
+              CupertinoIcons.refresh,
+              () => showTutorialOptions(context),
             ),
           ],
         ),
