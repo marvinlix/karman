@@ -32,12 +32,19 @@ class TaskDetailsSheetState extends State<TaskDetailsSheet> {
   bool _isReminderEnabled = false;
   bool _isTaskNameEmpty = true;
   bool _hasChanges = false;
+  late FocusNode _nameFocusNode;
 
   @override
   void initState() {
     super.initState();
     _initializeControllers();
     _setupListeners();
+    _nameFocusNode = FocusNode();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.isNewTask) {
+        _nameFocusNode.requestFocus();
+      }
+    });
   }
 
   void _initializeControllers() {
@@ -63,6 +70,7 @@ class TaskDetailsSheetState extends State<TaskDetailsSheet> {
     _noteController.removeListener(_checkForChanges);
     _nameController.dispose();
     _noteController.dispose();
+    _nameFocusNode.dispose();
     super.dispose();
   }
 
@@ -141,6 +149,7 @@ class TaskDetailsSheetState extends State<TaskDetailsSheet> {
             children: [
               TaskNameInput(
                 controller: _nameController,
+                focusNode: _nameFocusNode,
                 onSave: _hasChanges && !_isTaskNameEmpty ? _saveChanges : null,
                 isTaskNameEmpty: _isTaskNameEmpty,
                 hasChanges: _hasChanges,
