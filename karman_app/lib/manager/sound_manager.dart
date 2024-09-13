@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
 class SoundManager {
   final AudioPlayer backgroundPlayer = AudioPlayer();
-  final AudioPlayer chimePlayer = AudioPlayer();
 
   final List<Map<String, dynamic>> sounds = [
     {
@@ -60,20 +58,8 @@ class SoundManager {
     await backgroundPlayer.stop();
   }
 
-  Future<void> playChime() async {
-    try {
-      await chimePlayer.setAsset('lib/assets/audio/subtle_chime.mp3');
-      await chimePlayer.play();
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error playing chime: $e');
-      }
-    }
-  }
-
   void dispose() {
     backgroundPlayer.dispose();
-    chimePlayer.dispose();
   }
 
   IconData get currentIcon {
