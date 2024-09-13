@@ -227,7 +227,7 @@ class FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
                                   builder: (context) => PomodoroPage()),
                             );
                           },
-                          icon: 'lib/assets/images/pomodoro/pomo_icon.png',
+                          icon: 'lib/assets/images/pomodoro/pomo_active.png',
                         ),
                       ),
                     ],
