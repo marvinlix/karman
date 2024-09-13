@@ -108,7 +108,10 @@ class PomodoroPageState extends State<PomodoroPage>
           ),
           CupertinoDialogAction(
             isDestructiveAction: true,
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () {
+              controller.stopTimer(countSession: false);
+              Navigator.of(context).pop(true);
+            },
             child: Text('Exit'),
           ),
         ],

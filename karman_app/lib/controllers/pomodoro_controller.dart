@@ -77,7 +77,7 @@ class PomodoroController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _stopTimer({bool countSession = false}) {
+  void stopTimer({bool countSession = false}) {
     _isRunning = false;
     _timer?.cancel();
     Provider.of<AppState>(_context, listen: false).setPomodoroActive(false);
@@ -110,7 +110,7 @@ class PomodoroController extends ChangeNotifier {
             isDestructiveAction: true,
             onPressed: () {
               Navigator.of(context).pop();
-              _stopTimer(countSession: false);
+              stopTimer(countSession: false);
             },
             child: Text('Stop'),
           ),
@@ -139,7 +139,7 @@ class PomodoroController extends ChangeNotifier {
         _currentDuration = Duration(minutes: _breakDuration);
         soundManager.stopBackgroundSound();
       } else {
-        _stopTimer(countSession: true);
+        stopTimer(countSession: true);
         _showEndNotification();
         return;
       }
