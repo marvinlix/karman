@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class PomodoroSessionTypeIndicator extends StatelessWidget {
   final bool isFocusSession;
@@ -16,12 +17,12 @@ class PomodoroSessionTypeIndicator extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(
-          CupertinoIcons.hourglass,
-          color: isFocusSession && isRunning
-              ? CupertinoColors.white
-              : CupertinoColors.systemGrey,
-          size: 32,
+        SvgPicture.asset(
+          isFocusSession && isRunning
+              ? 'lib/assets/images/pomodoro/pomo_active.svg'
+              : 'lib/assets/images/pomodoro/pomo_inactive.svg',
+          width: 30,
+          height: 30,
         ),
         SizedBox(width: 40),
         Icon(

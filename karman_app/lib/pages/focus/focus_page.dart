@@ -9,15 +9,16 @@ import 'package:karman_app/components/focus/circular_slider.dart';
 import 'package:karman_app/components/focus/rolling_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:karman_app/components/badges/achievement_overlay.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class FocusPage extends StatefulWidget {
   const FocusPage({super.key});
 
   @override
-  _FocusPageState createState() => _FocusPageState();
+  FocusPageState createState() => FocusPageState();
 }
 
-class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
+class FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
   bool _isMenuOpen = false;
@@ -137,26 +138,23 @@ class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
                               );
                             }
                           : null,
-                      child: Icon(
-                        CupertinoIcons.timer,
-                        color: !controller.isTimerRunning
-                            ? CupertinoColors.white
-                            : CupertinoColors.systemGrey,
-                        size: 28,
+                      child: SvgPicture.asset(
+                        !controller.isTimerRunning
+                            ? 'lib/assets/images/pomodoro/pomo_active.svg'
+                            : 'lib/assets/images/pomodoro/pomo_inactive.svg',
+                        width: 40,
+                        height: 40,
                       ),
                     ),
                   ),
                   trailing: controller.isTimerRunning
-                      ? Padding(
-                          padding: EdgeInsets.only(right: 8),
-                          child: CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: _toggleMenu,
-                            child: Icon(
-                              controller.soundManager.currentIcon,
-                              color: CupertinoColors.white,
-                              size: 28,
-                            ),
+                      ? CupertinoButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: _toggleMenu,
+                          child: Icon(
+                            controller.soundManager.currentIcon,
+                            color: CupertinoColors.white,
+                            size: 28,
                           ),
                         )
                       : null,

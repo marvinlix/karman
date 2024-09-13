@@ -35,6 +35,7 @@ dependencies:
   lottie: ^3.1.2
   url_launcher: ^6.3.0
   flutter_native_splash: ^2.4.1
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +75,8 @@ flutter:
     - lib/assets/tutorials/focus/set_time.png
     - lib/assets/tutorials/focus/start_timer.png
     - lib/assets/tutorials/focus/relaxing_sounds.png
+    - lib/assets/images/pomodoro/pomo_active.svg
+    - lib/assets/images/pomodoro/pomo_inactive.svg
     - lib/assets/audio/rain.mp3
     - lib/assets/audio/forest.mp3
     - lib/assets/audio/ocean.mp3
