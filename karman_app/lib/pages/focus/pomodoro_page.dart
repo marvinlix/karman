@@ -7,6 +7,8 @@ import 'package:karman_app/components/pomodoro/pomodoro_settings_picker.dart';
 import 'package:karman_app/components/pomodoro/pomodoro_session_type_indicator.dart';
 import 'package:karman_app/components/focus/rolling_menu.dart';
 import 'package:karman_app/app_state.dart';
+import 'package:karman_app/pages/tutorial/pomodoro_tutorial.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PomodoroPage extends StatefulWidget {
   const PomodoroPage({super.key});
@@ -21,10 +23,17 @@ class PomodoroPageState extends State<PomodoroPage>
   late Animation<double> _animation;
   bool _isMenuOpen = false;
 
+  bool _showTutorial = false;
+  late AnimationController _tutorialAnimationController;
+  late Animation<double> _tutorialFadeAnimation;
+
   @override
   void initState() {
     super.initState();
     _setupAnimations();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkFirstLaunch();
+    });
   }
 
   void _setupAnimations() {
@@ -33,6 +42,33 @@ class PomodoroPageState extends State<PomodoroPage>
       vsync: this,
     );
     _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+    _tutorialAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 500),
+      vsync: this,
+    );
+    _tutorialFadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
+        .animate(_tutorialAnimationController);
+  }
+
+  Future<void> _checkFirstLaunch() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isFirstLaunch = prefs.getBool('first_launch_pomodoro') ?? true;
+    if (isFirstLaunch) {
+      await Future.delayed(Duration(milliseconds: 200));
+      setState(() {
+        _showTutorial = true;
+      });
+      _tutorialAnimationController.forward();
+    }
+  }
+
+  void _onTutorialComplete() async {
+    await _tutorialAnimationController.reverse();
+    setState(() {
+      _showTutorial = false;
+    });
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('first_launch_pomodoro', false);
   }
 
   void _toggleMenu() {
@@ -49,6 +85,7 @@ class PomodoroPageState extends State<PomodoroPage>
   @override
   void dispose() {
     _animationController.dispose();
+    _tutorialAnimationController.dispose();
     super.dispose();
   }
 
@@ -216,6 +253,12 @@ class PomodoroPageState extends State<PomodoroPage>
                             ),
                           ],
                         ),
+                      ),
+                    if (_showTutorial)
+                      FadeTransition(
+                        opacity: _tutorialFadeAnimation,
+                        child: PomodoroTutorial.build(
+                            context, _onTutorialComplete),
                       ),
                   ],
                 ),
