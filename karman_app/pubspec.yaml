@@ -77,12 +77,12 @@ flutter:
     - lib/assets/tutorials/focus/relaxing_sounds.png
     - lib/assets/images/pomodoro/pomo_active.svg
     - lib/assets/images/pomodoro/pomo_inactive.svg
+    - lib/assets/images/pomodoro/pomo_icon.png
     - lib/assets/audio/rain.mp3
     - lib/assets/audio/forest.mp3
     - lib/assets/audio/ocean.mp3
     - lib/assets/audio/night.mp3
     - lib/assets/audio/airplane.mp3
-    - lib/assets/audio/subtle_chime.mp3
 
 flutter_launcher_icons:
   android: "launcher_icon"

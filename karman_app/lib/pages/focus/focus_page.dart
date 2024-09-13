@@ -9,7 +9,7 @@ import 'package:karman_app/components/focus/circular_slider.dart';
 import 'package:karman_app/components/focus/rolling_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:karman_app/components/badges/achievement_overlay.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:karman_app/components/generic/minimal_floating_action_button.dart';
 
 class FocusPage extends StatefulWidget {
   const FocusPage({super.key});
@@ -26,6 +26,9 @@ class FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
   bool _showTutorial = false;
   late AnimationController _tutorialAnimationController;
   late Animation<double> _tutorialFadeAnimation;
+
+  late AnimationController _fabAnimationController;
+  late Animation<Offset> _fabAnimation;
 
   StreamSubscription? _achievementSubscription;
 
@@ -50,6 +53,17 @@ class FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
     );
     _tutorialFadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
         .animate(_tutorialAnimationController);
+    _fabAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _fabAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, 2),
+    ).animate(CurvedAnimation(
+      parent: _fabAnimationController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   Future<void> _checkFirstLaunch() async {
@@ -108,6 +122,7 @@ class FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
   void dispose() {
     _animationController.dispose();
     _tutorialAnimationController.dispose();
+    _fabAnimationController.dispose();
     _achievementSubscription?.cancel();
     super.dispose();
   }
@@ -121,32 +136,18 @@ class FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
           return FutureBuilder(
             future: Future.microtask(() => _listenForAchievements(controller)),
             builder: (context, snapshot) {
+              if (controller.isTimerRunning &&
+                  _fabAnimationController.isDismissed) {
+                _fabAnimationController.forward();
+              } else if (!controller.isTimerRunning &&
+                  _fabAnimationController.isCompleted) {
+                _fabAnimationController.reverse();
+              }
               return CupertinoPageScaffold(
                 navigationBar: CupertinoNavigationBar(
                   backgroundColor: CupertinoColors.black,
                   border: null,
                   padding: EdgeInsetsDirectional.fromSTEB(16, 10, 16, 10),
-                  leading: Padding(
-                    padding: EdgeInsets.only(left: 8),
-                    child: CupertinoButton(
-                      padding: EdgeInsets.zero,
-                      onPressed: !controller.isTimerRunning
-                          ? () {
-                              Navigator.of(context).push(
-                                CupertinoPageRoute(
-                                    builder: (context) => PomodoroPage()),
-                              );
-                            }
-                          : null,
-                      child: SvgPicture.asset(
-                        !controller.isTimerRunning
-                            ? 'lib/assets/images/pomodoro/pomo_active.svg'
-                            : 'lib/assets/images/pomodoro/pomo_inactive.svg',
-                        width: 40,
-                        height: 40,
-                      ),
-                    ),
-                  ),
                   trailing: controller.isTimerRunning
                       ? CupertinoButton(
                           padding: EdgeInsets.zero,
@@ -217,6 +218,18 @@ class FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
                           child:
                               FocusTutorial.build(context, _onTutorialComplete),
                         ),
+                      SlideTransition(
+                        position: _fabAnimation,
+                        child: MinimalFloatingActionButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              CupertinoPageRoute(
+                                  builder: (context) => PomodoroPage()),
+                            );
+                          },
+                          icon: 'lib/assets/images/pomodoro/pomo_icon.png',
+                        ),
+                      ),
                     ],
                   ),
                 ),

@@ -21,8 +21,8 @@ class PomodoroSessionTypeIndicator extends StatelessWidget {
           isFocusSession && isRunning
               ? 'lib/assets/images/pomodoro/pomo_active.svg'
               : 'lib/assets/images/pomodoro/pomo_inactive.svg',
-          width: 30,
-          height: 30,
+          width: 36,
+          height: 36,
         ),
         SizedBox(width: 40),
         Icon(
