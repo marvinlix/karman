@@ -6,7 +6,7 @@ import 'package:karman_app/components/task/taskDetailsWidgets/task_options_secti
 import 'package:provider/provider.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/controllers/task_controller.dart';
-import 'package:karman_app/services/task_notification_service.dart';
+import 'package:karman_app/services/notifications/task_notification_service.dart';
 
 class TaskDetailsSheet extends StatefulWidget {
   final Task? task;

@@ -5,7 +5,7 @@ import 'package:karman_app/app_state.dart';
 import 'package:karman_app/services/focus_service.dart';
 import 'package:provider/provider.dart';
 import 'package:karman_app/manager/sound_manager.dart';
-import 'package:karman_app/services/pomodoro_notification_service.dart';
+import 'package:karman_app/services/notifications/pomodoro_notification_service.dart';
 import 'package:karman_app/constants/pomodoro_constants.dart';
 
 class PomodoroController extends ChangeNotifier {

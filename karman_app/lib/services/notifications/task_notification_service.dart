@@ -1,5 +1,5 @@
 import 'package:karman_app/models/task/task.dart';
-import 'package:karman_app/services/notification_service.dart';
+import 'package:karman_app/services/notifications/notification_service.dart';
 
 class TaskNotificationService {
   static Future<void> scheduleNotification(Task task) async {
