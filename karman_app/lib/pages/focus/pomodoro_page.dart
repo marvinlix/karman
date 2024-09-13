@@ -111,7 +111,7 @@ class PomodoroPageState extends State<PomodoroPage>
                         : CupertinoColors.white,
                   ),
                 ),
-                trailing: controller.isRunning
+                trailing: controller.isRunning && controller.isFocusSession
                     ? CupertinoButton(
                         padding: EdgeInsets.zero,
                         onPressed: _toggleMenu,
@@ -132,7 +132,21 @@ class PomodoroPageState extends State<PomodoroPage>
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               PomodoroTimerDisplay(controller: controller),
-                              SizedBox(height: 10),
+                              if (controller.isRunning &&
+                                  controller.isFocusSession)
+                                Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: Text(
+                                    controller.currentQuote,
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: CupertinoColors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              SizedBox(height: 20),
                               PomodoroSessionIndicator(controller: controller),
                               SizedBox(height: 20),
                               PomodoroSessionTypeIndicator(
@@ -167,7 +181,7 @@ class PomodoroPageState extends State<PomodoroPage>
                         ),
                       ],
                     ),
-                    if (controller.isRunning)
+                    if (controller.isRunning && controller.isFocusSession)
                       Positioned(
                         top: 0,
                         right: 0,

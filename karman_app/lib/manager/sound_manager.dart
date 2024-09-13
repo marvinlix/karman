@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
@@ -64,7 +65,9 @@ class SoundManager {
       await chimePlayer.setAsset('lib/assets/audio/subtle_chime.mp3');
       await chimePlayer.play();
     } catch (e) {
-      print('Error playing chime: $e');
+      if (kDebugMode) {
+        print('Error playing chime: $e');
+      }
     }
   }
 

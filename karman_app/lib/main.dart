@@ -5,6 +5,7 @@ import 'package:karman_app/controllers/task_controller.dart';
 import 'package:karman_app/pages/welcome/welcome_screen.dart';
 import 'package:karman_app/pages/welcome/welcome_service.dart';
 import 'package:karman_app/services/notification_service.dart';
+import 'package:karman_app/services/pomodoro_notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:karman_app/database/database_service.dart';
@@ -14,21 +15,18 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   await NotificationService.init(navigatorKey);
+  await PomodoroNotificationService.initialize();
   tz.initializeTimeZones();
 
-  // Initialize the database
   final databaseService = DatabaseService();
   await databaseService.ensureInitialized();
 
-  // Initialize controllers
   final taskController = TaskController();
   final habitController = HabitController();
 
-  // Load initial data
   await taskController.loadTasks();
   await habitController.loadHabits();
 
-  // Check if we should show the welcome screen
   final shouldShowWelcome = await WelcomeService.shouldShowWelcomeScreen();
 
   runApp(MultiProvider(

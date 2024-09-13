@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:karman_app/app_state.dart';
 import 'package:karman_app/services/focus_service.dart';
 import 'package:provider/provider.dart';
 import 'package:karman_app/manager/sound_manager.dart';
+import 'package:karman_app/services/pomodoro_notification_service.dart';
+import 'package:karman_app/constants/pomodoro_constants.dart';
 
 class PomodoroController extends ChangeNotifier {
   final FocusService _focusService = FocusService();
@@ -19,6 +22,8 @@ class PomodoroController extends ChangeNotifier {
   int _totalSessions = 4;
   Duration _currentDuration = Duration(minutes: 25);
   bool _isSoundMenuOpen = false;
+  String _currentQuote = '';
+  DateTime? _sessionStartTime;
 
   bool get isRunning => _isRunning;
   bool get isFocusSession => _isFocusSession;
@@ -28,12 +33,15 @@ class PomodoroController extends ChangeNotifier {
   int get totalSessions => _totalSessions;
   Duration get currentDuration => _currentDuration;
   bool get isSoundMenuOpen => _isSoundMenuOpen;
+  String get currentQuote => _currentQuote;
 
   List<int> focusDurations = [15, 20, 25, 30, 35];
-  List<int> breakDurations = [5, 10, 15];
-  List<int> sessionOptions = [4, 5, 6];
+  List<int> breakDurations = [1, 5, 10, 15];
+  List<int> sessionOptions = [3, 4, 5, 6];
 
-  PomodoroController(this._context);
+  PomodoroController(this._context) {
+    _updateQuote();
+  }
 
   String get formattedTime {
     int minutes = _currentDuration.inMinutes;
@@ -48,36 +56,9 @@ class PomodoroController extends ChangeNotifier {
     return elapsedSeconds / totalSeconds;
   }
 
-  Future<bool> handleWillPop(BuildContext context) async {
-    if (_isRunning) {
-      _showWarningDialog(context);
-      return false;
-    }
-    return true;
-  }
-
-  void _showWarningDialog(BuildContext context) {
-    showCupertinoDialog(
-      context: context,
-      builder: (BuildContext context) => CupertinoAlertDialog(
-        title: Text('Pomodoro Timer Active'),
-        content: Text(
-            'Please complete or stop the Pomodoro session before leaving.'),
-        actions: <Widget>[
-          CupertinoDialogAction(
-            child: Text('OK'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
   void toggleTimer() {
     if (_isRunning) {
-      _stopTimer();
+      _showStopConfirmationDialog();
     } else {
       _startTimer();
     }
@@ -85,19 +66,57 @@ class PomodoroController extends ChangeNotifier {
 
   void _startTimer() {
     _isRunning = true;
+    _sessionStartTime = DateTime.now();
     _timer = Timer.periodic(Duration(seconds: 1), _updateTimer);
     Provider.of<AppState>(_context, listen: false).setPomodoroActive(true);
-    soundManager.playSelectedSound();
+    if (_isFocusSession) {
+      soundManager.playSelectedSound();
+      _updateQuote();
+    }
+    _showNotification();
     notifyListeners();
   }
 
-  void _stopTimer() {
+  void _stopTimer({bool countSession = false}) {
     _isRunning = false;
     _timer?.cancel();
     Provider.of<AppState>(_context, listen: false).setPomodoroActive(false);
     soundManager.stopBackgroundSound();
+    PomodoroNotificationService.cancelNotification();
+
+    if (countSession && _isFocusSession && _sessionStartTime != null) {
+      int sessionDuration =
+          DateTime.now().difference(_sessionStartTime!).inSeconds;
+      _focusService.addFocusSession(sessionDuration);
+    }
+
     _resetTimer();
     notifyListeners();
+  }
+
+  void _showStopConfirmationDialog() {
+    showCupertinoDialog(
+      context: _context,
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: Text('Stop Pomodoro Session?'),
+        content: Text(
+            'Your time will not be counted towards badges if you stop now.'),
+        actions: <Widget>[
+          CupertinoDialogAction(
+            child: Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+          CupertinoDialogAction(
+            isDestructiveAction: true,
+            onPressed: () {
+              Navigator.of(context).pop();
+              _stopTimer(countSession: false);
+            },
+            child: Text('Stop'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _updateTimer(Timer timer) {
@@ -114,24 +133,64 @@ class PomodoroController extends ChangeNotifier {
 
   void _switchSession() {
     if (_isFocusSession) {
-      if (_currentSession < _totalSessions - 1) {
+      _currentSession++;
+      if (_currentSession < _totalSessions) {
         _isFocusSession = false;
         _currentDuration = Duration(minutes: _breakDuration);
+        soundManager.stopBackgroundSound();
       } else {
-        _stopTimer();
-        _resetTimer();
+        _stopTimer(countSession: true);
+        _showEndNotification();
+        return;
       }
     } else {
       _isFocusSession = true;
-      _currentSession++;
       _currentDuration = Duration(minutes: _focusDuration);
+      soundManager.playSelectedSound();
+      _updateQuote();
     }
+    _sessionStartTime = DateTime.now();
+    _showNotification();
+    notifyListeners();
+  }
+
+  void _showNotification() {
+    String title = _isFocusSession
+        ? PomodoroConstants.focusNotificationTitle
+        : PomodoroConstants.breakNotificationTitle;
+    String body = _isFocusSession
+        ? PomodoroConstants.focusNotificationBody[
+            Random().nextInt(PomodoroConstants.focusNotificationBody.length)]
+        : PomodoroConstants.breakNotificationBody[
+            Random().nextInt(PomodoroConstants.breakNotificationBody.length)];
+    int durationSeconds = _currentDuration.inSeconds;
+
+    PomodoroNotificationService.showPomodoroNotification(
+      title: title,
+      body: body,
+      durationSeconds: durationSeconds,
+    );
+  }
+
+  void _showEndNotification() {
+    PomodoroNotificationService.showPomodoroNotification(
+      title: PomodoroConstants.endNotificationTitle,
+      body: PomodoroConstants.endNotificationBody[
+          Random().nextInt(PomodoroConstants.endNotificationBody.length)],
+      durationSeconds: 0,
+    );
   }
 
   void _resetTimer() {
     _currentSession = 0;
     _isFocusSession = true;
     _currentDuration = Duration(minutes: _focusDuration);
+    _sessionStartTime = null;
+  }
+
+  void _updateQuote() {
+    _currentQuote = PomodoroConstants.motivationalQuotes[
+        Random().nextInt(PomodoroConstants.motivationalQuotes.length)];
   }
 
   void setFocusDuration(int duration) {
