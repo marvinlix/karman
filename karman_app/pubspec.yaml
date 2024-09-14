@@ -75,6 +75,9 @@ flutter:
     - lib/assets/tutorials/focus/set_time.png
     - lib/assets/tutorials/focus/start_timer.png
     - lib/assets/tutorials/focus/relaxing_sounds.png
+    - lib/assets/tutorials/pomodoro/set_durations.png
+    - lib/assets/tutorials/pomodoro/start_session.png
+    - lib/assets/tutorials/pomodoro/track_session.png
     - lib/assets/images/pomodoro/pomo_active.png
     - lib/assets/images/pomodoro/pomo_inactive.png
     - lib/assets/audio/rain.mp3

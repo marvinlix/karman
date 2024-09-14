@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:karman_app/pages/tutorial/habit_tutorial.dart';
 import 'package:karman_app/pages/tutorial/task_tutorial.dart';
 import 'package:karman_app/pages/tutorial/focus_tutorial.dart';
+import 'package:karman_app/pages/tutorial/pomodoro_tutorial.dart';
 import 'package:karman_app/app_shell.dart';
 
 void showTutorialOptions(BuildContext context) {
@@ -44,6 +45,13 @@ void showTutorialOptions(BuildContext context) {
           'Master the art of concentration',
           CupertinoIcons.timer,
           () => _showSelectedTutorial(context, 'focus'),
+        ),
+        _buildTutorialOption(
+          context,
+          'Pomodoro',
+          'Learn to use the Pomodoro technique',
+          CupertinoIcons.time,
+          () => _showSelectedTutorial(context, 'pomodoro'),
         ),
       ],
       cancelButton: CupertinoActionSheetAction(
@@ -117,6 +125,10 @@ void _showSelectedTutorial(BuildContext context, String tutorialType) {
       case 'focus':
         appShellState.switchToTab(2);
         _showTutorialOverlay(context, FocusTutorial.build);
+        break;
+      case 'pomodoro':
+        appShellState.switchToTab(2);
+        _showTutorialOverlay(context, PomodoroTutorial.build);
         break;
     }
   }

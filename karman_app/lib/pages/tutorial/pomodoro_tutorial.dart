@@ -12,12 +12,8 @@ class PomodoroTutorial {
       imageAsset: 'lib/assets/tutorials/pomodoro/start_session.png',
     ),
     TutorialPage(
-      instruction: 'Track your progress',
-      imageAsset: 'lib/assets/tutorials/pomodoro/track_progress.png',
-    ),
-    TutorialPage(
-      instruction: 'Choose background sounds',
-      imageAsset: 'lib/assets/tutorials/pomodoro/choose_sounds.png',
+      instruction: 'Track your session',
+      imageAsset: 'lib/assets/tutorials/pomodoro/track_session.png',
     ),
   ];
 

@@ -60,7 +60,7 @@ class _TutorialOverlayState extends State<TutorialOverlay> {
           constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.5),
           decoration: BoxDecoration(
-            color: CupertinoColors.darkBackgroundGray.withOpacity(0.9),
+            color: CupertinoColors.darkBackgroundGray.withOpacity(0.97),
             borderRadius: BorderRadius.circular(20),
           ),
           child: Column(
