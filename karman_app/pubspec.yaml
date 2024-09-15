@@ -50,7 +50,7 @@ flutter:
   uses-material-design: true
 
   assets:
-    - lib/assets/images/icon/icon.png
+    - lib/assets/images/icon/iOS/icon.png
     - lib/assets/lottie/tasks.json
     - lib/assets/lottie/habits.json
     - lib/assets/lottie/focus.json
@@ -89,10 +89,10 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: "AppIcon"
-  image_path: "lib/assets/images/icon/icon.png"
+  image_path: "lib/assets/images/icon/iOS/icon.png"
   min_sdk_android: 21
-  adaptive_icon_foreground: "lib/assets/images/icon/foreground.png"
-  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "lib/assets/images/icon/Android/foreground.png"
+  adaptive_icon_background: "lib/assets/images/icon/Android/background.png"
   remove_alpha_ios: true
 
 flutter_native_splash:
@@ -119,7 +119,7 @@ flutter_native_splash:
 
   # The image parameter allows you to specify an image used in the splash screen.  It must be a
   # png file and should be sized for 4x pixel density.
-  image: lib/assets/images/icon/icon.png
+  image: lib/assets/images/icon/iOS/icon.png
 
   # The branding property allows you to specify an image used as branding in the splash screen.
   # It must be a png file. It is supported for Android, iOS and the Web.  For Android 12,
@@ -154,7 +154,7 @@ flutter_native_splash:
     # 640 pixels in diameter.
     # App icon without an icon background: This should be 1152×1152 pixels, and fit within a circle
     # 768 pixels in diameter.
-    image: lib/assets/images/icon/icon.png
+    image: lib/assets/images/icon/Android/foreground.png
 
     # Splash screen background color.
     color: "#000000"

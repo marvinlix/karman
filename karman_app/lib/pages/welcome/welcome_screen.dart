@@ -168,7 +168,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(height: constraints.maxHeight * 0.1),
-        Image.asset('lib/assets/images/icon/icon.png',
+        Image.asset('lib/assets/images/icon/iOS/icon.png',
             height: constraints.maxHeight * 0.2),
         SizedBox(height: constraints.maxHeight * 0.05),
         const Text(
