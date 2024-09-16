@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:karman_app/components/generic/minimal_floating_action_button.dart';
 import 'package:karman_app/components/habit/habit_tile.dart';
 import 'package:karman_app/controllers/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
@@ -61,7 +62,7 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isFirstLaunch = prefs.getBool('first_launch_habits') ?? true;
     if (isFirstLaunch) {
-      await Future.delayed(Duration(milliseconds: 1000));
+      await Future.delayed(Duration(milliseconds: 200));
       setState(() {
         _showTutorial = true;
       });
@@ -152,7 +153,7 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
               navigationBar: CupertinoNavigationBar(
                 backgroundColor: CupertinoColors.black,
                 middle: Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
+                  padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                   child: Text(
                     sortedHabits.isEmpty
                         ? 'No habits left'
@@ -161,14 +162,6 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
                       color: CupertinoColors.white,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
-                ),
-                trailing: CupertinoButton(
-                  onPressed: _showAddHabitDialog,
-                  child: Icon(
-                    CupertinoIcons.plus_circle,
-                    color: CupertinoColors.white,
-                    size: 32,
                   ),
                 ),
               ),
@@ -206,6 +199,10 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
                             ],
                           ),
               ),
+            ),
+            MinimalFloatingActionButton(
+              onPressed: _showAddHabitDialog,
+              icon: CupertinoIcons.plus,
             ),
             if (_showTutorial)
               FadeTransition(

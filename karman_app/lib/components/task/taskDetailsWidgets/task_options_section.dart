@@ -9,8 +9,8 @@ class TaskOptionsSection extends StatelessWidget {
   final DateTime? reminder;
   final Function(bool) onDateToggle;
   final Function(bool) onReminderToggle;
-  final Function(DateTime) onDateSelected;
-  final Function(DateTime) onReminderSet;
+  final Function(DateTime?) onDateSelected;
+  final Function(DateTime?) onReminderSet;
 
   const TaskOptionsSection({
     super.key,

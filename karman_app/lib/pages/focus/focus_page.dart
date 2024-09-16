@@ -1,21 +1,24 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:karman_app/app_state.dart';
 import 'package:karman_app/controllers/focus_controller.dart';
+import 'package:karman_app/pages/focus/pomodoro_page.dart';
 import 'package:karman_app/pages/tutorial/focus_tutorial.dart';
 import 'package:provider/provider.dart';
 import 'package:karman_app/components/focus/circular_slider.dart';
 import 'package:karman_app/components/focus/rolling_menu.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:karman_app/components/badges/achievement_overlay.dart';
+import 'package:karman_app/components/generic/minimal_floating_action_button.dart';
 
 class FocusPage extends StatefulWidget {
   const FocusPage({super.key});
 
   @override
-  _FocusPageState createState() => _FocusPageState();
+  FocusPageState createState() => FocusPageState();
 }
 
-class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
+class FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
   bool _isMenuOpen = false;
@@ -23,6 +26,9 @@ class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
   bool _showTutorial = false;
   late AnimationController _tutorialAnimationController;
   late Animation<double> _tutorialFadeAnimation;
+
+  late AnimationController _fabAnimationController;
+  late Animation<Offset> _fabAnimation;
 
   StreamSubscription? _achievementSubscription;
 
@@ -47,13 +53,24 @@ class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
     );
     _tutorialFadeAnimation = Tween<double>(begin: 0.0, end: 1.0)
         .animate(_tutorialAnimationController);
+    _fabAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _fabAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: const Offset(0, 2),
+    ).animate(CurvedAnimation(
+      parent: _fabAnimationController,
+      curve: Curves.easeInOut,
+    ));
   }
 
   Future<void> _checkFirstLaunch() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isFirstLaunch = prefs.getBool('first_launch_focus') ?? true;
     if (isFirstLaunch) {
-      await Future.delayed(Duration(milliseconds: 1000));
+      await Future.delayed(Duration(milliseconds: 200));
       setState(() {
         _showTutorial = true;
       });
@@ -105,6 +122,7 @@ class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
   void dispose() {
     _animationController.dispose();
     _tutorialAnimationController.dispose();
+    _fabAnimationController.dispose();
     _achievementSubscription?.cancel();
     super.dispose();
   }
@@ -113,22 +131,31 @@ class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => FocusController(),
-      child: Consumer<FocusController>(
-        builder: (context, controller, child) {
+      child: Consumer2<FocusController, AppState>(
+        builder: (context, controller, appState, child) {
           return FutureBuilder(
             future: Future.microtask(() => _listenForAchievements(controller)),
             builder: (context, snapshot) {
+              if (controller.isTimerRunning &&
+                  _fabAnimationController.isDismissed) {
+                _fabAnimationController.forward();
+              } else if (!controller.isTimerRunning &&
+                  _fabAnimationController.isCompleted) {
+                _fabAnimationController.reverse();
+              }
               return CupertinoPageScaffold(
                 navigationBar: CupertinoNavigationBar(
                   backgroundColor: CupertinoColors.black,
+                  border: null,
+                  padding: EdgeInsetsDirectional.fromSTEB(16, 10, 16, 10),
                   trailing: controller.isTimerRunning
                       ? CupertinoButton(
-                          onPressed:
-                              controller.isTimerRunning ? _toggleMenu : null,
+                          padding: EdgeInsets.zero,
+                          onPressed: _toggleMenu,
                           child: Icon(
                             controller.soundManager.currentIcon,
                             color: CupertinoColors.white,
-                            size: 32,
+                            size: 28,
                           ),
                         )
                       : null,
@@ -191,6 +218,18 @@ class _FocusPageState extends State<FocusPage> with TickerProviderStateMixin {
                           child:
                               FocusTutorial.build(context, _onTutorialComplete),
                         ),
+                      SlideTransition(
+                        position: _fabAnimation,
+                        child: MinimalFloatingActionButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              CupertinoPageRoute(
+                                  builder: (context) => PomodoroPage()),
+                            );
+                          },
+                          icon: 'lib/assets/images/pomodoro/pomo_active.png',
+                        ),
+                      ),
                     ],
                   ),
                 ),

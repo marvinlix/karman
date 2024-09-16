@@ -2,7 +2,7 @@ name: karman_app
 description: "Productivity in your pocket"
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.1.0
+version: 1.2.1
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
@@ -23,7 +23,6 @@ dependencies:
   provider: ^6.1.2
   sqflite: ^2.3.3+1
   slide_to_act: ^2.0.2
-  circular_countdown_timer: ^0.2.3
   sleek_circular_slider: ^2.0.1
   audioplayers: ^6.0.0
   just_audio: ^0.9.39
@@ -35,6 +34,7 @@ dependencies:
   lottie: ^3.1.2
   url_launcher: ^6.3.0
   flutter_native_splash: ^2.4.1
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -49,13 +49,15 @@ flutter:
   uses-material-design: true
 
   assets:
-    - lib/assets/images/icon/icon.png
+    - lib/assets/images/icon/iOS/icon.png
     - lib/assets/lottie/tasks.json
     - lib/assets/lottie/habits.json
     - lib/assets/lottie/focus.json
     - lib/assets/lottie/github.json
     - lib/assets/lottie/discord.json
     - lib/assets/lottie/support.json
+    - lib/assets/images/badges/focus_badge.png
+    - lib/assets/images/badges/habit_badge.png
     - lib/assets/tutorials/tasks/create_task.png
     - lib/assets/tutorials/tasks/clear_completed.png
     - lib/assets/tutorials/tasks/task_details.png
@@ -72,20 +74,24 @@ flutter:
     - lib/assets/tutorials/focus/set_time.png
     - lib/assets/tutorials/focus/start_timer.png
     - lib/assets/tutorials/focus/relaxing_sounds.png
+    - lib/assets/tutorials/pomodoro/set_durations.png
+    - lib/assets/tutorials/pomodoro/start_session.png
+    - lib/assets/tutorials/pomodoro/track_session.png
+    - lib/assets/images/pomodoro/pomo_active.png
+    - lib/assets/images/pomodoro/pomo_inactive.png
     - lib/assets/audio/rain.mp3
     - lib/assets/audio/forest.mp3
     - lib/assets/audio/ocean.mp3
     - lib/assets/audio/night.mp3
     - lib/assets/audio/airplane.mp3
-    - lib/assets/audio/subtle_chime.mp3
 
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: "AppIcon"
-  image_path: "lib/assets/images/icon/icon.png"
+  image_path: "lib/assets/images/icon/iOS/icon.png"
   min_sdk_android: 21
-  adaptive_icon_foreground: "lib/assets/images/icon/foreground.png"
-  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "lib/assets/images/icon/Android/foreground.png"
+  adaptive_icon_background: "lib/assets/images/icon/Android/background.png"
   remove_alpha_ios: true
 
 flutter_native_splash:
@@ -112,7 +118,7 @@ flutter_native_splash:
 
   # The image parameter allows you to specify an image used in the splash screen.  It must be a
   # png file and should be sized for 4x pixel density.
-  image: lib/assets/images/icon/icon.png
+  image: lib/assets/images/icon/iOS/icon.png
 
   # The branding property allows you to specify an image used as branding in the splash screen.
   # It must be a png file. It is supported for Android, iOS and the Web.  For Android 12,
@@ -147,7 +153,7 @@ flutter_native_splash:
     # 640 pixels in diameter.
     # App icon without an icon background: This should be 1152×1152 pixels, and fit within a circle
     # 768 pixels in diameter.
-    image: lib/assets/images/icon/icon.png
+    image: lib/assets/images/icon/Android/foreground.png
 
     # Splash screen background color.
     color: "#000000"

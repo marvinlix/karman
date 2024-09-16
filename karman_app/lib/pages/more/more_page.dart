@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:karman_app/pages/more/badges/focus_badges_page.dart';
+import 'package:karman_app/pages/more/badges/habit_badges_page.dart';
 import 'package:karman_app/pages/more/details/community_page.dart';
 import 'package:karman_app/pages/more/details/contribution_page.dart';
 import 'package:karman_app/pages/more/details/support_page.dart';
-import 'package:karman_app/pages/more/badges/focus_badges_page.dart';
-import 'package:karman_app/pages/more/badges/habit_badges_page.dart';
+import 'package:karman_app/pages/more/details/tutorial_selector.dart';
 
 class MorePage extends StatelessWidget {
   const MorePage({super.key});
@@ -19,7 +20,6 @@ class MorePage extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.all(16),
           children: [
-            // Achievements Section
             Text(
               'Achievements',
               style: TextStyle(
@@ -34,8 +34,8 @@ class MorePage extends StatelessWidget {
                 Expanded(
                   child: _buildActionTile(
                     context,
-                    'Focus Badges',
-                    CupertinoIcons.rosette,
+                    'Focus',
+                    'lib/assets/images/badges/focus_badge.png',
                     () => Navigator.push(
                       context,
                       CupertinoPageRoute(
@@ -48,8 +48,8 @@ class MorePage extends StatelessWidget {
                 Expanded(
                   child: _buildActionTile(
                     context,
-                    'Habit Badges',
-                    CupertinoIcons.star_circle,
+                    'Habits',
+                    'lib/assets/images/badges/habit_badge.png',
                     () => Navigator.push(
                       context,
                       CupertinoPageRoute(
@@ -61,10 +61,8 @@ class MorePage extends StatelessWidget {
               ],
             ),
             SizedBox(height: 40),
-
-            // Make Karman Better Section
             Text(
-              'Make Karman Better',
+              'Make karman Better',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -107,18 +105,34 @@ class MorePage extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(height: 40),
+            Text(
+              'Help',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: CupertinoColors.white,
+              ),
+            ),
+            SizedBox(height: 16),
+            _buildNavigationTile(
+              context,
+              'Repeat Tutorial',
+              CupertinoIcons.refresh,
+              () => showTutorialOptions(context),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildActionTile(
-      BuildContext context, String title, IconData icon, VoidCallback onTap) {
+  Widget _buildActionTile(BuildContext context, String title, String imagePath,
+      VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: CupertinoColors.darkBackgroundGray,
           borderRadius: BorderRadius.circular(12),
@@ -126,7 +140,11 @@ class MorePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 40, color: CupertinoColors.white),
+            Image.asset(
+              imagePath,
+              width: 80,
+              height: 80,
+            ),
             SizedBox(height: 16),
             Text(
               title,

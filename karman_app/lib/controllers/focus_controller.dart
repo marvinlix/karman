@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:karman_app/constants/focus_notification_constants.dart';
 import 'package:karman_app/manager/sound_manager.dart';
 import 'package:karman_app/services/badges/focus_badge_service.dart';
 import 'package:karman_app/services/timer_service.dart';
 import 'package:karman_app/services/focus_service.dart';
+import 'package:karman_app/services/notifications/focus_notification_service.dart';
 
 class FocusController extends ChangeNotifier {
   final SoundManager _soundManager = SoundManager();
@@ -61,7 +63,7 @@ class FocusController extends ChangeNotifier {
       _startTimer();
       _soundManager.playSelectedSound();
     } else {
-      _stopTimer(playChime: false);
+      _stopTimer();
     }
     _saveTimerState();
     notifyListeners();
@@ -80,19 +82,17 @@ class FocusController extends ChangeNotifier {
       _saveTimerState();
       notifyListeners();
     } else {
-      _stopTimer(playChime: true);
+      _stopTimer();
     }
   }
 
-  void _stopTimer({required bool playChime}) {
+  void _stopTimer() {
     _timer?.cancel();
     _isTimerRunning = false;
     _soundManager.stopBackgroundSound();
 
-    if (playChime) {
-      Future.delayed(Duration(seconds: 1), () {
-        _soundManager.playChime();
-      });
+    if (_remainingSeconds <= 0) {
+      _showFocusEndNotification();
       _recordFocusSession();
     } else {
       _resetTimer();
@@ -118,23 +118,27 @@ class FocusController extends ChangeNotifier {
 
   void _recordFocusSession() async {
     final duration = _totalSeconds - _remainingSeconds;
-    print(
-        "Recording focus session with duration: $duration seconds"); // Debug print
     await _focusService.addFocusSession(duration);
 
     List<String> newlyAchievedBadges =
         await _achievementService.checkNewlyAchievedBadges();
-
-    print("Newly achieved badges: $newlyAchievedBadges"); // Debug print
 
     _resetTimer();
     _saveTimerState();
     notifyListeners();
 
     if (newlyAchievedBadges.isNotEmpty) {
-      print("Notifying about new achievements"); // Debug print
       _achievementStreamController.add(newlyAchievedBadges);
     }
+  }
+
+  void _showFocusEndNotification() {
+    Future.delayed(Duration(seconds: 1), () {
+      FocusNotificationService.showFocusEndNotification(
+        title: FocusConstants.endNotificationTitle,
+        body: FocusConstants.getRandomEndNotificationBody(),
+      );
+    });
   }
 
   String formatTime(int seconds) {

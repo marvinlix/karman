@@ -4,7 +4,7 @@ import 'package:karman_app/components/reminders/habit_reminder.dart';
 import 'package:karman_app/controllers/habit_controller.dart';
 import 'package:karman_app/models/habits/habit.dart';
 import 'package:karman_app/pages/habit/habit_logs_page.dart';
-import 'package:karman_app/services/notification_service.dart';
+import 'package:karman_app/services/notifications/notification_service.dart';
 import 'package:provider/provider.dart';
 
 class HabitDetailsSheet extends StatefulWidget {

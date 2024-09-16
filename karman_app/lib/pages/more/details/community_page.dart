@@ -4,7 +4,7 @@ final communityPage = SkeletonPage(
   title: 'Community',
   animationAsset: 'lib/assets/lottie/discord.json',
   linkText: 'Join the Discord Server',
-  linkUrl: 'https://discord.gg/wDkZDfpVwp',
+  linkUrl: 'https://discord.gg/AH7dAXfxkD',
   paragraphs: const [
     'Be a part of a vibrant community that is driving the evolution of karman.',
     'Engage directly with our development team and other users by sharing your insights, reporting issues, and suggesting new features or design improvements.',

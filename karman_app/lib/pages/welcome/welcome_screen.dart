@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:karman_app/pages/welcome/welcome_content.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,50 +14,49 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
   late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<Offset> _slideAnimation;
-  bool _showFinalButton = false;
+  late Animation<double> _widthAnimation;
+  late Animation<double> _chevronOpacityAnimation;
+  late Animation<double> _textOpacityAnimation;
+  bool _isLastPage = false;
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 500),
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    _widthAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeOutQuart,
+      ),
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.5),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic),
+    _chevronOpacityAnimation = Tween<double>(begin: 1, end: 0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0, 0.5, curve: Curves.easeOutCubic),
+      ),
+    );
+
+    _textOpacityAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.5, 1, curve: Curves.easeInCubic),
+      ),
     );
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
     _pageController.dispose();
+    _animationController.dispose();
     super.dispose();
-  }
-
-  void _onLastPageReached() {
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        setState(() {
-          _showFinalButton = true;
-        });
-        _animationController.forward();
-      }
-    });
   }
 
   @override
@@ -73,12 +73,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     controller: _pageController,
                     onPageChanged: (index) {
                       setState(() {
-                        _currentPage = index;
-                        if (index == welcomePages.length + 1) {
-                          _onLastPageReached();
+                        _isLastPage = index == welcomePages.length + 1;
+                        if (_isLastPage) {
+                          _animationController.forward();
                         } else {
-                          _showFinalButton = false;
-                          _animationController.reset();
+                          _animationController.reverse();
                         }
                       });
                     },
@@ -98,40 +97,48 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       AnimatedBuilder(
                         animation: _animationController,
                         builder: (context, child) {
-                          return _currentPage < welcomePages.length + 1
-                              ? CupertinoButton(
-                                  onPressed: () {
-                                    _pageController.nextPage(
-                                      duration:
-                                          const Duration(milliseconds: 300),
-                                      curve: Curves.easeInOut,
-                                    );
-                                  },
-                                  child: const Icon(
-                                    CupertinoIcons.chevron_right_circle_fill,
-                                    color: CupertinoColors.white,
-                                    size: 52,
+                          return Container(
+                            width: 60 + (140 * _widthAnimation.value),
+                            height: 60,
+                            child: CupertinoButton(
+                              onPressed: _isLastPage
+                                  ? _finishOnboarding
+                                  : () {
+                                      _pageController.nextPage(
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    },
+                              padding: EdgeInsets.zero,
+                              color: CupertinoColors.white,
+                              borderRadius: BorderRadius.circular(30),
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Opacity(
+                                    opacity: _chevronOpacityAnimation.value,
+                                    child: const Icon(
+                                      Icons.chevron_right_rounded,
+                                      color: CupertinoColors.black,
+                                      size: 40,
+                                    ),
                                   ),
-                                )
-                              : _showFinalButton
-                                  ? SlideTransition(
-                                      position: _slideAnimation,
-                                      child: FadeTransition(
-                                        opacity: _fadeAnimation,
-                                        child: CupertinoButton(
-                                          onPressed: _finishOnboarding,
-                                          child: const Text(
-                                            "Let's rock!",
-                                            style: TextStyle(
-                                              color: CupertinoColors.white,
-                                              fontSize: 28,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
+                                  Opacity(
+                                    opacity: _textOpacityAnimation.value,
+                                    child: const Text(
+                                      "Let's rock!",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: CupertinoColors.black,
                                       ),
-                                    )
-                                  : const SizedBox.shrink();
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
                         },
                       ),
                       const SizedBox(height: 20),
@@ -161,7 +168,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         SizedBox(height: constraints.maxHeight * 0.1),
-        Image.asset('lib/assets/images/icon/icon.png',
+        Image.asset('lib/assets/images/icon/iOS/icon.png',
             height: constraints.maxHeight * 0.2),
         SizedBox(height: constraints.maxHeight * 0.05),
         const Text(
@@ -238,7 +245,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 40),
           child: Text(
-            'Karman is an open-source productivity app. Contribute and make it better!',
+            'karman is an open-source productivity app. Contribute and make it better!',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 20,
