@@ -99,7 +99,7 @@ Found a bug or have a feature request? Open an issue on our [Issues page](https:
   </tr>
 </table>
 
-### UI/UX Designer
+### UI/UX & Contributing Developer
 <table>
   <tr>
     <td align="center"><a href="https://github.com/SkinnyFatBoy05"><img src="https://github.com/SkinnyFatBoy05.png" width="100px;" alt=""/><br /><sub><b>Kishore Srinivasan</b></sub></a></td>
