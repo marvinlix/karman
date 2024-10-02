@@ -10,10 +10,10 @@ class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 
   @override
-  _WelcomeScreenState createState() => _WelcomeScreenState();
+  WelcomeScreenState createState() => WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen>
+class WelcomeScreenState extends State<WelcomeScreen>
     with TickerProviderStateMixin {
   final PageController _pageController = PageController();
   late AnimationController _animationController;
@@ -97,7 +97,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       AnimatedBuilder(
                         animation: _animationController,
                         builder: (context, child) {
-                          return Container(
+                          return SizedBox(
                             width: 60 + (140 * _widthAnimation.value),
                             height: 60,
                             child: CupertinoButton(
@@ -261,9 +261,16 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   void _finishOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('onboarding_complete', true);
+
+    final lastUsedTabIndex = prefs.getInt('lastUsedTabIndex') ?? 1;
+
     Navigator.of(context).pushReplacement(
       CupertinoPageRoute(
-          builder: (context) => AppShell(key: AppShell.globalKey)),
+        builder: (context) => AppShell(
+          key: AppShell.globalKey,
+          initialTabIndex: lastUsedTabIndex,
+        ),
+      ),
     );
   }
 }

@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:karman_app/database/database_service.dart';
 import 'package:karman_app/app_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,9 @@ void main() async {
 
   final shouldShowWelcome = await WelcomeService.shouldShowWelcomeScreen();
 
+  final prefs = await SharedPreferences.getInstance();
+  final lastUsedTabIndex = prefs.getInt('lastUsedTabIndex') ?? 1;
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (context) => taskController),
@@ -38,6 +42,7 @@ void main() async {
     child: KarmanApp(
       navigatorKey: navigatorKey,
       showWelcome: shouldShowWelcome,
+      initialTabIndex: lastUsedTabIndex,
     ),
   ));
 }
@@ -45,11 +50,13 @@ void main() async {
 class KarmanApp extends StatelessWidget {
   final GlobalKey<NavigatorState> navigatorKey;
   final bool showWelcome;
+  final int initialTabIndex;
 
   const KarmanApp({
     super.key,
     required this.navigatorKey,
     required this.showWelcome,
+    required this.initialTabIndex,
   });
 
   @override
@@ -62,7 +69,7 @@ class KarmanApp extends StatelessWidget {
       ),
       home: showWelcome
           ? const WelcomeScreen()
-          : AppShell(key: AppShell.globalKey),
+          : AppShell(key: AppShell.globalKey, initialTabIndex: initialTabIndex),
     );
   }
 }

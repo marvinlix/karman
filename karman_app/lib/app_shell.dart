@@ -3,19 +3,43 @@ import 'package:karman_app/pages/more/more_page.dart';
 import 'package:karman_app/pages/habit/habits_page.dart';
 import 'package:karman_app/pages/task/tasks_page.dart';
 import 'package:karman_app/pages/focus/focus_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppShell extends StatefulWidget {
   static final GlobalKey<AppShellState> globalKey = GlobalKey<AppShellState>();
+  final int initialTabIndex;
 
-  const AppShell({super.key});
+  const AppShell({super.key, required this.initialTabIndex});
 
   @override
   AppShellState createState() => AppShellState();
 }
 
 class AppShellState extends State<AppShell> {
-  final CupertinoTabController _controller =
-      CupertinoTabController(initialIndex: 1);
+  late final CupertinoTabController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = CupertinoTabController(initialIndex: widget.initialTabIndex);
+    _controller.addListener(_handleTabChange);
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_handleTabChange);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTabChange() {
+    _saveLastUsedTabIndex(_controller.index);
+  }
+
+  Future<void> _saveLastUsedTabIndex(int index) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('lastUsedTabIndex', index);
+  }
 
   void switchToTab(int index) {
     setState(() {
@@ -23,7 +47,7 @@ class AppShellState extends State<AppShell> {
     });
   }
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(
       controller: _controller,
@@ -31,12 +55,12 @@ class AppShellState extends State<AppShell> {
         iconSize: 32,
         backgroundColor: CupertinoColors.black,
         activeColor: CupertinoColors.white,
-        height: 60, // Increase the height of the tab bar
-        border: null, // Remove the top border
+        height: 60,
+        border: null,
         items: const [
           BottomNavigationBarItem(
             icon: Padding(
-              padding: EdgeInsets.only(top: 8), // Add padding above the icon
+              padding: EdgeInsets.only(top: 8),
               child: Icon(CupertinoIcons.repeat),
             ),
             label: 'Habit',
