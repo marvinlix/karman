@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:karman_app/components/task/taskDetailsWidgets/priority_selector.dart';
 import 'package:karman_app/components/task/taskDetailsWidgets/task_name_input.dart';
 import 'package:karman_app/components/task/taskDetailsWidgets/task_note.dart';
@@ -108,6 +109,7 @@ class TaskDetailsSheetState extends State<TaskDetailsSheet> {
       dueDate: _isDateEnabled ? _dueDate : null,
       reminder: _isReminderEnabled ? _reminder : null,
       isCompleted: widget.task?.isCompleted ?? false,
+      order: widget.task?.order ?? 0,
     );
   }
 
@@ -129,9 +131,9 @@ class TaskDetailsSheetState extends State<TaskDetailsSheet> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: SingleChildScrollView(
+    return Material(
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
         child: Container(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom + 40,
@@ -143,56 +145,59 @@ class TaskDetailsSheetState extends State<TaskDetailsSheet> {
             color: CupertinoColors.darkBackgroundGray,
             borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TaskNameInput(
-                controller: _nameController,
-                focusNode: _nameFocusNode,
-                onSave: _hasChanges && !_isTaskNameEmpty ? _saveChanges : null,
-                isTaskNameEmpty: _isTaskNameEmpty,
-                hasChanges: _hasChanges,
-              ),
-              SizedBox(height: 20),
-              TaskNote(
-                controller: _noteController,
-                hintText: 'Note...',
-              ),
-              SizedBox(height: 30),
-              TaskOptionsSection(
-                isDateEnabled: _isDateEnabled,
-                isReminderEnabled: _isReminderEnabled,
-                dueDate: _dueDate,
-                reminder: _reminder,
-                onDateToggle: (value) => setState(() {
-                  _isDateEnabled = value;
-                  if (!value) _dueDate = null;
-                  _checkForChanges();
-                }),
-                onReminderToggle: (value) => setState(() {
-                  _isReminderEnabled = value;
-                  if (!value) _reminder = null;
-                  _checkForChanges();
-                }),
-                onDateSelected: (date) => setState(() {
-                  _dueDate = date;
-                  _checkForChanges();
-                }),
-                onReminderSet: (DateTime? newDateTime) => setState(() {
-                  _reminder = newDateTime;
-                  _checkForChanges();
-                }),
-              ),
-              SizedBox(height: 30),
-              PrioritySelector(
-                selectedPriority: _priority,
-                onPriorityChanged: (priority) => setState(() {
-                  _priority = priority;
-                  _checkForChanges();
-                }),
-              ),
-            ],
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TaskNameInput(
+                  controller: _nameController,
+                  focusNode: _nameFocusNode,
+                  onSave:
+                      _hasChanges && !_isTaskNameEmpty ? _saveChanges : null,
+                  isTaskNameEmpty: _isTaskNameEmpty,
+                  hasChanges: _hasChanges,
+                ),
+                SizedBox(height: 20),
+                TaskNote(
+                  controller: _noteController,
+                  hintText: 'Note...',
+                ),
+                SizedBox(height: 30),
+                TaskOptionsSection(
+                  isDateEnabled: _isDateEnabled,
+                  isReminderEnabled: _isReminderEnabled,
+                  dueDate: _dueDate,
+                  reminder: _reminder,
+                  onDateToggle: (value) => setState(() {
+                    _isDateEnabled = value;
+                    if (!value) _dueDate = null;
+                    _checkForChanges();
+                  }),
+                  onReminderToggle: (value) => setState(() {
+                    _isReminderEnabled = value;
+                    if (!value) _reminder = null;
+                    _checkForChanges();
+                  }),
+                  onDateSelected: (date) => setState(() {
+                    _dueDate = date;
+                    _checkForChanges();
+                  }),
+                  onReminderSet: (DateTime? newDateTime) => setState(() {
+                    _reminder = newDateTime;
+                    _checkForChanges();
+                  }),
+                ),
+                SizedBox(height: 30),
+                PrioritySelector(
+                  selectedPriority: _priority,
+                  onPriorityChanged: (priority) => setState(() {
+                    _priority = priority;
+                    _checkForChanges();
+                  }),
+                ),
+              ],
+            ),
           ),
         ),
       ),

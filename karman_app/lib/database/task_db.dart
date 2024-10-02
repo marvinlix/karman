@@ -12,7 +12,8 @@ class TaskDatabase {
         priority INTEGER NOT NULL,
         due_date TEXT,
         reminder TEXT,
-        is_completed INTEGER NOT NULL DEFAULT 0
+        is_completed INTEGER NOT NULL DEFAULT 0,
+        `order` INTEGER NOT NULL
       )
     ''');
   }
@@ -23,7 +24,7 @@ class TaskDatabase {
   }
 
   Future<List<Map<String, dynamic>>> getTasks(Database db) async {
-    return await db.query(tableName);
+    return await db.query(tableName, orderBy: '`order` ASC');
   }
 
   Future<int> updateTask(Database db, Map<String, dynamic> task) async {
@@ -62,5 +63,28 @@ class TaskDatabase {
       return maps.first;
     }
     return null;
+  }
+
+  Future<int> getMaxOrder(Database db, int priority) async {
+    final result = await db.rawQuery('''
+      SELECT MAX(`order`) as max_order 
+      FROM $tableName 
+      WHERE priority = ? AND is_completed = 0
+    ''', [priority]);
+    return (result.first['max_order'] as int?) ?? 0;
+  }
+
+  Future<void> updateTaskOrders(
+      Database db, List<Map<String, dynamic>> updates) async {
+    await db.transaction((txn) async {
+      for (var update in updates) {
+        await txn.update(
+          tableName,
+          {'order': update['new_order']},
+          where: 'task_id = ?',
+          whereArgs: [update['task_id']],
+        );
+      }
+    });
   }
 }

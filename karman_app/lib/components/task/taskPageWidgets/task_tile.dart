@@ -11,6 +11,7 @@ class TaskTile extends StatefulWidget {
   final Function(bool?)? onChanged;
   final Function(BuildContext)? onDelete;
   final VoidCallback onTap;
+  final bool showReorderIcon;
 
   const TaskTile({
     super.key,
@@ -18,13 +19,14 @@ class TaskTile extends StatefulWidget {
     required this.onChanged,
     required this.onDelete,
     required this.onTap,
+    this.showReorderIcon = true,
   });
 
   @override
-  _TaskTileState createState() => _TaskTileState();
+  TaskTileState createState() => TaskTileState();
 }
 
-class _TaskTileState extends State<TaskTile> {
+class TaskTileState extends State<TaskTile> {
   @override
   void initState() {
     super.initState();
@@ -126,7 +128,9 @@ class _TaskTileState extends State<TaskTile> {
                                       isOverdue:
                                           _isOverdue(widget.task.dueDate!),
                                     ),
-                                  widget.task.dueDate != null ? SizedBox(width: 20) : SizedBox(width: 0),
+                                  widget.task.dueDate != null
+                                      ? SizedBox(width: 20)
+                                      : SizedBox(width: 0),
                                   if (widget.task.reminder != null)
                                     _buildInfoWithIcon(
                                       CupertinoIcons.bell_fill,
@@ -134,12 +138,17 @@ class _TaskTileState extends State<TaskTile> {
                                       isOverdue:
                                           _isOverdue(widget.task.reminder!),
                                     ),
-                                  widget.task.reminder != null ? SizedBox(width: 20) : SizedBox(width: 0),
-                                  if(widget.task.note != null && widget.task.note!.isNotEmpty)
+                                  widget.task.reminder != null
+                                      ? SizedBox(width: 20)
+                                      : SizedBox(width: 0),
+                                  if (widget.task.note != null &&
+                                      widget.task.note!.isNotEmpty)
                                     Icon(
                                       CupertinoIcons.doc_text_fill,
                                       size: 16,
-                                      color: widget.task.isCompleted ? Colors.grey[700] : CupertinoColors.systemGrey5,
+                                      color: widget.task.isCompleted
+                                          ? Colors.grey[700]
+                                          : CupertinoColors.systemGrey5,
                                     ),
                                 ],
                               ),
@@ -147,7 +156,14 @@ class _TaskTileState extends State<TaskTile> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 16),
+                      if (widget.showReorderIcon) ...[
+                        SizedBox(width: 16),
+                        Icon(
+                          CupertinoIcons.line_horizontal_3,
+                          color: CupertinoColors.systemGrey,
+                        ),
+                        SizedBox(width: 16),
+                      ],
                     ],
                   ),
                 ),
@@ -167,13 +183,21 @@ class _TaskTileState extends State<TaskTile> {
         Icon(
           icon,
           size: 16,
-          color: isOverdue ? CupertinoColors.systemRed : (widget.task.isCompleted ? Colors.grey[700] : CupertinoColors.systemGrey5),
+          color: isOverdue
+              ? CupertinoColors.systemRed
+              : (widget.task.isCompleted
+                  ? Colors.grey[700]
+                  : CupertinoColors.systemGrey5),
         ),
         SizedBox(width: 4),
         Text(
           text,
           style: TextStyle(
-            color: isOverdue ? CupertinoColors.systemRed : (widget.task.isCompleted ? Colors.grey[700] : CupertinoColors.systemGrey5),
+            color: isOverdue
+                ? CupertinoColors.systemRed
+                : (widget.task.isCompleted
+                    ? Colors.grey[700]
+                    : CupertinoColors.systemGrey5),
             fontSize: 13,
             fontWeight: FontWeight.w400,
           ),

@@ -12,7 +12,7 @@ class NotificationService {
   static Future<void> init(GlobalKey<NavigatorState> key) async {
     navigatorKey = key;
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@drawable/ic_launcher_foreground');
+        AndroidInitializationSettings('@drawable/notification_icon');
     const DarwinInitializationSettings initializationSettingsIOS =
         DarwinInitializationSettings();
     const InitializationSettings initializationSettings =
@@ -77,6 +77,10 @@ class NotificationService {
         'Instant Notifications',
         importance: Importance.max,
         priority: Priority.high,
+        icon: '@drawable/notification_icon',
+        color: Color.fromARGB(255, 255, 255, 255),
+        largeIcon: DrawableResourceAndroidBitmap('@mipmap/launcher_icon'),
+        styleInformation: BigTextStyleInformation(''),
       ),
       iOS: DarwinNotificationDetails(),
     );
@@ -110,6 +114,10 @@ class NotificationService {
           'Scheduled Notifications',
           importance: Importance.max,
           priority: Priority.high,
+          icon: '@drawable/notification_icon',
+          color: Color.fromARGB(255, 255, 255, 255),
+          largeIcon: DrawableResourceAndroidBitmap('@mipmap/launcher_icon'),
+          styleInformation: BigTextStyleInformation(''),
         ),
         iOS: DarwinNotificationDetails(),
       ),
@@ -170,7 +178,7 @@ class NotificationService {
     }
 
     await scheduleNotification(
-      id: id + 10000, // Use a different ID range for streak reminders
+      id: id + 10000,
       title: title,
       body: body,
       scheduledDate: scheduledDate,

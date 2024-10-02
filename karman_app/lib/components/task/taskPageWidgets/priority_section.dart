@@ -1,8 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:karman_app/models/task/task.dart';
 import 'package:karman_app/components/task/taskPageWidgets/task_tile.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
-class PrioritySection extends StatelessWidget {
+class PrioritySection extends StatefulWidget {
   final int priority;
   final List<Task> tasks;
   final bool isExpanded;
@@ -10,9 +13,10 @@ class PrioritySection extends StatelessWidget {
   final Function(Task) onTaskToggle;
   final Function(BuildContext, int) onTaskDelete;
   final Function(Task) onTaskTap;
+  final Function(int, Task, int) onTaskReorder;
 
   const PrioritySection({
-    super.key,
+    Key? key,
     required this.priority,
     required this.tasks,
     required this.isExpanded,
@@ -20,15 +24,41 @@ class PrioritySection extends StatelessWidget {
     required this.onTaskToggle,
     required this.onTaskDelete,
     required this.onTaskTap,
-  });
+    required this.onTaskReorder,
+  }) : super(key: key);
+
+  @override
+  _PrioritySectionState createState() => _PrioritySectionState();
+}
+
+class _PrioritySectionState extends State<PrioritySection> {
+  late List<Task> _priorityTasks;
+
+  @override
+  void initState() {
+    super.initState();
+    _updatePriorityTasks();
+  }
+
+  @override
+  void didUpdateWidget(PrioritySection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.tasks != widget.tasks ||
+        oldWidget.priority != widget.priority) {
+      _updatePriorityTasks();
+    }
+  }
+
+  void _updatePriorityTasks() {
+    _priorityTasks = widget.tasks
+        .where((task) => task.priority == widget.priority && !task.isCompleted)
+        .toList()
+      ..sort((a, b) => a.order.compareTo(b.order));
+  }
 
   @override
   Widget build(BuildContext context) {
-    final priorityTasks = tasks
-        .where((task) => task.priority == priority && !task.isCompleted)
-        .toList();
-
-    if (priorityTasks.isEmpty) {
+    if (_priorityTasks.isEmpty) {
       return SizedBox.shrink();
     }
 
@@ -36,7 +66,7 @@ class PrioritySection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onTap: () => onToggle(priority),
+          onTap: () => widget.onToggle(widget.priority),
           child: Container(
             padding: EdgeInsets.only(
               top: 23,
@@ -49,25 +79,27 @@ class PrioritySection extends StatelessWidget {
               children: [
                 Icon(
                   size: 32,
-                  isExpanded
+                  widget.isExpanded
                       ? CupertinoIcons.flag_circle
                       : CupertinoIcons.flag_circle_fill,
-                  color: priority == 3
+                  color: widget.priority == 3
                       ? CupertinoColors.systemRed
-                      : (priority == 2
+                      : (widget.priority == 2
                           ? CupertinoColors.systemYellow
                           : CupertinoColors.systemGreen),
                 ),
                 SizedBox(width: 10),
                 Text(
-                  priority == 3 ? 'High' : (priority == 2 ? 'Medium' : 'Low'),
+                  widget.priority == 3
+                      ? 'High'
+                      : (widget.priority == 2 ? 'Medium' : 'Low'),
                   style: TextStyle(
                       color: CupertinoColors.white,
                       fontWeight: FontWeight.bold),
                 ),
                 Spacer(),
                 Icon(
-                  isExpanded
+                  widget.isExpanded
                       ? CupertinoIcons.chevron_up
                       : CupertinoIcons.chevron_down,
                   color: CupertinoColors.white,
@@ -76,33 +108,82 @@ class PrioritySection extends StatelessWidget {
             ),
           ),
         ),
-        if (isExpanded)
-          CustomScrollView(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            slivers: [
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final task = priorityTasks[index];
-                    return AnimatedSwitcher(
-                      duration: Duration(milliseconds: 400),
-                      child: TaskTile(
-                        key: ValueKey(task.taskId),
-                        task: task,
-                        onChanged: (value) => onTaskToggle(task),
-                        onDelete: (context) =>
-                            onTaskDelete(context, task.taskId!),
-                        onTap: () => onTaskTap(task),
-                      ),
-                    );
-                  },
-                  childCount: priorityTasks.length,
-                ),
-              ),
-            ],
+        if (widget.isExpanded)
+          Material(
+            color: Colors.transparent,
+            child: Localizations(
+              locale: const Locale('en', 'US'),
+              delegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              child: _priorityTasks.length > 1
+                  ? ReorderableListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: _priorityTasks.length,
+                      itemBuilder: (context, index) {
+                        final task = _priorityTasks[index];
+                        return TaskTile(
+                          key: ValueKey(task.taskId),
+                          task: task,
+                          onChanged: (value) => widget.onTaskToggle(task),
+                          onDelete: (context) =>
+                              widget.onTaskDelete(context, task.taskId!),
+                          onTap: () => widget.onTaskTap(task),
+                          showReorderIcon: true,
+                        );
+                      },
+                      onReorder: (oldIndex, newIndex) {
+                        setState(() {
+                          if (oldIndex < newIndex) {
+                            newIndex -= 1;
+                          }
+                          final Task task = _priorityTasks.removeAt(oldIndex);
+                          _priorityTasks.insert(newIndex, task);
+                          widget.onTaskReorder(widget.priority, task, newIndex);
+                        });
+                      },
+                      proxyDecorator: (child, index, animation) {
+                        return AnimatedBuilder(
+                          animation: animation,
+                          builder: (BuildContext context, Widget? child) {
+                            final double animValue =
+                                Curves.easeInOut.transform(animation.value);
+                            final double elevation =
+                                lerpDouble(0, 6, animValue)!;
+                            return Material(
+                              elevation: elevation,
+                              color: Colors.black.withOpacity(0.5),
+                              shadowColor: Colors.black54,
+                              child: child,
+                            );
+                          },
+                          child: child,
+                        );
+                      },
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: _priorityTasks.length,
+                      itemBuilder: (context, index) {
+                        final task = _priorityTasks[index];
+                        return TaskTile(
+                          key: ValueKey(task.taskId),
+                          task: task,
+                          onChanged: (value) => widget.onTaskToggle(task),
+                          onDelete: (context) =>
+                              widget.onTaskDelete(context, task.taskId!),
+                          onTap: () => widget.onTaskTap(task),
+                          showReorderIcon: false,
+                        );
+                      },
+                    ),
+            ),
           ),
-        SizedBox(height: 16),
+        SizedBox(height: 16)
       ],
     );
   }
