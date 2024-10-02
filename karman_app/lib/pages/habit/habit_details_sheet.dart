@@ -10,18 +10,20 @@ import 'package:provider/provider.dart';
 class HabitDetailsSheet extends StatefulWidget {
   final Habit habit;
   final bool isNewHabit;
+  final bool autoFocus;
 
   const HabitDetailsSheet({
     super.key,
     required this.habit,
     this.isNewHabit = false,
+    this.autoFocus = false,
   });
 
   @override
-  _HabitDetailsSheetState createState() => _HabitDetailsSheetState();
+  HabitDetailsSheetState createState() => HabitDetailsSheetState();
 }
 
-class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
+class HabitDetailsSheetState extends State<HabitDetailsSheet> {
   late TextEditingController _nameController;
   late FocusNode _nameFocusNode;
   TimeOfDay? _reminderTime;
@@ -40,6 +42,11 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
       final minutes = widget.habit.reminderTime!.inMinutes;
       _reminderTime = TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60);
       _isReminderEnabled = true;
+    }
+    if (widget.autoFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        FocusScope.of(context).requestFocus(_nameFocusNode);
+      });
     }
   }
 
@@ -188,6 +195,7 @@ class _HabitDetailsSheetState extends State<HabitDetailsSheet> {
               color: CupertinoColors.systemGrey,
               fontSize: 20,
             ),
+            textCapitalization: TextCapitalization.sentences,
           ),
         ),
         SizedBox(width: 20),

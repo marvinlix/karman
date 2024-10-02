@@ -14,10 +14,10 @@ class HabitsPage extends StatefulWidget {
   const HabitsPage({super.key});
 
   @override
-  _HabitsPageState createState() => _HabitsPageState();
+  HabitsPageState createState() => HabitsPageState();
 }
 
-class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
+class HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
   bool _isLoading = true;
   Timer? _debounce;
   bool _showTutorial = false;
@@ -104,6 +104,7 @@ class _HabitsPageState extends State<HabitsPage> with TickerProviderStateMixin {
           startDate: DateTime.now(),
         ),
         isNewHabit: true,
+        autoFocus: true,
       ),
     );
   }
