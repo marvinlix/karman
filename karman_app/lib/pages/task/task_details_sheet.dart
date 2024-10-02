@@ -109,6 +109,7 @@ class TaskDetailsSheetState extends State<TaskDetailsSheet> {
       dueDate: _isDateEnabled ? _dueDate : null,
       reminder: _isReminderEnabled ? _reminder : null,
       isCompleted: widget.task?.isCompleted ?? false,
+      order: widget.task?.order ?? 0,
     );
   }
 

@@ -6,6 +6,7 @@ class Task {
   final DateTime? dueDate;
   final DateTime? reminder;
   final bool isCompleted;
+  final int order;
 
   Task({
     this.taskId,
@@ -15,6 +16,7 @@ class Task {
     this.dueDate,
     this.reminder,
     this.isCompleted = false,
+    required this.order,
   });
 
   Map<String, dynamic> toMap() {
@@ -26,6 +28,7 @@ class Task {
       'due_date': dueDate?.toIso8601String(),
       'reminder': reminder?.toIso8601String(),
       'is_completed': isCompleted ? 1 : 0,
+      'order': order,
     };
   }
 
@@ -36,9 +39,9 @@ class Task {
       note: map['note'],
       priority: map['priority'],
       dueDate: map['due_date'] != null ? DateTime.parse(map['due_date']) : null,
-      reminder:
-          map['reminder'] != null ? DateTime.parse(map['reminder']) : null,
+      reminder: map['reminder'] != null ? DateTime.parse(map['reminder']) : null,
       isCompleted: map['is_completed'] == 1,
+      order: map['order'],
     );
   }
 
@@ -50,6 +53,7 @@ class Task {
     DateTime? dueDate,
     DateTime? reminder,
     bool? isCompleted,
+    int? order,
   }) {
     return Task(
       taskId: taskId ?? this.taskId,
@@ -59,6 +63,7 @@ class Task {
       dueDate: dueDate ?? this.dueDate,
       reminder: reminder ?? this.reminder,
       isCompleted: isCompleted ?? this.isCompleted,
+      order: order ?? this.order,
     );
   }
 }

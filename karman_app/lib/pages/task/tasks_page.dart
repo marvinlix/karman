@@ -12,10 +12,10 @@ class TasksPage extends StatefulWidget {
   const TasksPage({super.key});
 
   @override
-  _TasksPageState createState() => _TasksPageState();
+  TasksPageState createState() => TasksPageState();
 }
 
-class _TasksPageState extends State<TasksPage> with TickerProviderStateMixin {
+class TasksPageState extends State<TasksPage> with TickerProviderStateMixin {
   List<Task> _sortedTasks = [];
   final Map<int, bool> _expandedSections = {1: true, 2: true, 3: true, 0: true};
   bool _showTutorial = false;
@@ -74,7 +74,7 @@ class _TasksPageState extends State<TasksPage> with TickerProviderStateMixin {
       if (a.priority != b.priority) {
         return b.priority.compareTo(a.priority);
       }
-      return tasks.indexOf(a).compareTo(tasks.indexOf(b));
+      return a.order.compareTo(b.order);
     });
   }
 
@@ -190,6 +190,11 @@ class _TasksPageState extends State<TasksPage> with TickerProviderStateMixin {
                   onTaskToggle: _toggleTaskCompletion,
                   onTaskDelete: _deleteTask,
                   onTaskTap: _openTaskDetails,
+                  onTaskReorder: (priority, task, newIndex) {
+                    context
+                        .read<TaskController>()
+                        .reorderTasks(priority, task, newIndex);
+                  },
                 ),
               ),
             ),

@@ -22,12 +22,18 @@ class TaskController extends ChangeNotifier {
 
   Future<Task> addTask(Task task) async {
     try {
-      final newTask = await _taskService.createTask(task);
-      _tasks.add(newTask);
-      _scheduleTaskUpdates(newTask);
-      await TaskNotificationService.scheduleNotification(newTask);
+      final highestOrder = _tasks
+          .where((t) => t.priority == task.priority && !t.isCompleted)
+          .fold(0, (max, t) => t.order > max ? t.order : max);
+
+      final newTask = task.copyWith(order: highestOrder + 1);
+
+      final createdTask = await _taskService.createTask(newTask);
+      _tasks.add(createdTask);
+      _scheduleTaskUpdates(createdTask);
+      await TaskNotificationService.scheduleNotification(createdTask);
       notifyListeners();
-      return newTask;
+      return createdTask;
     } catch (e) {
       if (kDebugMode) {
         print('Error adding task: $e');
@@ -149,6 +155,36 @@ class TaskController extends ChangeNotifier {
     for (var task in _tasks) {
       _scheduleTaskUpdates(task);
     }
+  }
+
+  Future<void> reorderTasks(int priority, Task movedTask, int newIndex) async {
+    final priorityTasks = _tasks
+        .where((task) => task.priority == priority && !task.isCompleted)
+        .toList()
+      ..sort((a, b) => a.order.compareTo(b.order));
+
+    final oldIndex =
+        priorityTasks.indexWhere((task) => task.taskId == movedTask.taskId);
+
+    if (oldIndex == -1 || oldIndex == newIndex) return;
+
+    // Remove the task from its old position
+    priorityTasks.removeAt(oldIndex);
+
+    // Insert the task at its new position
+    priorityTasks.insert(newIndex, movedTask);
+
+    // Update the order of all tasks in this priority
+    for (int i = 0; i < priorityTasks.length; i++) {
+      final updatedTask = priorityTasks[i].copyWith(order: i);
+      await _taskService.updateTask(updatedTask);
+      final index = _tasks.indexWhere((t) => t.taskId == updatedTask.taskId);
+      if (index != -1) {
+        _tasks[index] = updatedTask;
+      }
+    }
+
+    notifyListeners();
   }
 
   @override
