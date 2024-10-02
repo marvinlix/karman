@@ -11,6 +11,7 @@ class TaskTile extends StatefulWidget {
   final Function(bool?)? onChanged;
   final Function(BuildContext)? onDelete;
   final VoidCallback onTap;
+  final bool showReorderIcon;
 
   const TaskTile({
     super.key,
@@ -18,6 +19,7 @@ class TaskTile extends StatefulWidget {
     required this.onChanged,
     required this.onDelete,
     required this.onTap,
+    this.showReorderIcon = true,
   });
 
   @override
@@ -154,12 +156,14 @@ class TaskTileState extends State<TaskTile> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 16),
-                      Icon(
-                        CupertinoIcons.line_horizontal_3,
-                        color: CupertinoColors.systemGrey,
-                      ),
-                      SizedBox(width: 16),
+                      if (widget.showReorderIcon) ...[
+                        SizedBox(width: 16),
+                        Icon(
+                          CupertinoIcons.line_horizontal_3,
+                          color: CupertinoColors.systemGrey,
+                        ),
+                        SizedBox(width: 16),
+                      ],
                     ],
                   ),
                 ),

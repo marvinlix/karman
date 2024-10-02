@@ -16,7 +16,7 @@ class PrioritySection extends StatefulWidget {
   final Function(int, Task, int) onTaskReorder;
 
   const PrioritySection({
-    super.key,
+    Key? key,
     required this.priority,
     required this.tasks,
     required this.isExpanded,
@@ -25,13 +25,13 @@ class PrioritySection extends StatefulWidget {
     required this.onTaskDelete,
     required this.onTaskTap,
     required this.onTaskReorder,
-  });
+  }) : super(key: key);
 
   @override
-  PrioritySectionState createState() => PrioritySectionState();
+  _PrioritySectionState createState() => _PrioritySectionState();
 }
 
-class PrioritySectionState extends State<PrioritySection> {
+class _PrioritySectionState extends State<PrioritySection> {
   late List<Task> _priorityTasks;
 
   @override
@@ -118,49 +118,69 @@ class PrioritySectionState extends State<PrioritySection> {
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
-              child: ReorderableListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: _priorityTasks.length,
-                itemBuilder: (context, index) {
-                  final task = _priorityTasks[index];
-                  return TaskTile(
-                    key: ValueKey(task.taskId),
-                    task: task,
-                    onChanged: (value) => widget.onTaskToggle(task),
-                    onDelete: (context) =>
-                        widget.onTaskDelete(context, task.taskId!),
-                    onTap: () => widget.onTaskTap(task),
-                  );
-                },
-                onReorder: (oldIndex, newIndex) {
-                  setState(() {
-                    if (oldIndex < newIndex) {
-                      newIndex -= 1;
-                    }
-                    final Task task = _priorityTasks.removeAt(oldIndex);
-                    _priorityTasks.insert(newIndex, task);
-                    widget.onTaskReorder(widget.priority, task, newIndex);
-                  });
-                },
-                proxyDecorator: (child, index, animation) {
-                  return AnimatedBuilder(
-                    animation: animation,
-                    builder: (BuildContext context, Widget? child) {
-                      final double animValue =
-                          Curves.easeInOut.transform(animation.value);
-                      final double elevation = lerpDouble(0, 6, animValue)!;
-                      return Material(
-                        elevation: elevation,
-                        color: Colors.black.withOpacity(0.5),
-                        shadowColor: Colors.black54,
-                        child: child,
-                      );
-                    },
-                    child: child,
-                  );
-                },
-              ),
+              child: _priorityTasks.length > 1
+                  ? ReorderableListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: _priorityTasks.length,
+                      itemBuilder: (context, index) {
+                        final task = _priorityTasks[index];
+                        return TaskTile(
+                          key: ValueKey(task.taskId),
+                          task: task,
+                          onChanged: (value) => widget.onTaskToggle(task),
+                          onDelete: (context) =>
+                              widget.onTaskDelete(context, task.taskId!),
+                          onTap: () => widget.onTaskTap(task),
+                          showReorderIcon: true,
+                        );
+                      },
+                      onReorder: (oldIndex, newIndex) {
+                        setState(() {
+                          if (oldIndex < newIndex) {
+                            newIndex -= 1;
+                          }
+                          final Task task = _priorityTasks.removeAt(oldIndex);
+                          _priorityTasks.insert(newIndex, task);
+                          widget.onTaskReorder(widget.priority, task, newIndex);
+                        });
+                      },
+                      proxyDecorator: (child, index, animation) {
+                        return AnimatedBuilder(
+                          animation: animation,
+                          builder: (BuildContext context, Widget? child) {
+                            final double animValue =
+                                Curves.easeInOut.transform(animation.value);
+                            final double elevation =
+                                lerpDouble(0, 6, animValue)!;
+                            return Material(
+                              elevation: elevation,
+                              color: Colors.black.withOpacity(0.5),
+                              shadowColor: Colors.black54,
+                              child: child,
+                            );
+                          },
+                          child: child,
+                        );
+                      },
+                    )
+                  : ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: _priorityTasks.length,
+                      itemBuilder: (context, index) {
+                        final task = _priorityTasks[index];
+                        return TaskTile(
+                          key: ValueKey(task.taskId),
+                          task: task,
+                          onChanged: (value) => widget.onTaskToggle(task),
+                          onDelete: (context) =>
+                              widget.onTaskDelete(context, task.taskId!),
+                          onTap: () => widget.onTaskTap(task),
+                          showReorderIcon: false,
+                        );
+                      },
+                    ),
             ),
           ),
         SizedBox(height: 16)

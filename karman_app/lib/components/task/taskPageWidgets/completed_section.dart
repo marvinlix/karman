@@ -69,30 +69,24 @@ class CompletedSection extends StatelessWidget {
           ),
         ),
         if (isExpanded)
-          CustomScrollView(
+          ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            slivers: [
-              SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final task = completedTasks[index];
-                    return AnimatedSwitcher(
-                      duration: Duration(milliseconds: 300),
-                      child: TaskTile(
-                        key: ValueKey(task.taskId),
-                        task: task,
-                        onChanged: (value) => onTaskToggle(task),
-                        onDelete: (context) =>
-                            onTaskDelete(context, task.taskId!),
-                        onTap: () => onTaskTap(task),
-                      ),
-                    );
-                  },
-                  childCount: completedTasks.length,
+            itemCount: completedTasks.length,
+            itemBuilder: (context, index) {
+              final task = completedTasks[index];
+              return AnimatedSwitcher(
+                duration: Duration(milliseconds: 300),
+                child: TaskTile(
+                  key: ValueKey(task.taskId),
+                  task: task,
+                  onChanged: (value) => onTaskToggle(task),
+                  onDelete: (context) => onTaskDelete(context, task.taskId!),
+                  onTap: () => onTaskTap(task),
+                  showReorderIcon: false,
                 ),
-              ),
-            ],
+              );
+            },
           ),
       ],
     );
