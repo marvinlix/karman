@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class TaskNameInput extends StatelessWidget {
   final TextEditingController controller;
@@ -34,6 +35,9 @@ class TaskNameInput extends StatelessWidget {
               color: CupertinoColors.systemGrey,
               fontSize: 20,
             ),
+            inputFormatters: [
+              UpperCaseFirstLetterFormatter(),
+            ],
           ),
         ),
         SizedBox(width: 20),
@@ -53,5 +57,19 @@ class TaskNameInput extends StatelessWidget {
         ),
       ],
     );
+  }
+}
+
+class UpperCaseFirstLetterFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text.isNotEmpty) {
+      return TextEditingValue(
+        text: newValue.text[0].toUpperCase() + newValue.text.substring(1),
+        selection: newValue.selection,
+      );
+    }
+    return newValue;
   }
 }
