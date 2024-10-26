@@ -30,7 +30,7 @@ To contribute code, please follow these steps:
    ```bash
    git push origin feature/your-feature
    ```
-6. **Open a Pull Request**: Open a pull request on the main repository. Provide a detailed description of your changes and why they are needed.
+6. **Open a Pull Request**: Open a pull request on the `experimental` repository. Provide a detailed description of your changes and why they are needed.
 
 ### Code Style
 
